@@ -11,7 +11,7 @@ const HATS=['بدون','كاب','تاج','طاقية','هوائي','نظارة',
 const HPRICE={9:60,10:120,11:250,12:40,13:90,14:30,15:70,16:50,17:60,18:110,19:35,20:55,21:65,22:140,23:30,24:99999,25:99999,26:99999,27:99999};
 const FLOORS=['#c8a27a','#8d99ae','#b7e4c7','#f4acb7','#6c757d'];
 const WALLS=['#f1faee','#ffe8d6','#cdeac0','#bde0fe','#e0aaff'];
-const TRICKS=['🤸','🦘','🙏','🌀'];const EMOJIS=['👋','😂','❤️','💃','👍','😮','🎉','😴','🍵','☕','🧃','🏆','🔥','😎','🎈','🌟'];
+const TRICKS=['🤸','🦘','🙏','🌀'];const EMOJIS=['👋','😂','❤️','💃','👍','😮','🎉','😴','🍵','☕','🧃','🏆','🔥','😎','🎈','🌟','🥳','🤩','🫶','🚀','👑'];const LEMO=[['🥳',2],['🤩',3],['🫶',4],['🚀',6],['👑',9]];
 let AC=null;
 function sfx(k){if(me&&me.mute)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const seq={star:[[880,.08],[1320,.12]],chat:[[620,.05]],place:[[300,.07]],win:[[660,.1],[880,.1],[1320,.2]],err:[[200,.15]],drink:[[500,.06],[700,.08]],tick:[[900,.04]]}[k]||[];let t=AC.currentTime;for(const[f,d]of seq){const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d);t+=d*.9}}catch(e){}}
 let jukeT=null;
@@ -778,9 +778,9 @@ $('modal').addEventListener('pointerdown',e=>{if(e.target===$('modal'))closeModa
 let lastChatT=0;function sendChat(){const i=$('chatin'),t=str(i.value,80).trim();if(!t)return;if(Date.now()-lastChatT<1200){toast('🕐 براحة شوية على الرسايل',1200);return}lastChatT=Date.now();i.value='';sfx('chat');player.say(t);addLog('أنا',t);pub({t:'c',i:me.id,n:me.name,m:t});$('chatbox').style.display='none';i.blur()}
 $('chatsend').onclick=sendChat;$('chatin').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat()});
 $('bChat').onclick=()=>{$('emo').style.display='none';const b=$('chatbox');b.style.display=b.style.display==='flex'?'none':'flex';if(b.style.display==='flex')setTimeout(()=>$('chatin').focus(),50)};
-function renderEmo(){$('emo').innerHTML=EMOJIS.slice(0,8).concat(me.pet?(me.tricks||[]):[]).map(e=>'<b>'+e+'</b>').join('')}renderEmo();
-$('emo').onclick=e=>{if(e.target.tagName!=='B')return;const em=e.target.textContent;if(TRICKS.includes(em)&&!(me.pet&&(me.tricks||[]).includes(em)))return;if(TRICKS.includes(em))me.trickDo=(me.trickDo||0)+1;player.emote(em);pub({t:'e',i:me.id,e:em});$('emo').style.display='none'};
-$('bEmo').onclick=()=>{$('chatbox').style.display='none';const b=$('emo');b.style.display=b.style.display==='flex'?'none':'flex'};
+function renderEmo(){const lv=typeof plLevel==='function'?plLevel().lv:1;$('emo').innerHTML=EMOJIS.slice(0,8).concat(me.pet?(me.tricks||[]):[]).map(e=>'<b>'+e+'</b>').join('')+LEMO.map(a=>lv>=a[1]?'<b>'+a[0]+'</b>':'<b data-l="'+a[1]+'" style="opacity:.4">🔒</b>').join('')}renderEmo();
+$('emo').onclick=e=>{if(e.target.tagName!=='B')return;if(e.target.dataset.l){toast('🎖️ الإيموجي ده بيتفتح عند مستوى '+e.target.dataset.l);return}const em=e.target.textContent;if(TRICKS.includes(em)&&!(me.pet&&(me.tricks||[]).includes(em)))return;if(TRICKS.includes(em))me.trickDo=(me.trickDo||0)+1;player.emote(em);pub({t:'e',i:me.id,e:em});$('emo').style.display='none'};
+$('bEmo').onclick=()=>{renderEmo();$('chatbox').style.display='none';const b=$('emo');b.style.display=b.style.display==='flex'?'none':'flex'};
 $('bHome').onclick=()=>{if(room.type==='plaza')goMyHome();else goPlaza(room.type)};
 $('bEdit').onclick=()=>{editing=!editing;hold=null;clearGhost();home.sel=null;rebuildFurn();renderShop();$('bEdit').innerHTML=editing?'<span>✅</span>تم':'<span>🛋️</span>فرّش'};
 $('act').onclick=()=>{if(actFn)actFn.fn()};
