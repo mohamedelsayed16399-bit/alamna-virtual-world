@@ -100,8 +100,8 @@ function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a
 function toast(msg,ms=2200){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',ms)}
 const BODY=['#e8590c','#2f9e44','#3b5bdb','#9c36b5','#e03131','#f08c00','#0c8599','#495057','#d6336c','#1098ad','#74b816','#f783ac'];
 const HEAD=['#ffd8a8','#f1b98a','#d9a066','#a9744f','#7a4b2a','#ffe3e3'];
-const HATS=['بدون','كاب','تاج','طاقية','هوائي','نظارة','قرون','طربوش','شعر ملون','هالة','أجنحة','تاج ملكي','أذن قطة','قبعة ساحر','كعكة','سماعات'];
-const HPRICE={9:60,10:120,11:250,12:40,13:90,14:30,15:70};
+const HATS=['بدون','كاب','تاج','طاقية','هوائي','نظارة','قرون','طربوش','شعر ملون','هالة','أجنحة','تاج ملكي','أذن قطة','قبعة ساحر','كعكة','سماعات','نجمة','تاج ورد','خوذة فضاء','قبعة صياد'];
+const HPRICE={9:60,10:120,11:250,12:40,13:90,14:30,15:70,16:50,17:60,18:110,19:35};
 const FLOORS=['#c8a27a','#8d99ae','#b7e4c7','#f4acb7','#6c757d'];
 const WALLS=['#f1faee','#ffe8d6','#cdeac0','#bde0fe','#e0aaff'];
 const EMOJIS=['👋','😂','❤️','💃','👍','😮','🎉','😴','🍵','☕','🧃','🏆'];
@@ -196,6 +196,10 @@ function buildAvatar(a){
  if(h===11){g.add(mesh(G.cyl(0.34,0.4,0.3,8),0xffd43b,0,1.98,0,0x553d00));const cc=[0xff6b6b,0x4dabf7,0x69db7c,0xb197fc,0xff922b,0xf06595];for(let i=0;i<6;i++){const an=i/6*Math.PI*2;g.add(mesh(G.cone(0.09,0.3,4),0xffd43b,Math.cos(an)*0.34,2.28,Math.sin(an)*0.34,0x553d00),mesh(G.sph(0.06,6),cc[i],Math.cos(an)*0.34,2.46,Math.sin(an)*0.34,cc[i]))}}
  if(h===13){g.add(mesh(G.cone(0.38,0.9,10),0x5f3dc4,0,2.2,0));g.add(mesh(G.cyl(0.55,0.55,0.05,12),0x5f3dc4,0,1.78,0));g.add(mesh(G.sph(0.08,6),0xffd43b,0.1,2.1,0.3,0x665500))}
  if(h===14){g.add(mesh(G.cyl(0.3,0.34,0.22,12),0xf8f0e3,0,1.9,0));g.add(mesh(G.cyl(0.31,0.31,0.06,12),0xf783ac,0,2.04,0));g.add(mesh(G.sph(0.07,6),0xe03131,0,2.12,0))}
+ if(h===16){const st=mesh(G.cone(0.2,0.1,5),0xffd43b,0,2.15,0,0xaa8800);st.rotation.x=Math.PI;g.add(st,mesh(G.cone(0.2,0.3,5),0xffd43b,0,2.3,0,0xaa8800))}
+ if(h===17){for(let i=0;i<8;i++){const a=i/8*6.28;g.add(mesh(G.sph(0.1,6),[0xff6b9d,0xffd43b,0xf8f9fa,0xb197fc][i%4],Math.cos(a)*0.42,1.9,Math.sin(a)*0.42,0x331122))}g.add(mesh(G.cyl(0.4,0.4,0.05,12),0x2f9e44,0,1.86,0))}
+ if(h===18){const gl=mesh(G.sph(0.62,14),0xa5d8ff,0,1.62,0);gl.material=new THREE.MeshLambertMaterial({color:0xa5d8ff,transparent:true,opacity:0.35});g.add(gl,mesh(G.cyl(0.5,0.5,0.1,12),0xdee2e6,0,1.15,0))}
+ if(h===19){g.add(mesh(G.cyl(0.55,0.55,0.05,14),0xf4d58d,0,1.9,0),mesh(G.cyl(0.3,0.36,0.3,12),0xf4d58d,0,2.05,0),mesh(G.cyl(0.37,0.37,0.06,12),0xe03131,0,2.0,0),mesh(G.box(0.04,0.3,0.04),0xff922b,0.25,2.2,0.15))}
  if(h===15){const b=mesh(G.cyl(0.42,0.42,0.06,14),0x212529,0,1.92,0);g.add(b);for(const sx of[-1,1])g.add(mesh(G.cyl(0.14,0.14,0.2,10),0x339af0,sx*0.44,1.55,0,0x0b3a66))}
  if(h===12){for(const sx of[-1,1]){const e=mesh(G.cone(0.14,0.3,4),0x343a40,sx*0.22,1.88,0);e.rotation.z=sx*-0.25;g.add(e);g.add(mesh(G.cone(0.07,0.18,4),0xf783ac,sx*0.22,1.86,0.04))}}
  if(h===4){g.add(mesh(G.cyl(0.02,0.02,0.4,6),0x868e96,0,2.0,0),mesh(G.sph(0.08,8),0xff6b6b,0,2.25,0,0x661111))}
@@ -314,7 +318,7 @@ const CAT={
  sofa:{n:'كنبة',e:'🛋️',p:40,w:2,d:1},bed:{n:'سرير',e:'🛏️',p:80,w:2,d:2},table:{n:'ترابيزة',e:'🪵',p:30,w:2,d:1},chair:{n:'كرسي',e:'🪑',p:15,w:1,d:1},
  aquarium:{n:'حوض سمك',e:'🐠',p:100,w:2,d:1},fireplace:{n:'مدفأة',e:'🔥',p:150,w:2,d:1},desk:{n:'مكتب',e:'💻',p:50,w:2,d:1},cactus:{n:'صبار',e:'🌵',p:8,w:1,d:1},
  plant:{n:'نبتة',e:'🪴',p:10,w:1,d:1},lamp:{n:'أباجورة',e:'💡',p:20,w:1,d:1},tv:{n:'تلفزيون',e:'📺',p:70,w:2,d:1},rug:{n:'سجادة',e:'🟥',p:25,w:2,d:2,floor:true},
- shelf:{n:'مكتبة',e:'📚',p:35,w:2,d:1},fridge:{n:'تلاجة',e:'🧊',p:45,w:1,d:1},piano:{n:'بيانو',e:'🎹',p:120,w:2,d:1},trophy:{n:'كأس',e:'🏆',p:200,w:1,d:1},wardrobe:{n:'دولاب',e:'🚪',p:60,w:2,d:1},fountain:{n:'نافورة',e:'⛲',p:180,w:2,d:2},globe:{n:'كرة أرضية',e:'🌍',p:55,w:1,d:1}
+ shelf:{n:'مكتبة',e:'📚',p:35,w:2,d:1},fridge:{n:'تلاجة',e:'🧊',p:45,w:1,d:1},piano:{n:'بيانو',e:'🎹',p:120,w:2,d:1},trophy:{n:'كأس',e:'🏆',p:200,w:1,d:1},wardrobe:{n:'دولاب',e:'🚪',p:60,w:2,d:1},fountain:{n:'نافورة',e:'⛲',p:180,w:2,d:2},globe:{n:'كرة أرضية',e:'🌍',p:55,w:1,d:1},xtree:{n:'شجرة زينة',e:'🎄',p:60,w:1,d:1},scope:{n:'تليسكوب',e:'🔭',p:90,w:1,d:1},jukebox:{n:'جوك بوكس',e:'🎵',p:140,w:1,d:1},pondf:{n:'بركة كوي',e:'🪷',p:110,w:2,d:2,floor:true}
 };
 function buildFurn(id){
  const g=new THREE.Group(),c=CAT[id],W=c.w,D=c.d;
@@ -338,6 +342,10 @@ function buildFurn(id){
  case'wardrobe':A(mesh(G.box(1.8,2.2,0.8),0x8d6e63,0,1.1,0));A(mesh(G.box(0.03,2.0,0.05),0x3e2723,0,1.1,0.42));A(mesh(G.sph(0.06,6),0xffd43b,-0.12,1.1,0.44,0x553d00));A(mesh(G.sph(0.06,6),0xffd43b,0.12,1.1,0.44,0x553d00));break;
  case'fountain':A(mesh(G.cyl(0.95,1.05,0.4,16),0xadb5bd,0,0.2,0));A(mesh(G.cyl(0.85,0.85,0.08,16),0x4dabf7,0,0.38,0,0x0b3a66));A(mesh(G.cyl(0.12,0.16,0.9,8),0xced4da,0,0.8,0));A(mesh(G.sph(0.22,8),0x74c0fc,0,1.3,0,0x0b3a66));break;
  case'globe':A(mesh(G.cyl(0.25,0.3,0.1,10),0x495057,0,0.05,0));A(mesh(G.cyl(0.04,0.04,0.5,6),0x495057,0,0.35,0));A(mesh(G.sph(0.4,12),0x1c7ed6,0,0.95,0,0x0b3a66));A(mesh(G.sph(0.2,8),0x40c057,0.2,1.0,0.28));break;
+ case'xtree':A(mesh(G.cyl(0.1,0.12,0.3,6),0x6f4e37,0,0.15,0));A(mesh(G.cone(0.55,0.8,8),0x2b8a3e,0,0.65,0));A(mesh(G.cone(0.42,0.7,8),0x2f9e44,0,1.15,0));A(mesh(G.cone(0.28,0.55,8),0x37b24d,0,1.6,0));A(mesh(G.sph(0.1,6),0xffd43b,0,1.95,0,0xaa8800));for(const[x,y,z,c]of[[.25,.5,.3,0xff6b6b],[-.2,.9,.25,0x4dabf7],[.15,1.3,.2,0xffd43b],[-.1,1.6,.15,0xff6b9d]])A(mesh(G.sph(0.07,6),c,x,y,z,c));break;
+ case'scope':for(const[x,z]of[[0,.3],[-.3,-.25],[.3,-.25]]){const l=mesh(G.cyl(0.03,0.03,1.0,5),0x343a40,x*0.8,0.5,z*0.8);l.rotation.z=x*-0.4;A(l)}{const t=mesh(G.cyl(0.1,0.16,1.0,10),0xf1f3f5,0,1.15,0);t.rotation.x=Math.PI/2-0.6;A(t);const e=mesh(G.cyl(0.12,0.12,0.06,10),0x1c7ed6,0,1.5,-0.38,0x0b3a66);e.rotation.x=Math.PI/2-0.6;A(e)}break;
+ case'jukebox':A(mesh(G.box(0.9,1.3,0.6),0xc2255c,0,0.65,0));A(mesh(G.cyl(0.45,0.45,0.6,12),0xe64980,0,1.3,0));A(mesh(G.box(0.6,0.5,0.05),0xffd43b,0,0.9,0.32,0xaa8800));A(mesh(G.box(0.6,0.12,0.05),0x74c0fc,0,0.45,0.32,0x113355));break;
+ case'pondf':A(mesh(G.cyl(0.95,0.95,0.07,16),0x4dabf7,0,0.05,0,0x0b3a66));A(mesh(G.cyl(1.0,1.05,0.1,16),0xadb5bd,0,0.0,0));for(const[x,z,c]of[[.3,.2,0xff922b],[-.35,-.1,0xf8f9fa],[.1,-.45,0xff6b6b]])A(mesh(G.box(0.3,0.04,0.12),c,x,0.1,z));for(const[x,z]of[[-.5,.35],[.45,-.3]]){A(mesh(G.cyl(0.18,0.18,0.02,8),0x2f9e44,x,0.1,z));A(mesh(G.sph(0.07,6),0xff6b9d,x,0.14,z))}break;
  case'trophy':A(mesh(G.box(0.7,0.5,0.7),0x495057,0,0.25,0));A(mesh(G.cyl(0.3,0.1,0.6,10),0xffd43b,0,0.85,0,0x553d00));A(mesh(G.cyl(0.05,0.05,0.3,6),0xffd43b,0,0.5,0,0x553d00));break;
  }
  g.userData.id=id;return g;
@@ -895,12 +903,17 @@ function buildGarden(){
  const b=new THREE.Group();b.position.set(-3,0,1);b.add(mesh(G.box(2,0.12,0.7),0x8d6e63,0,0.55,0),mesh(G.box(2,0.5,0.1),0x8d6e63,0,0.9,-0.3),mesh(G.box(0.12,0.5,0.6),0x5c4033,-0.9,0.25,0),mesh(G.box(0.12,0.5,0.6),0x5c4033,0.9,0.25,0));g.add(b);
  const wc=new THREE.Group();wc.position.set(0,0,-3);wc.add(mesh(G.cyl(0.3,0.4,0.6,10),0x1c7ed6,0,0.3,0),mesh(G.cyl(0.05,0.05,0.5,6),0x1864ab,0.3,0.55,0));g.add(wc);
  sign(g,'🚿 اسقِ الورد',0,1.8,-3);interacts.push({x:0,z:-2,label:'🚿 اسقِ الورد (+3🪙)',fn:waterFlowers});
+ g.add(mesh(G.box(1.2,0.1,2.2),0x8d6e63,3.5,0.12,0.9),mesh(G.box(0.1,0.5,0.1),0x5c4033,2.95,0.3,1.9),mesh(G.box(0.1,0.5,0.1),0x5c4033,4.05,0.3,1.9));sign(g,'🎣 صيد السمك',3.5,2.2,2.2);interacts.push({x:3.5,z:1.6,label:'🎣 اصطد سمك',fn:openFishing});
  sign(g,'🌷 الحديقة',0,4,-7.5,'rgba(190,40,100,.85)');sign(g,'🦋 اصطد الفراشات',5.5,2.2,3.5);interacts.push({x:5.5,z:4.5,label:'🦋 العب اصطياد الفراشات',fn:startButter});sign(g,'🏆 أفضل الصيادين',-5.5,2.2,3.5);interacts.push({x:-5.5,z:4.5,label:'🏆 أفضل الصيادين',fn:openButterLB});
  finishRoom(g);
  for(let i=0;i<8;i++){const m=new THREE.Group(),c=cols[i%6];for(const sx of[-1,1]){const w=new THREE.Mesh(new THREE.PlaneGeometry(0.28,0.22),new THREE.MeshBasicMaterial({color:c,side:2}));w.position.x=sx*0.14;w.userData.sx=sx;m.add(w)}room.group.add(m);butter.push({m,a:rng()*6.28,r:2+rng()*4.5,h:1.2+rng()*1.2,sp:0.3+rng()*0.4,cx:(rng()-0.5)*6,cz:(rng()-0.5)*5})}
 }
+let fishT=null;
+function openFishing(){modal(c=>{const fd=()=>{const t=today();if(!me.fd||me.fd.d!==t)me.fd={d:t,n:0};return me.fd};c.innerHTML='<h2>🎣 صيد السمك</h2><div id="fmsg" style="font-size:18px;margin:10px 0;min-height:48px;text-align:center">ارمي السنارة وانتظر النبشة، وبعدين اشد بسرعة!</div><div class="row"><button class="btn" id="fgo">🎣 ارمي السنارة</button><button class="btn d" id="fx">إغلاق</button></div><div id="fst" style="text-align:center;opacity:.8;font-size:13px;margin-top:6px"></div>';let st=0,tm=null,bite=0;const upd=()=>{$('fst').textContent='🐟 صيدك الكلي: '+(me.fish||0)+' · مدفوع النهاردة '+fd().n+'/10'};upd();const end=()=>{clearTimeout(tm);closeModal()};$('fx').onclick=end;$('fgo').onclick=()=>{const m=$('fmsg'),b=$('fgo');if(st===0){st=1;m.textContent='🌊 مستني النبشة...';b.textContent='استنى...';tm=setTimeout(()=>{st=2;bite=Date.now();m.textContent='⚡ نبشة! اشد دلوقتي!';b.textContent='⚡ شد!';sfx('chat');tm=setTimeout(()=>{st=0;m.textContent='🐟 السمكة هربت! جرب تاني';b.textContent='🎣 ارمي السنارة'},1300)},1500+Math.random()*2800)}else if(st===1){clearTimeout(tm);st=0;m.textContent='😅 شديت بدري، السمكة خافت';b.textContent='🎣 ارمي السنارة'}else if(st===2){clearTimeout(tm);st=0;const r=Math.random(),f=r<0.02?['🦈',50,'قرش!']:r<0.12?['🐡',15,'سمكة نفاخة']:r<0.4?['🐠',8,'سمكة ملونة']:['🐟',4,'سمكة'];const d=fd();let pay=d.n<10?f[1]:0;if(pay)d.n++;me.fish=(me.fish||0)+1;me.coins+=pay;m.textContent=f[0]+' '+f[2]+(pay?' +'+pay+'🪙':' (وصلت حد النهاردة)');b.textContent='🎣 ارمي تاني';sfx('star');burst(player.root.position,0x74c0fc,10);updCoins();saveMe();upd()}}})}
 function waterFlowers(){const t=Date.now();if(t-lastWater<20000){toast('🌱 الورد لسه مبلول، استنى '+Math.ceil((20000-(t-lastWater))/1000)+' ثانية');return}lastWater=t;me.coins+=3;sfx('star');burst(player.root.position,0x74c0fc,12);toast('🌷 الورد فرحان! +3🪙');updCoins();saveMe()}
-function gardenTick(dt){dt=dt||0.016;butterGame(dt);if(!butter.length||!room||room.type!=='garden')return;for(const b of butter){b.a+=dt*b.sp;b.m.position.set(b.cx+Math.cos(b.a)*b.r,b.h+Math.sin(b.a*3)*0.3,b.cz+Math.sin(b.a)*b.r*0.7);b.m.rotation.y=-b.a;const f=Math.sin(tClock*14+b.a*5)*0.9;b.m.children[0].rotation.y=f;b.m.children[1].rotation.y=-f}}
+let rays=null;
+function rayTick(){if(!scene||!room)return;if(!rays){rays=new THREE.Group();for(let i=0;i<6;i++){const m=new THREE.Mesh(new THREE.PlaneGeometry(2.2+i*0.3,34),new THREE.MeshBasicMaterial({color:0xfff3b0,transparent:true,opacity:0.07,blending:THREE.AdditiveBlending,depthWrite:false,side:2}));m.position.set(-34+i*4.5,15,-26-i*1.5);m.rotation.z=-0.55;m.userData.i=i;rays.add(m)}scene.add(rays)}const d=new Date(),h=d.getHours()+d.getMinutes()/60,day=h>7&&h<17;rays.visible=day&&(room.type==='plaza'||room.type==='park'||room.type==='garden')&&!(me&&me.lq)&&!window.autoLQ;if(rays.visible)rays.children.forEach(m=>m.material.opacity=0.09+0.06*Math.sin(tClock*0.6+m.userData.i*1.7))}
+function gardenTick(dt){rayTick();dt=dt||0.016;butterGame(dt);if(!butter.length||!room||room.type!=='garden')return;for(const b of butter){b.a+=dt*b.sp;b.m.position.set(b.cx+Math.cos(b.a)*b.r,b.h+Math.sin(b.a*3)*0.3,b.cz+Math.sin(b.a)*b.r*0.7);b.m.rotation.y=-b.a;const f=Math.sin(tClock*14+b.a*5)*0.9;b.m.children[0].rotation.y=f;b.m.children[1].rotation.y=-f}}
 
 const QUICK=['مرحبا 👋','تعالى بيتي 🏠','نلعب؟ 🎮','شكراً 🙏','ههه 😂','يلا بينا!'];
 (function(){const cb=$('chatbox');const row=document.createElement('div');cb.style.flexWrap='wrap';row.style.cssText='flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;direction:rtl';QUICK.forEach(t=>{const b=document.createElement('button');b.className='btn';b.style.cssText='padding:6px 10px;min-height:40px;font-size:13px';b.textContent=t;b.onclick=()=>{$('chatin').value=t;sendChat()};row.appendChild(b)});cb.appendChild(row)})();
@@ -1007,7 +1020,7 @@ function pubPet(){const l=Math.floor((me.fed||0)/3);if(!me.pet||l<1||!netOK||!cl
 function openPetBoard(){const e={};modal(c=>{c.innerHTML='<h2>🏆 أكبر الحيوانات</h2><div id="pl"></div><div class="row"><button class="btn d" id="px">إغلاق</button></div>';const nm=['','🐱','🐶','🦆'];const render=()=>{const l=$('pl');if(!l)return;l.innerHTML='';const a=Object.values(e).sort((x,y)=>y.l-x.l).slice(0,10);if(!a.length)l.textContent='لسه مفيش أرقام';a.forEach((v,i)=>{const d=document.createElement('div');d.className='qrow';d.textContent=(i+1)+'. '+v.n+' · '+(nm[v.p]||'🐾')+' مستوى '+v.l;l.appendChild(d)})};plCb=(id,m)=>{e[id]=m;render()};if(netOK)try{client.subscribe(NS+'/pl/+')}catch(x){}const l0=Math.floor((me.fed||0)/3);if(me.pet&&l0>0)e[me.id]={n:me.name,l:Math.min(l0,30),p:me.pet};$('px').onclick=()=>{try{client.unsubscribe(NS+'/pl/+')}catch(x){}plCb=null;closeModal()};render()})}
 
 /* ===== achievements ===== */
-const ACH=[['friend','🤝','أول صاحب',()=>me.friends.length>=1],['rich','💰','٣٠٠ عملة',()=>me.coins>=300],['pet3','🐾','حيوان مستوى ٣',()=>(me.fed||0)>=9],['tres','🧰','صياد كنوز اليوم',()=>me.tr&&me.tr.got.length>=5],['hats','🎩','٣ قبعات مشتراة',()=>(me.owned||[]).length>=3],['bfly','🦋','٢٠ فراشة',()=>(me.bfBest||0)>=20],['race','🏁','أنهيت سباق',()=>!!me.raceBest],['mem','🃏','ذاكرة قوية',()=>(me.memWins||0)>=1]];
+const ACH=[['friend','🤝','أول صاحب',()=>me.friends.length>=1],['rich','💰','٣٠٠ عملة',()=>me.coins>=300],['pet3','🐾','حيوان مستوى ٣',()=>(me.fed||0)>=9],['tres','🧰','صياد كنوز اليوم',()=>me.tr&&me.tr.got.length>=5],['hats','🎩','٣ قبعات مشتراة',()=>(me.owned||[]).length>=3],['bfly','🦋','٢٠ فراشة',()=>(me.bfBest||0)>=20],['race','🏁','أنهيت سباق',()=>!!me.raceBest],['mem','🃏','ذاكرة قوية',()=>(me.memWins||0)>=1],['fish','🎣','٥ سمكات',()=>(me.fish||0)>=5]];
 let achT=0;
 function achTick(dt){achT-=dt;if(achT>0||!me)return;achT=3;me.ach=me.ach||{};for(const [k,e,n,f] of ACH){if(!me.ach[k]){let ok=false;try{ok=f()}catch(x){}if(ok){me.ach[k]=1;me.coins+=10;updCoins();saveMe();sfx('win');toast('🏅 إنجاز جديد: '+e+' '+n+' · +10🪙',3500);break}}}}
 function openAch(){modal(c=>{c.innerHTML='<h2>🏅 إنجازاتك</h2><div id="al"></div><div class="row"><button class="btn g" id="ok">تمام</button></div>';me.ach=me.ach||{};for(const [k,e,n] of ACH){const d=document.createElement('div');d.className='qrow';d.textContent=(me.ach[k]?'✅ ':'🔒 ')+e+' '+n;$('al').appendChild(d)}$('ok').onclick=closeModal})}
@@ -1084,4 +1097,4 @@ requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
 </script>
 </body>
-      </html>
+            </html>
