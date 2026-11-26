@@ -323,7 +323,7 @@ const CAT={
  sofa:{n:'كنبة',e:'🛋️',p:40,w:2,d:1},bed:{n:'سرير',e:'🛏️',p:80,w:2,d:2},table:{n:'ترابيزة',e:'🪵',p:30,w:2,d:1},chair:{n:'كرسي',e:'🪑',p:15,w:1,d:1},
  aquarium:{n:'حوض سمك',e:'🐠',p:100,w:2,d:1},fireplace:{n:'مدفأة',e:'🔥',p:150,w:2,d:1},desk:{n:'مكتب',e:'💻',p:50,w:2,d:1},cactus:{n:'صبار',e:'🌵',p:8,w:1,d:1},
  plant:{n:'نبتة',e:'🪴',p:10,w:1,d:1},lamp:{n:'أباجورة',e:'💡',p:20,w:1,d:1},tv:{n:'تلفزيون',e:'📺',p:70,w:2,d:1},rug:{n:'سجادة',e:'🟥',p:25,w:2,d:2,floor:true},
- shelf:{n:'مكتبة',e:'📚',p:35,w:2,d:1},fridge:{n:'تلاجة',e:'🧊',p:45,w:1,d:1},piano:{n:'بيانو',e:'🎹',p:120,w:2,d:1},trophy:{n:'كأس',e:'🏆',p:200,w:1,d:1},wardrobe:{n:'دولاب',e:'🚪',p:60,w:2,d:1},fountain:{n:'نافورة',e:'⛲',p:180,w:2,d:2},globe:{n:'كرة أرضية',e:'🌍',p:55,w:1,d:1},xtree:{n:'شجرة زينة',e:'🎄',p:60,w:1,d:1},scope:{n:'تليسكوب',e:'🔭',p:90,w:1,d:1},jukebox:{n:'جوك بوكس',e:'🎵',p:140,w:1,d:1},pondf:{n:'بركة كوي',e:'🪷',p:110,w:2,d:2,floor:true},beanbag:{n:'بين باج',e:'🟣',p:35,w:1,d:1},drums:{n:'طبول',e:'🥁',p:95,w:2,d:1},easel:{n:'حامل رسم',e:'🎨',p:45,w:1,d:1},tent:{n:'خيمة',e:'⛺',p:75,w:2,d:2}
+ shelf:{n:'مكتبة',e:'📚',p:35,w:2,d:1},fridge:{n:'تلاجة',e:'🧊',p:45,w:1,d:1},piano:{n:'بيانو',e:'🎹',p:120,w:2,d:1},trophy:{n:'كأس',e:'🏆',p:200,w:1,d:1},wardrobe:{n:'دولاب',e:'🚪',p:60,w:2,d:1},fountain:{n:'نافورة',e:'⛲',p:180,w:2,d:2},globe:{n:'كرة أرضية',e:'🌍',p:55,w:1,d:1},xtree:{n:'شجرة زينة',e:'🎄',p:60,w:1,d:1},scope:{n:'تليسكوب',e:'🔭',p:90,w:1,d:1},jukebox:{n:'جوك بوكس',e:'🎵',p:140,w:1,d:1},pondf:{n:'بركة كوي',e:'🪷',p:110,w:2,d:2,floor:true},beanbag:{n:'بين باج',e:'🟣',p:35,w:1,d:1},drums:{n:'طبول',e:'🥁',p:95,w:2,d:1},easel:{n:'حامل رسم',e:'🎨',p:45,w:1,d:1},tent:{n:'خيمة',e:'⛺',p:75,w:2,d:2},painting:{n:'لوحة (حيط)',e:'🖼️',p:30,w:2,d:1,wall:true},wclock:{n:'ساعة (حيط)',e:'🕒',p:20,w:1,d:1,wall:true},banner:{n:'راية (حيط)',e:'🚩',p:25,w:2,d:1,wall:true},mirror:{n:'مراية (حيط)',e:'🪞',p:35,w:1,d:1,wall:true}
 };
 function buildFurn(id){
  const g=new THREE.Group(),c=CAT[id],W=c.w,D=c.d;
@@ -355,6 +355,10 @@ function buildFurn(id){
  case'drums':A(mesh(G.cyl(0.4,0.4,0.5,12),0xe03131,-0.4,0.5,0));A(mesh(G.cyl(0.3,0.3,0.4,12),0x1971c2,0.3,0.75,0.1));A(mesh(G.cyl(0.35,0.35,0.35,12),0xf08c00,0.6,0.45,-0.2));A(mesh(G.cyl(0.03,0.03,1.0,5),0x868e96,-0.7,0.9,0.1));A(mesh(G.cyl(0.3,0.3,0.03,12),0xffd43b,-0.7,1.4,0.1,0x886600));break;
  case'easel':for(const x of[-.3,.3])A(mesh(G.box(0.06,1.6,0.06),0x8d6e63,x,0.8,x*0.3));A(mesh(G.box(0.9,0.7,0.05),0xf8f9fa,0,1.1,0.05));A(mesh(G.sph(0.18,6),0xff6b6b,-0.2,1.15,0.09));A(mesh(G.sph(0.14,6),0x4dabf7,0.15,1.0,0.09));A(mesh(G.sph(0.12,6),0xffd43b,0.1,1.3,0.09));break;
  case'tent':A(mesh(G.cone(1.5,1.6,4),0xf76707,0,0.8,0));A(mesh(G.box(0.6,0.9,0.05),0x5c3d1e,0,0.45,0.72));A(mesh(G.cone(0.1,0.25,4),0xffd43b,0,1.7,0,0x886600));break;
+ case'painting':A(mesh(G.box(1.8,1.2,0.08),0x6d4c2a,0,2.3,-0.44));A(mesh(G.box(1.6,1.0,0.06),0x74c0fc,0,2.3,-0.4));A(mesh(G.box(1.6,0.4,0.07),0x51cf66,0,2.0,-0.39));A(mesh(G.sph(0.18,8),0xffd43b,0.4,2.55,-0.36,0xaa8800));A(mesh(G.cone(0.3,0.5,4),0x868e96,-0.4,2.35,-0.37));break;
+ case'wclock':{const f=mesh(G.cyl(0.38,0.38,0.08,16),0x5c3d1e,0,2.4,-0.42);f.rotation.x=Math.PI/2;A(f);const fc=mesh(G.cyl(0.32,0.32,0.06,16),0xf8f9fa,0,2.4,-0.39);fc.rotation.x=Math.PI/2;A(fc);A(mesh(G.box(0.04,0.22,0.03),0x111,0,2.46,-0.35));const hh=mesh(G.box(0.03,0.15,0.03),0x111,0.06,2.4,-0.35);hh.rotation.z=-1.1;A(hh)}break;
+ case'banner':A(mesh(G.box(0.1,0.1,0.1),0x6d4c2a,-0.8,2.9,-0.42));A(mesh(G.box(1.8,0.06,0.06),0x6d4c2a,0,2.9,-0.42));A(mesh(G.box(1.5,1.2,0.04),0xc92a2a,0,2.25,-0.42));A(mesh(G.cone(0.3,0.35,5),0xffd43b,0,2.4,-0.39,0xaa8800));A(mesh(G.box(1.5,0.12,0.05),0xffd43b,0,1.7,-0.41));break;
+ case'mirror':A(mesh(G.box(0.8,1.4,0.08),0xffd43b,0,2.2,-0.44,0x553d00));A(mesh(G.box(0.66,1.26,0.06),0xcfeaff,0,2.2,-0.4,0x335577));break;
  case'trophy':A(mesh(G.box(0.7,0.5,0.7),0x495057,0,0.25,0));A(mesh(G.cyl(0.3,0.1,0.6,10),0xffd43b,0,0.85,0,0x553d00));A(mesh(G.cyl(0.05,0.05,0.3,6),0xffd43b,0,0.5,0,0x553d00));break;
  }
  g.userData.id=id;return g;
@@ -757,12 +761,12 @@ canvas.addEventListener('wheel',e=>{dist=clamp(dist+e.deltaY*0.01,7,28);e.preven
 /* ===================== edit mode ===================== */
 let editing=false,sel=null,hold=null;
 function occupied(id,cx,cz,rot,ignore){
- const[w,d]=footprint(id,rot);if(cx<0||cz<0||cx+w>14||cz+d>14)return true;const fl=CAT[id].floor;
- for(let i=0;i<home.items.length;i++){if(i===ignore)continue;const it=home.items[i];if(!!CAT[it[0]].floor!==!!fl)continue;
+ const[w,d]=footprint(id,rot);if(cx<0||cz<0||cx+w>14||cz+d>14)return true;const fl=CAT[id].floor,LY=k=>CAT[k].floor?1:CAT[k].wall?2:0;if(CAT[id].wall&&(rot||cz!==0))return true;
+ for(let i=0;i<home.items.length;i++){if(i===ignore)continue;const it=home.items[i];if(LY(it[0])!==LY(id))continue;
   const[w2,d2]=footprint(it[0],it[3]);if(cx<it[1]+w2&&cx+w>it[1]&&cz<it[2]+d2&&cz+d>it[2])return true}
  return false;
 }
-function cellFor(id,rot,p){const[w,d]=footprint(id,rot);return[clamp(Math.round(p.x+7-w/2),0,14-w),clamp(Math.round(p.z+7-d/2),0,14-d)]}
+function cellFor(id,rot,p){const[w,d]=footprint(id,rot);return[clamp(Math.round(p.x+7-w/2),0,14-w),CAT[id].wall?0:clamp(Math.round(p.z+7-d/2),0,14-d)]}
 function updateGhost(cx,cy){
  if(!hold)return;const p=pointerWorld(cx,cy);if(!p)return;
  const[x,z]=cellFor(hold.id,hold.rot,p);hold.cx=x;hold.cz=z;
@@ -1155,4 +1159,4 @@ requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
 </script>
 </body>
- </html>
+        </html>
