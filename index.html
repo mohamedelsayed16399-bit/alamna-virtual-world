@@ -101,7 +101,7 @@ const WALLS=['#f1faee','#ffe8d6','#cdeac0','#bde0fe','#e0aaff'];
 const EMOJIS=['👋','😂','❤️','💃','👍','😮','🎉','😴','🍵','☕','🧃','🏆'];
 
 let AC=null;
-function sfx(k){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const seq={star:[[880,.08],[1320,.12]],chat:[[620,.05]],place:[[300,.07]],win:[[660,.1],[880,.1],[1320,.2]],err:[[200,.15]],drink:[[500,.06],[700,.08]],tick:[[900,.04]]}[k]||[];let t=AC.currentTime;for(const[f,d]of seq){const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d);t+=d*.9}}catch(e){}}
+function sfx(k){if(me&&me.mute)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const seq={star:[[880,.08],[1320,.12]],chat:[[620,.05]],place:[[300,.07]],win:[[660,.1],[880,.1],[1320,.2]],err:[[200,.15]],drink:[[500,.06],[700,.08]],tick:[[900,.04]]}[k]||[];let t=AC.currentTime;for(const[f,d]of seq){const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d);t+=d*.9}}catch(e){}}
 let jukeT=null;
 function jukebox(){if(jukeT){clearInterval(jukeT);jukeT=null;toast('🎵 وقفت الموسيقى');return}const sc=[523,587,659,784,880,784,659,587];let i=0;jukeT=setInterval(()=>{try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=sc[i%8]*(i%16<8?1:0.75);i++;g.gain.setValueAtTime(.1,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+.35);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+.36)}catch(e){}},380);toast('🎵 شغّلت الموسيقى')}
 addEventListener('pointerdown',()=>{try{if(AC&&AC.state==='suspended')AC.resume()}catch(e){}},{passive:true});
@@ -117,7 +117,7 @@ function updCoins(){$('coins').textContent='🪙 '+me.coins}
 /* ===================== three setup ===================== */
 const canvas=$('c');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));
+function applyQ(){renderer.setPixelRatio(me&&me.lq?1:Math.min(devicePixelRatio||1,1.75));renderer.setSize(innerWidth,innerHeight,false)}
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(50,1,0.1,200);
 const hemi=new THREE.HemisphereLight(0xffffff,0x556677,0.85);scene.add(hemi);
@@ -274,6 +274,7 @@ function buildPlaza(){
 /* ----- furniture ----- */
 const CAT={
  sofa:{n:'كنبة',e:'🛋️',p:40,w:2,d:1},bed:{n:'سرير',e:'🛏️',p:80,w:2,d:2},table:{n:'ترابيزة',e:'🪵',p:30,w:2,d:1},chair:{n:'كرسي',e:'🪑',p:15,w:1,d:1},
+ aquarium:{n:'حوض سمك',e:'🐠',p:100,w:2,d:1},fireplace:{n:'مدفأة',e:'🔥',p:150,w:2,d:1},desk:{n:'مكتب',e:'💻',p:50,w:2,d:1},cactus:{n:'صبار',e:'🌵',p:8,w:1,d:1},
  plant:{n:'نبتة',e:'🪴',p:10,w:1,d:1},lamp:{n:'أباجورة',e:'💡',p:20,w:1,d:1},tv:{n:'تلفزيون',e:'📺',p:70,w:2,d:1},rug:{n:'سجادة',e:'🟥',p:25,w:2,d:2,floor:true},
  shelf:{n:'مكتبة',e:'📚',p:35,w:2,d:1},fridge:{n:'تلاجة',e:'🧊',p:45,w:1,d:1},piano:{n:'بيانو',e:'🎹',p:120,w:2,d:1},trophy:{n:'كأس',e:'🏆',p:200,w:1,d:1}
 };
@@ -292,6 +293,10 @@ function buildFurn(id){
  case'shelf':A(mesh(G.box(2,2,0.4),0x7b4a2a,0,1,0));{const cs=[0xe03131,0x1971c2,0xf08c00,0x2f9e44,0x9c36b5];for(let r=0;r<3;r++)for(let i=0;i<7;i++)A(mesh(G.box(0.18,0.4,0.28),cs[(i+r)%5],-0.8+i*0.27,0.45+r*0.6,0.06))}break;
  case'fridge':A(mesh(G.box(0.9,1.9,0.8),0xf1f3f5,0,0.95,0));A(mesh(G.box(0.05,0.5,0.05),0x868e96,0.35,1.2,0.42));A(mesh(G.box(0.85,0.03,0.02),0xadb5bd,0,1.3,0.41));break;
  case'piano':A(mesh(G.box(2,1,0.8),0x111111,0,0.5,-0.05));A(mesh(G.box(1.9,0.08,0.4),0xffffff,0,1.0,0.25));A(mesh(G.box(0.1,0.7,0.1),0x111,-0.8,0.35,0.35));A(mesh(G.box(0.1,0.7,0.1),0x111,0.8,0.35,0.35));break;
+ case'aquarium':A(mesh(G.box(2,0.5,0.8),0x343a40,0,0.25,0));{const gl=mesh(G.box(1.9,0.9,0.7),0x74c0fc,0,0.95,0);gl.material=new THREE.MeshLambertMaterial({color:0x74c0fc,transparent:true,opacity:0.45});A(gl);for(const[x,y,z,c]of[[-.5,.9,0,0xff922b],[.3,1.1,.1,0xffd43b],[.6,.8,-.1,0xff6b6b]])A(mesh(G.box(0.25,0.14,0.08),c,x,y,z))}break;
+ case'fireplace':A(mesh(G.box(2,1.6,0.6),0x868e96,0,0.8,0));A(mesh(G.box(1.1,0.9,0.1),0x111111,0,0.55,0.3));A(mesh(G.cone(0.25,0.6,5),0xff922b,-0.15,0.5,0.32,0xaa4400));A(mesh(G.cone(0.2,0.45,5),0xffd43b,0.15,0.45,0.32,0x886600));A(mesh(G.box(2.2,0.15,0.8),0x495057,0,1.65,0));break;
+ case'desk':A(mesh(G.box(1.9,0.1,0.9),0xa9754f,0,0.8,0));A(mesh(G.box(0.1,0.8,0.8),0x7b4a2a,-0.85,0.4,0));A(mesh(G.box(0.1,0.8,0.8),0x7b4a2a,0.85,0.4,0));A(mesh(G.box(0.6,0.04,0.4),0x343a40,0,0.87,0.1));{const sc=mesh(G.box(0.6,0.4,0.03),0x4dabf7,0,1.1,-0.1,0x113355);sc.rotation.x=-0.2;A(sc)}break;
+ case'cactus':A(mesh(G.cyl(0.25,0.18,0.35,8),0xc2410c,0,0.18,0));A(mesh(G.cyl(0.14,0.16,0.7,8),0x2f9e44,0,0.65,0));A(mesh(G.cyl(0.07,0.07,0.3,6),0x2f9e44,0.22,0.65,0));A(mesh(G.sph(0.06,5),0xff6b9d,0,1.02,0));break;
  case'trophy':A(mesh(G.box(0.7,0.5,0.7),0x495057,0,0.25,0));A(mesh(G.cyl(0.3,0.1,0.6,10),0xffd43b,0,0.85,0,0x553d00));A(mesh(G.cyl(0.05,0.05,0.3,6),0xffd43b,0,0.5,0,0x553d00));break;
  }
  g.userData.id=id;return g;
@@ -309,7 +314,7 @@ function applyHomeColors(){
  home.floorMesh.material=M(FLOORS[home.floor%FLOORS.length]);
  for(const w of home.wallMeshes)w.material=M(WALLS[home.wall%WALLS.length]);
 }
-let interacts=[],actFn=null;
+let interacts=[],actFn=null,gbCb=null;
 function indoor(fc,wc,neon){
  const g=new THREE.Group();g.add(mesh(G.box(16,0.3,16),fc,0,-0.15,0),mesh(G.box(17,0.1,17),0x15182f,0,-0.35,0));
  g.add(mesh(G.box(16.4,5,0.4),wc,0,2.5,-8.2),mesh(G.box(0.4,5,16.4),wc,-8.2,2.5,0));
@@ -364,6 +369,14 @@ function tickBall(dt){
  if(player){const dx=p.x-player.root.position.x,dz=p.z-player.root.position.z,d=Math.hypot(dx,dz);
   if(d<1.05&&d>0.01&&goalCool<=0){const sp=player.moving?9:5;ballV.x=dx/d*sp;ballV.z=dz/d*sp;lastKick=me.id;sfx('tick');const n=performance.now();if(n-ballSend>90){ballSend=n;pub({t:'ball',i:me.id,x:+p.x.toFixed(2),z:+p.z.toFixed(2),vx:+ballV.x.toFixed(2),vz:+ballV.z.toFixed(2)})}}}
 }
+function openGuestbook(){
+ const owner=room.owner,entries={};
+ modal(c=>{c.innerHTML='<h2>📖 دفتر الزوار</h2><div id="gbl" style="max-height:30vh;overflow:auto"></div><label>اكتب رسالة</label><input type="text" id="gbi" maxlength="60" autocomplete="off"><div class="row"><button class="btn g" id="gbs">وقّع</button><button class="btn d" id="gbx">إغلاق</button></div>';
+  const render=()=>{const l=$('gbl');if(!l)return;l.innerHTML='';const arr=Object.values(entries).sort((a,b)=>b.t-a.t);if(!arr.length)l.textContent='لسه مفيش توقيعات';arr.slice(0,30).forEach(e=>{const d=document.createElement('div');d.className='qrow';d.textContent=e.n+': '+e.m;l.appendChild(d)})};
+  gbCb=(id,m)=>{entries[id]=m;render()};
+  if(netOK)client.subscribe(NS+'/gb/'+owner+'/+');
+  $('gbs').onclick=()=>{const t=str($('gbi').value,60).trim();if(!t||!netOK){toast('محتاج اتصال');return}const o={n:me.name,m:t,t:Date.now()};client.publish(NS+'/gb/'+owner+'/'+me.id,JSON.stringify(o),{retain:true});entries[me.id]=o;$('gbi').value='';render();sfx('place')};
+  $('gbx').onclick=()=>{try{client.unsubscribe(NS+'/gb/'+owner+'/+')}catch(e){}gbCb=null;closeModal()};render()})}
 function buildHome(data){
  const g=new THREE.Group();home.group=g;home.items=data.items.map(a=>a.slice());home.floor=data.floor|0;home.wall=data.wall|0;home.name=data.n||'';home.sel=null;
  home.floorMesh=mesh(G.box(14,0.3,14),0xffffff,0,-0.15,0);g.add(home.floorMesh);
@@ -376,6 +389,8 @@ function buildHome(data){
  g.add(mesh(G.box(2.4,3,0.2),0x5c3d1e,3.5,1.5,-6.9));
  const grid=new THREE.GridHelper(14,14,0xffffff,0xffffff);grid.material.transparent=true;grid.material.opacity=0.25;grid.position.y=0.02;grid.visible=false;g.add(grid);home.grid=grid;
  const pm=portalMesh('اخرج للساحة',0,6.2,0xff8787,'plaza');g.add(pm);
+ g.add(mesh(G.box(0.8,1,0.8),0x5c3d1e,6,0.5,-4.5),mesh(G.box(0.7,0.12,0.5),0xc92a2a,6,1.05,-4.5));{const gl=labelSprite('📖 دفتر الزوار',{s:2.6});gl.position.set(6,2.1,-4.5);g.add(gl)}
+ interacts=[{x:5.2,z:-4.5,label:'📖 دفتر الزوار',fn:openGuestbook}];
  applyHomeColors();scene.add(g);room.group=g;room.bounds=6.5;rebuildFurn();
  const ownerTag=labelSprite('بيت '+(data.n||'صاحبنا'),{s:3.4});ownerTag.position.set(0,5.2,-6.9);g.add(ownerTag);
 }
@@ -426,6 +441,7 @@ function onMsg(topic,payload){
  let m;try{m=JSON.parse(payload.toString())}catch(e){return}
  if(!m||typeof m!=='object')return;
  if(topic.startsWith(NS+'/u/')){const c=topic.slice(NS.length+3);if(typeof m.r==='string')friendPres[c]={n:str(m.n,14),r:str(m.r,8),h:m.h?str(m.h,8):null,seen:Date.now()};return}
+ if(topic.startsWith(NS+'/gb/')){const pp=topic.split('/');if(gbCb&&pp[2]===room.owner&&pp[3])gbCb(pp[3],{n:str(m.n,14),m:str(m.m,60),t:num(m.t,0,9e15)});return}
  if(topic.startsWith(NS+'/h/')){if(homeCb&&topic===NS+'/h/'+homeCb.code)homeCb.fn(m);return}
  if(topic!==topicRoom(room.id))return;
  if(m.i===me.id||typeof m.i!=='string'||m.i.length>12)return;
@@ -722,7 +738,7 @@ $('bVisit').onclick=()=>modal(c=>{
  me.friends.forEach(f=>{const d=document.createElement('div');d.className='friend';const pr=friendPres[f.code],on=pr&&Date.now()-pr.seen<40000;const s=document.createElement('span');s.textContent=(on?'🟢 ':'⚪ ')+f.name+' · '+f.code+(on?' · '+(RN[pr.r]||''):'');const b=document.createElement('button');b.className='btn g';b.style.padding='6px 12px';b.textContent='زيارة';b.onclick=()=>{closeModal();visit(f.code)};d.append(s);if(on&&pr.r!=='home'&&RN[pr.r]){const j=document.createElement('button');j.className='btn o';j.style.cssText='padding:6px 12px;margin-inline-end:6px';j.textContent='انضم';j.onclick=()=>{closeModal();enterRoom(pr.r,{})};d.append(j)}d.append(b);fl.appendChild(d)});
 });
 $('bInfo').onclick=()=>modal(c=>{
- c.innerHTML='<h2>ℹ️ إزاي تلعب</h2><div style="line-height:1.9;font-size:15px">• اضغط في أي مكان أو استخدم العصا عشان تمشي. اسحب الشاشة تلف الكاميرا.<br>• اجمع ⭐ في الساحة (بتتجدد كل ٣٠ ثانية للكل) وخد 🪙.<br>• 🏠 بيتي: فرّش بيتك بالفلوس اللي جمعتها.<br>• 🔑 زيارة: اكتب كود صاحبك وادخل بيته. كودك في زر "شكلي".<br>• اللاعبين اللي عليهم 🤖 بوتات بتحاول تخلي الساحة حية، وباقي اللاعبين حقيقيين أونلاين.</div><div class="row"><button class="btn g" id="ok">تمام</button></div>';$('ok').onclick=closeModal});
+ c.innerHTML='<h2>ℹ️ إزاي تلعب</h2><div style="line-height:1.9;font-size:15px">• اضغط في أي مكان أو استخدم العصا عشان تمشي. اسحب الشاشة تلف الكاميرا.<br>• اجمع ⭐ في الساحة (بتتجدد كل ٣٠ ثانية للكل) وخد 🪙.<br>• 🏠 بيتي: فرّش بيتك بالفلوس اللي جمعتها.<br>• 🔑 زيارة: اكتب كود صاحبك وادخل بيته. كودك في زر "شكلي".<br>• اللاعبين اللي عليهم 🤖 بوتات بتحاول تخلي الساحة حية، وباقي اللاعبين حقيقيين أونلاين.</div><div class="row"><button class="btn d" id="sm"></button><button class="btn d" id="sq"></button></div><div class="row"><button class="btn g" id="ok">تمام</button></div>';const lab=()=>{$('sm').textContent=me.mute?'🔇 الصوت: مكتوم':'🔊 الصوت: شغال';$('sq').textContent=me.lq?'🖼️ الجودة: خفيفة':'🖼️ الجودة: عالية'};lab();$('sm').onclick=()=>{me.mute=!me.mute;saveMe();lab();if(me.mute&&jukeT){jukebox()}};$('sq').onclick=()=>{me.lq=!me.lq;saveMe();applyQ();lab()};$('ok').onclick=closeModal});
 
 /* ===================== main loop ===================== */
 let last=performance.now(),tClock=0;
@@ -766,8 +782,8 @@ function frame(now){
 }
 let nearCool=false;
 function gotoPortal(to){if(to==='home')goMyHome();else if(to==='plaza')goPlaza(room.type);else enterRoom(to,{})}
-window.__vw={get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
-updCoins();enterRoom('plaza');netConnect();setOnline();dailyCheck();ensureQ();
+window.__vw={get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
+applyQ();updCoins();enterRoom('plaza');netConnect();setOnline();dailyCheck();ensureQ();
 requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
 </script>
