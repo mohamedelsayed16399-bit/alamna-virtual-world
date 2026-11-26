@@ -46,6 +46,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#101830;font-family:sy
 .it span{display:block;font-size:22px}
 #shoptools{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;align-items:center;font-size:13px}
 #shoptools .btn{padding:6px 10px;min-width:0;flex-direction:row;font-size:13px}
+#mm{position:fixed;right:8px;top:calc(max(8px,env(safe-area-inset-bottom)) + 44px);width:92px;height:92px;border-radius:50%;background:rgba(16,24,48,.6);border:1px solid rgba(255,255,255,.2);z-index:4;pointer-events:none}
+.qrow{background:#252e57;border-radius:10px;padding:8px 10px;margin-top:6px;font-size:14px}.qbar{height:6px;border-radius:3px;background:#0f1530;margin-top:5px;overflow:hidden}.qbar i{display:block;height:100%;background:#51cf66}
 #act{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:9;display:none;font-size:16px;padding:12px 18px;flex-direction:row;background:#f08c00}
 #toast{position:fixed;top:30%;left:50%;transform:translateX(-50%);background:rgba(16,24,48,.92);border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:10px 16px;z-index:30;display:none;max-width:86vw;text-align:center;font-size:15px;pointer-events:none}
 #chatbox{position:fixed;left:8px;right:8px;bottom:calc(70px + env(safe-area-inset-bottom));z-index:12;display:none;gap:6px}
@@ -60,6 +62,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#101830;font-family:sy
 <div id="top"><div class="pill" id="roomName">…</div><div class="pill" id="online">⚪ …</div><div class="pill" id="coins">🪙 0</div></div>
 <div id="lb"></div>
 <div id="log"></div>
+<canvas id="mm" width="184" height="184"></canvas>
 <div id="joy"><i></i></div>
 <div id="shop"><div id="shoptools"></div><div id="shopitems"></div></div>
 <div id="chatbox"><input id="chatin" type="text" maxlength="80" placeholder="اكتب رسالة…" autocomplete="off"><button class="btn g" id="chatsend" style="padding:8px 14px">إرسال</button></div>
@@ -71,6 +74,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#101830;font-family:sy
 <button class="btn g" id="bHome"><span>🏠</span>بيتي</button>
 <button class="btn" id="bVisit"><span>🔑</span>زيارة</button>
 <button class="btn r" id="bEdit" hidden><span>🛋️</span>فرّش</button>
+<button class="btn o" id="bQ"><span>🎯</span>مهام</button>
 <button class="btn d" id="bInfo"><span>ℹ️</span>مساعدة</button>
 </div>
 <button class="btn" id="act"></button>
@@ -90,7 +94,8 @@ function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a
 function toast(msg,ms=2200){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',ms)}
 const BODY=['#e8590c','#2f9e44','#3b5bdb','#9c36b5','#e03131','#f08c00','#0c8599','#495057','#d6336c','#1098ad','#74b816','#f783ac'];
 const HEAD=['#ffd8a8','#f1b98a','#d9a066','#a9744f','#7a4b2a','#ffe3e3'];
-const HATS=['بدون','كاب','تاج','طاقية','هوائي','نظارة','قرون','طربوش','شعر ملون'];
+const HATS=['بدون','كاب','تاج','طاقية','هوائي','نظارة','قرون','طربوش','شعر ملون','هالة','أجنحة','تاج ملكي','أذن قطة'];
+const HPRICE={9:60,10:120,11:250,12:40};
 const FLOORS=['#c8a27a','#8d99ae','#b7e4c7','#f4acb7','#6c757d'];
 const WALLS=['#f1faee','#ffe8d6','#cdeac0','#bde0fe','#e0aaff'];
 const EMOJIS=['👋','😂','❤️','💃','👍','😮','🎉','😴','🍵','☕','🧃','🏆'];
@@ -105,7 +110,7 @@ const DEFAULT_ITEMS=[['rug',5,6,0],['sofa',3,3,0],['plant',1,1,0]];
 let me;
 try{me=JSON.parse(localStorage.getItem('ealam_me')||'null')}catch(e){me=null}
 if(!me||!me.id){me={id:rnd(6),name:'زائر'+Math.floor(Math.random()*900+100),body:Math.floor(Math.random()*BODY.length),head:0,hat:0,coins:150,floor:0,wall:0,items:DEFAULT_ITEMS.map(a=>a.slice()),friends:[],best:0}}
-me.friends=me.friends||[];me.best=me.best||0;
+me.friends=me.friends||[];me.best=me.best||0;me.owned=me.owned||[];me.daily=me.daily||{d:'',streak:0};
 function saveMe(){try{localStorage.setItem('ealam_me',JSON.stringify(me))}catch(e){}updCoins()}
 function updCoins(){$('coins').textContent='🪙 '+me.coins}
 
@@ -164,6 +169,10 @@ function buildAvatar(a){
  if(h===6){g.add(mesh(G.cone(0.08,0.4,6),0xe03131,-0.25,1.9,0),mesh(G.cone(0.08,0.4,6),0xe03131,0.25,1.9,0))}
  if(h===7){g.add(mesh(G.cyl(0.26,0.32,0.32,12),0xc92a2a,0,1.9,0),mesh(G.cyl(0.02,0.02,0.2,6),0x111111,0,2.15,0),mesh(G.sph(0.07,6),0x111111,0,2.28,0))}
  if(h===8){g.add(mesh(G.sph(0.4,10),0xcc5de8,0,1.72,-0.05));g.children[g.children.length-1].scale.set(1,0.6,1)}
+ if(h===9){const t=new THREE.Mesh(new THREE.TorusGeometry(0.28,0.04,6,18),new THREE.MeshBasicMaterial({color:0xffe066}));t.rotation.x=Math.PI/2;t.position.y=2.05;g.add(t)}
+ if(h===10){for(const sx of[-1,1]){const w=mesh(G.box(0.7,0.08,0.4),0xffffff,sx*0.55,1.1,-0.35);w.rotation.z=sx*-0.5;w.rotation.y=sx*0.3;g.add(w);const w2=mesh(G.box(0.5,0.07,0.3),0xdbe4ff,sx*0.5,0.8,-0.35);w2.rotation.z=sx*-0.4;g.add(w2)}}
+ if(h===11){g.add(mesh(G.cyl(0.34,0.4,0.3,8),0xffd43b,0,1.98,0,0x553d00));const cc=[0xff6b6b,0x4dabf7,0x69db7c,0xb197fc,0xff922b,0xf06595];for(let i=0;i<6;i++){const an=i/6*Math.PI*2;g.add(mesh(G.cone(0.09,0.3,4),0xffd43b,Math.cos(an)*0.34,2.28,Math.sin(an)*0.34,0x553d00),mesh(G.sph(0.06,6),cc[i],Math.cos(an)*0.34,2.46,Math.sin(an)*0.34,cc[i]))}}
+ if(h===12){for(const sx of[-1,1]){const e=mesh(G.cone(0.14,0.3,4),0x343a40,sx*0.22,1.88,0);e.rotation.z=sx*-0.25;g.add(e);g.add(mesh(G.cone(0.07,0.18,4),0xf783ac,sx*0.22,1.86,0.04))}}
  if(h===4){g.add(mesh(G.cyl(0.02,0.02,0.4,6),0x868e96,0,2.0,0),mesh(G.sph(0.08,8),0xff6b6b,0,2.25,0,0x661111))}
  const sh=new THREE.Mesh(new THREE.CircleGeometry(0.5,16),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:0.25}));sh.rotation.x=-Math.PI/2;sh.position.y=0.02;g.add(sh);
  return g;
@@ -190,6 +199,9 @@ class Actor{
 function angDiff(a,b){let d=(b-a)%(Math.PI*2);if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;return d}
 const myApp=()=>({b:me.body,h:me.head,a:me.hat});
 
+const parts=[],pGeo=new THREE.SphereGeometry(0.09,5,4);
+function burst(p,col,n){for(let i=0;i<n;i++){const m=new THREE.Mesh(pGeo,new THREE.MeshBasicMaterial({color:Array.isArray(col)?col[i%col.length]:col}));m.position.set(p.x,p.y+1.6,p.z);scene.add(m);const a=Math.random()*6.283,u=1+Math.random()*3;parts.push({m,vx:Math.cos(a)*u,vy:2+Math.random()*4,vz:Math.sin(a)*u,t:1.3})}}
+function tickParts(dt){for(let i=parts.length-1;i>=0;i--){const q=parts[i];q.t-=dt;q.vy-=9*dt;q.m.position.x+=q.vx*dt;q.m.position.y+=q.vy*dt;q.m.position.z+=q.vz*dt;if(q.t<=0){scene.remove(q.m);q.m.material.dispose();parts.splice(i,1)}}}
 /* ===================== rooms ===================== */
 let room={type:'plaza',id:'plaza',owner:null,group:null,stars:[],bounds:26,pickables:[]};
 let lamps=[],fountainWater=null,portals=[],ground=null,clouds=[];
@@ -346,7 +358,7 @@ function netConnect(){
  try{
   if(client){try{client.end(true)}catch(e){}}
   client=mqtt.connect(BROKERS[bi],{clientId:'ealam_'+me.id+'_'+rnd(5),clean:true,reconnectPeriod:0,connectTimeout:7000,keepalive:30});
-  client.on('connect',()=>{netOK=true;subRoom=null;subscribeRoom();setOnline()});
+  client.on('connect',()=>{netOK=true;subRoom=null;subscribeRoom();subFriends();pubPres();publishHome();setOnline()});
   client.on('message',onMsg);
   const fail=()=>{if(netOK||client){netOK=false;setOnline()}bi=(bi+1)%BROKERS.length;clearTimeout(netConnect.t);netConnect.t=setTimeout(netConnect,4000)};
   client.on('error',fail);client.on('close',fail);
@@ -371,6 +383,7 @@ function getRemote(m){
 function onMsg(topic,payload){
  let m;try{m=JSON.parse(payload.toString())}catch(e){return}
  if(!m||typeof m!=='object')return;
+ if(topic.startsWith(NS+'/u/')){const c=topic.slice(NS.length+3);if(typeof m.r==='string')friendPres[c]={n:str(m.n,14),r:str(m.r,8),h:m.h?str(m.h,8):null,seen:Date.now()};return}
  if(topic.startsWith(NS+'/h/')){if(homeCb&&topic===NS+'/h/'+homeCb.code)homeCb.fn(m);return}
  if(topic!==topicRoom(room.id))return;
  if(m.i===me.id||typeof m.i!=='string'||m.i.length>12)return;
@@ -403,6 +416,29 @@ function fetchHome(code,cb){
  client.subscribe(NS+'/h/'+code);setTimeout(()=>fin(null),3500);
 }
 
+const QD={stars:['اجمع 5 نجوم',5,30],drink:['اطلب مشروب من الكافيه',1,15],ttt:['اكسب لعبة إكس أو',1,25],visit:['زور بيت صاحب',1,20]};
+function today(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function ensureQ(){if(!me.q||me.q.d!==today())me.q={d:today(),p:{stars:0,drink:0,ttt:0,visit:0},c:{}}}
+function qAdd(k){ensureQ();const q=me.q,def=QD[k];if(q.c[k])return;q.p[k]=Math.min(def[1],(q.p[k]||0)+1);if(q.p[k]>=def[1]){q.c[k]=1;me.coins+=def[2];toast('🎯 خلصت مهمة: '+def[0]+' +'+def[2]+'🪙',3000);sfx('win')}saveMe()}
+function dailyCheck(){const t=today();if(me.daily.d===t)return;const y=new Date(Date.now()-864e5),ys=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();me.daily.streak=me.daily.d===ys?me.daily.streak+1:1;me.daily.d=t;const r=20+10*Math.min(me.daily.streak-1,6);me.coins+=r;saveMe();
+ setTimeout(()=>{modal(c=>{c.innerHTML='<h2>🎁 هدية اليوم</h2><div style="font-size:42px;text-align:center">🪙 +'+r+'</div><div style="text-align:center;color:#aab4de">يوم متتالي رقم '+me.daily.streak+' · ارجع بكرة لهدية أكبر</div><div class="row"><button class="btn g" id="ok">شكراً</button></div>';$('ok').onclick=closeModal});burst(player.root.position,[0xff6b6b,0xffd43b,0x4dabf7,0x69db7c],40);sfx('win')},900)}
+$('bQ').onclick=()=>{ensureQ();modal(c=>{c.innerHTML='<h2>🎯 مهام النهارده</h2><div id="ql"></div><div class="row"><button class="btn g" id="ok">تمام</button></div>';Object.keys(QD).forEach(k=>{const d=QD[k],p=me.q.p[k]||0,r=document.createElement('div');r.className='qrow';r.textContent=(me.q.c[k]?'✅ ':'⬜ ')+d[0]+' · +'+d[2]+'🪙 ('+p+'/'+d[1]+')';const b=document.createElement('div');b.className='qbar';b.innerHTML='<i style="width:'+(p/d[1]*100)+'%"></i>';r.appendChild(b);$('ql').appendChild(r)});$('ok').onclick=closeModal})};
+/* minimap */
+function drawMM(){const cv=$('mm'),x=cv.getContext('2d'),W=184,sc=84/room.bounds;x.clearRect(0,0,W,W);x.save();x.translate(92,92);
+ x.fillStyle='rgba(80,160,90,.35)';x.beginPath();if(room.type==='plaza')x.arc(0,0,room.bounds*sc,0,6.3);else x.rect(-room.bounds*sc,-room.bounds*sc,room.bounds*sc*2,room.bounds*sc*2);x.fill();
+ const dot=(px,pz,c,r)=>{x.fillStyle=c;x.beginPath();x.arc(px*sc,pz*sc,r,0,6.3);x.fill()};
+ for(const s of starObjs)if(!starTaken.has(s.k))dot(s.x,s.z,'#ffd43b',4);
+ for(const pt of portals)dot(pt.x,pt.z,'#ff8787',5);
+ for(const it of interacts)dot(it.x,it.z,'#74c0fc',4);
+ for(const b of bots)dot(b.root.position.x,b.root.position.z,'#999',3);
+ for(const [,r] of remotes)dot(r.root.position.x,r.root.position.z,'#4dabf7',5);
+ dot(player.root.position.x,player.root.position.z,'#fff',6);x.restore()}
+/* ===================== friends presence ===================== */
+const friendPres={};const RN={plaza:'الساحة',arcade:'الأركيد',cafe:'الكافيه',home:'بيت'};
+function presTopic(c){return NS+'/u/'+c}
+function subFriends(){if(!netOK||!client)return;me.friends.forEach(f=>{try{client.subscribe(presTopic(f.code))}catch(e){}})}
+function pubPres(){if(!netOK||!client)return;try{client.publish(presTopic(me.id),JSON.stringify({n:me.name,r:room.type,h:room.type==='home'?room.owner:null}))}catch(e){}}
+setInterval(pubPres,15000);
 /* ===================== room switching ===================== */
 const tttInit=()=>({g:0,mv:0,b:'.........',x:null,o:null,xn:'',on:'',over:false});
 let ttt=tttInit(),tttMode='net',tttBot=null,tttRender=null;
@@ -413,13 +449,13 @@ function tttRecv(m){
  if(typeof m.b!=='string'||!/^[XO.]{9}$/.test(m.b))return;const g=num(m.g,0,1e6)|0,mv=num(m.mv,0,9)|0;
  if(g>ttt.g||(g===ttt.g&&mv>ttt.mv)){ttt={g,mv,b:m.b,x:m.x?str(m.x,12):null,o:m.o?str(m.o,12):null,xn:str(m.xn,14),on:str(m.on,14),over:!!tttWinner(m.b)};if(ttt.over)tttPayout();if(tttRender&&tttMode==='net')tttRender()}
 }
-function tttPayout(){const w=tttWinner(ttt.b);if(w==='X'&&ttt.x===me.id||w==='O'&&ttt.o===me.id){me.coins+=20;saveMe();sfx('win');toast('🏆 كسبت! +20 🪙')}}
+function tttPayout(){const w=tttWinner(ttt.b);if(w==='X'&&ttt.x===me.id||w==='O'&&ttt.o===me.id){me.coins+=20;saveMe();sfx('win');burst(player.root.position,[0xff6b6b,0xffd43b,0x4dabf7,0x69db7c],40);qAdd('ttt');toast('🏆 كسبت! +20 🪙')}}
 function tttMove(i){
  if(tttMode==='bot'){const b=tttBot;if(b.over||b.b[i]!=='.')return;b.b=b.b.slice(0,i)+'X'+b.b.slice(i+1);let w=tttWinner(b.b);
   if(!w){const e=[];for(let k=0;k<9;k++)if(b.b[k]==='.')e.push(k);let pick=null;
    for(const sym of['O','X']){for(const k of e){const t=b.b.slice(0,k)+sym+b.b.slice(k+1);if(sym==='O'?tttWinner(t)==='O':tttWinner(b.b.slice(0,k)+'X'+b.b.slice(k+1))==='X'){pick=k;break}}if(pick!=null)break}
    if(pick==null)pick=b.b[4]==='.'?4:e[Math.floor(Math.random()*e.length)];b.b=b.b.slice(0,pick)+'O'+b.b.slice(pick+1);w=tttWinner(b.b)}
-  if(w){b.over=true;if(w==='X'){me.coins+=10;saveMe();sfx('win');toast('🏆 كسبت البوت! +10 🪙')}}else sfx('tick');tttRender();return}
+  if(w){b.over=true;if(w==='X'){me.coins+=10;saveMe();sfx('win');burst(player.root.position,[0xff6b6b,0xffd43b,0x4dabf7],30);qAdd('ttt');toast('🏆 كسبت البوت! +10 🪙')}}else sfx('tick');tttRender();return}
  if(ttt.over||ttt.b[i]!=='.')return;
  let sym=null;const odd=ttt.mv%2;
  if(ttt.x===me.id)sym='X';else if(ttt.o===me.id)sym='O';
@@ -452,7 +488,7 @@ function openReact(){
 }
 function openCafeMenu(){
  modal(c=>{c.innerHTML='<h2>☕ منيو الكافيه</h2><div id="cm"></div><div class="row"><button class="btn d" id="cx">إغلاق</button></div>';
-  [['شاي','🍵',5],['قهوة','☕',8],['عصير','🧃',10],['كأس الفخامة','🏆',40]].forEach(([n,e,p])=>{const d=document.createElement('div');d.className='friend';const sp=document.createElement('span');sp.textContent=e+' '+n+' · 🪙'+p;const b=document.createElement('button');b.className='btn g';b.style.padding='6px 12px';b.textContent='اطلب';b.onclick=()=>{if(me.coins<p){toast('فلوسك مش كفاية');sfx('err');return}me.coins-=p;saveMe();sfx('drink');player.emote(e);pub({t:'e',i:me.id,e});addLog('','طلبت '+n);closeModal()};d.append(sp,b);$('cm').appendChild(d)});
+  [['شاي','🍵',5],['قهوة','☕',8],['عصير','🧃',10],['كأس الفخامة','🏆',40]].forEach(([n,e,p])=>{const d=document.createElement('div');d.className='friend';const sp=document.createElement('span');sp.textContent=e+' '+n+' · 🪙'+p;const b=document.createElement('button');b.className='btn g';b.style.padding='6px 12px';b.textContent='اطلب';b.onclick=()=>{if(me.coins<p){toast('فلوسك مش كفاية');sfx('err');return}me.coins-=p;saveMe();sfx('drink');qAdd('drink');player.emote(e);pub({t:'e',i:me.id,e});addLog('','طلبت '+n);closeModal()};d.append(sp,b);$('cm').appendChild(d)});
   $('cx').onclick=closeModal})}
 let stars=0,starSlot=-1,starObjs=[],starTaken=new Set();
 function enterRoom(type,opts={}){
@@ -469,7 +505,7 @@ function enterRoom(type,opts={}){
  player.root.rotation.y=player.yaw=Math.PI;scene.add(player.root);walkTarget=null;
  $('bHome').innerHTML=type==='plaza'?'<span>🏠</span>بيتي':'<span>🌳</span>الساحة';
  $('bEdit').hidden=!(type==='home'&&room.owner===me.id);
- dist=type==='home'?(innerWidth<600?24:17):(innerWidth<600?24:20);applySky();subscribeRoom();setOnline();renderLB();if(type==='arcade'){ttt=tttInit();setTimeout(()=>pub({t:'tttq',i:me.id}),800)}
+ dist=type==='home'?(innerWidth<600?24:17):(innerWidth<600?24:20);applySky();subscribeRoom();setOnline();renderLB();pubPres();if(type==='arcade'){ttt=tttInit();setTimeout(()=>pub({t:'tttq',i:me.id}),800)}
 }
 function goPlaza(from){enterRoom('plaza',{from:from===true?'home':from})}
 function goMyHome(){enterRoom('home',{owner:me.id,data:{n:me.name,floor:me.floor,wall:me.wall,items:me.items}})}
@@ -480,7 +516,7 @@ function visit(code){
  fetchHome(code,d=>{if(!d){toast('مفيش بيت بالكود ده، أو الإنترنت واقع');return}
   enterRoom('home',{owner:code,data:d});
   if(!me.friends.some(f=>f.code===code)){me.friends.push({code,name:d.n||code});saveMe()}
-  toast('أنت في بيت '+(d.n||code))});
+  toast('أنت في بيت '+(d.n||code));qAdd('visit');subFriends()});
 }
 
 /* ===================== bots (honest, labeled) ===================== */
@@ -517,7 +553,7 @@ function rollStars(){
 function takeStar(slot,k,mine){
  if(room.type!=='plaza'||slot!==starSlot)return;const key=k;if(starTaken.has(key))return;
  const s=starObjs.find(o=>o.k===k);if(!s)return;starTaken.add(key);room.group.remove(s.m);
- if(mine){sfx('star');stars++;me.coins+=5;if(stars>me.best)me.best=stars;saveMe();pub({t:'s',i:me.id,n:me.name,sl:slot,k});player.emote('⭐');renderLB();sendPos(true)}
+ if(mine){sfx('star');burst(player.root.position,0xffd43b,10);qAdd('stars');stars++;me.coins+=5;if(stars>me.best)me.best=stars;saveMe();pub({t:'s',i:me.id,n:me.name,sl:slot,k});player.emote('⭐');renderLB();sendPos(true)}
 }
 function renderLB(){
  const el=$('lb');if(room.type!=='plaza'){el.style.display='none';return}el.style.display='block';
@@ -631,7 +667,7 @@ $('act').onclick=()=>{if(actFn)actFn.fn()};
 $('bMe').onclick=()=>modal(c=>{
  c.innerHTML='<h2>🎨 شكلك واسمك</h2><label>الاسم</label><input type="text" id="nm" maxlength="14"><label>لون الجسم</label><div class="sw" id="s1"></div><label>لون البشرة</label><div class="sw" id="s2"></div><label>القبعة</label><div class="sw" id="s3"></div><label>كودك (ابعته لصحابك عشان يزوروا بيتك)</label><div style="font-size:26px;letter-spacing:4px;font-weight:800;color:#ffd35c" id="code"></div><div class="row"><button class="btn g" id="ok">تم</button></div>';
  $('nm').value=me.name;$('code').textContent=me.id;
- const sw=(id,arr,key,isCol)=>{const el=$(id);arr.forEach((v,i)=>{const b=document.createElement(isCol?'b':'u');if(isCol)b.style.background=v;else b.textContent=v;if(me[key]===i)b.classList.add('on');b.onclick=()=>{me[key]=i;[...el.children].forEach(x=>x.classList.remove('on'));b.classList.add('on');player.setApp(myApp());saveMe();sendPos(true)};el.appendChild(b)})};
+ const sw=(id,arr,key,isCol)=>{const el=$(id);arr.forEach((v,i)=>{const b=document.createElement(isCol?'b':'u');const lock=key==='hat'&&HPRICE[i]&&!me.owned.includes(i);if(isCol)b.style.background=v;else b.textContent=v+(lock?' 🔒'+HPRICE[i]:'');if(me[key]===i)b.classList.add('on');b.onclick=()=>{if(lock&&!b.dataset.u){if(me.coins<HPRICE[i]){toast('محتاج '+HPRICE[i]+' 🪙');sfx('err');return}me.coins-=HPRICE[i];me.owned.push(i);b.dataset.u=1;b.textContent=v;sfx('win');burst(player.root.position,0xffd43b,30)}me[key]=i;[...el.children].forEach(x=>x.classList.remove('on'));b.classList.add('on');player.setApp(myApp());saveMe();sendPos(true)};el.appendChild(b)})};
  sw('s1',BODY,'body',true);sw('s2',HEAD,'head',true);sw('s3',HATS,'hat',false);
  $('ok').onclick=()=>{const n=str($('nm').value,14).trim();if(n){me.name=n;player.setName(n)}saveMe();publishHome();sendPos(true);closeModal()};
 });
@@ -639,7 +675,7 @@ $('bVisit').onclick=()=>modal(c=>{
  c.innerHTML='<h2>🔑 زيارة صاحب</h2><label>اكتب كود صاحبك</label><input type="text" id="vc" maxlength="8" style="text-transform:uppercase;letter-spacing:3px" autocomplete="off"><div class="row"><button class="btn g" id="go">زيارة</button></div><label>أصحابك</label><div id="fl"></div>';
  $('go').onclick=()=>{const v=$('vc').value;closeModal();visit(v)};
  const fl=$('fl');if(!me.friends.length)fl.textContent='لسه مفيش. أي بيت تزوره بيتضاف هنا.';
- me.friends.forEach(f=>{const d=document.createElement('div');d.className='friend';const s=document.createElement('span');s.textContent=f.name+' · '+f.code;const b=document.createElement('button');b.className='btn g';b.style.padding='6px 12px';b.textContent='زيارة';b.onclick=()=>{closeModal();visit(f.code)};d.append(s,b);fl.appendChild(d)});
+ me.friends.forEach(f=>{const d=document.createElement('div');d.className='friend';const pr=friendPres[f.code],on=pr&&Date.now()-pr.seen<40000;const s=document.createElement('span');s.textContent=(on?'🟢 ':'⚪ ')+f.name+' · '+f.code+(on?' · '+(RN[pr.r]||''):'');const b=document.createElement('button');b.className='btn g';b.style.padding='6px 12px';b.textContent='زيارة';b.onclick=()=>{closeModal();visit(f.code)};d.append(s);if(on&&pr.r!=='home'&&RN[pr.r]){const j=document.createElement('button');j.className='btn o';j.style.cssText='padding:6px 12px;margin-inline-end:6px';j.textContent='انضم';j.onclick=()=>{closeModal();enterRoom(pr.r,{})};d.append(j)}d.append(b);fl.appendChild(d)});
 });
 $('bInfo').onclick=()=>modal(c=>{
  c.innerHTML='<h2>ℹ️ إزاي تلعب</h2><div style="line-height:1.9;font-size:15px">• اضغط في أي مكان أو استخدم العصا عشان تمشي. اسحب الشاشة تلف الكاميرا.<br>• اجمع ⭐ في الساحة (بتتجدد كل ٣٠ ثانية للكل) وخد 🪙.<br>• 🏠 بيتي: فرّش بيتك بالفلوس اللي جمعتها.<br>• 🔑 زيارة: اكتب كود صاحبك وادخل بيته. كودك في زر "شكلي".<br>• اللاعبين اللي عليهم 🤖 بوتات بتحاول تخلي الساحة حية، وباقي اللاعبين حقيقيين أونلاين.</div><div class="row"><button class="btn g" id="ok">تمام</button></div>';$('ok').onclick=closeModal});
@@ -666,6 +702,7 @@ function frame(now){
   for(const pt of portals){const dx=p.x-pt.x,dz=p.z-pt.z;pt.ring.rotation.z+=dt*2;if(!nearCool&&dx*dx+dz*dz<1.1){nearCool=true;setTimeout(()=>nearCool=false,1500);gotoPortal(pt.to);break}}
  }
  {let best=null,bd=9;if(player)for(const it of interacts){const d=Math.hypot(player.root.position.x-it.x,player.root.position.z-it.z);if(d<2.6&&d<bd){bd=d;best=it}}const a=$('act');if(best){if(actFn!==best){actFn=best;a.textContent=best.label;a.style.display='flex'}}else if(actFn){actFn=null;a.style.display='none'}}
+ tickParts(dt);if(player&&(frame.n%6===0))drawMM();
  for(const c of clouds){c.position.x+=dt*0.8;if(c.position.x>70)c.position.x=-70}
  const nowMs=performance.now();
  for(const [id,r] of remotes){
@@ -684,8 +721,8 @@ function frame(now){
 }
 let nearCool=false;
 function gotoPortal(to){if(to==='home')goMyHome();else if(to==='plaza')goPlaza(room.type);else enterRoom(to,{})}
-window.__vw={get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
-updCoins();enterRoom('plaza');netConnect();setOnline();
+window.__vw={friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
+updCoins();enterRoom('plaza');netConnect();setOnline();dailyCheck();ensureQ();
 requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
 </script>
