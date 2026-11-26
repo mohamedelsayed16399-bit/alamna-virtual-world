@@ -473,6 +473,7 @@ if(topic.startsWith(NS+'/h/')){if(homeCb&&topic===NS+'/h/'+homeCb.code)homeCb.fn
 if(topic!==topicRoom(room.id))return;
 if(m.i===me.id||typeof m.i!=='string'||m.i.length>12)return;
 if(m.t==='bye'){const r=remotes.get(m.i);if(r){scene.remove(r.root);remotes.delete(m.i);setOnline()}return}
+if(me.blk&&me.blk.some(e=>e.i===m.i))return;
 const r=getRemote(m);
 if(m.t==='p'){r.tx=num(m.x,-50,50);r.tz=num(m.z,-50,50);r.stars=num(m.s,0,99999)|0}
 else if(m.t==='c'){const t=str(m.m,100);if(t){sfx('chat');r.say(t);addLog(r.name,t)}}
