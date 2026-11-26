@@ -383,6 +383,16 @@ const GBG=[['golf','⛳ جولف',1],['hoops','🏀 سلة',0],['bowl','🎳 ب�
 function myBests(){return{golf:me.golfBest||0,hoops:me.hoopBest||0,bowl:me.bowlBest||0,gal:me.galBest||0,tag:me.tagBest||0,pen:me.penBest||0,seek:me.seekBest||0,kite:me.kiteBest||0,bump:me.bumpBest||0}}
 function pubBests(){try{const o=JSON.stringify({n:me.name,g:myBests()});if(o===chLast||!netOK)return;chLast=o;client.publish(NS+'/ch/'+me.id,o,{retain:true})}catch(e){}}
 const _sv0=saveMe;saveMe=function(){_sv0.apply(this,arguments);pubBests()};
+const WKEYS=['tag','seek','kite','bump','pen','hoop','gal','bowl'];
+function wkId(){const d=new Date(),j=new Date(d.getFullYear(),0,1);return d.getFullYear()+'w'+Math.floor(((d-j)/864e5+j.getDay())/7)}
+function wkCounts(){const o={};for(const k of WKEYS)o[k]=me[k+'Games']||0;return o}
+function wkInit(){if(!me.wk||me.wk.w!==wkId()){me.wk={w:wkId(),base:wkCounts(),cl:[]};saveMe()}return me.wk}
+function wkProg(){const w=wkInit(),n=wkCounts();let sum=0,dif=0;for(const k of WKEYS){const d=n[k]-(w.base[k]||0);if(d>0){sum+=d;dif++}}return{sum,dif}}
+const WCH=[['🎮 العب ١٠ جولات',p=>p.sum,10,25],['🌈 جرّب ٤ ألعاب مختلفة',p=>p.dif,4,25],['🔥 العب ٢٥ جولة',p=>p.sum,25,60]];
+function openWeekly(){const w=wkInit();modal(c=>{const p=wkProg();let h='<h2>📅 تحدي الأسبوع</h2><div style="font-size:13px;opacity:.8;text-align:center;margin-bottom:8px">بيتجدد كل أسبوع · الألعاب: طاردة، استغماية، طيارة، تصادم، جزاء، سلة، رماية، بولينج</div>';
+ WCH.forEach((q,i)=>{const v=Math.min(q[2],q[1](p)),done=v>=q[2],cl=w.cl.indexOf(i)>=0;h+='<div style="background:rgba(255,255,255,.08);border-radius:12px;padding:10px;margin:6px 0"><b>'+q[0]+'</b> · '+v+'/'+q[2]+'<div style="height:8px;background:rgba(255,255,255,.15);border-radius:6px;margin:6px 0"><div style="height:8px;width:'+Math.round(v/q[2]*100)+'%;background:#51cf66;border-radius:6px"></div></div>'+(cl?'<span>✅ اتسلّمت</span>':done?'<button class="btn g" data-q="'+i+'">استلم +'+q[3]+'🪙</button>':'<span>الجايزة '+q[3]+'🪙</span>')+'</div>'});
+ c.innerHTML=h+'<div class="row"><button class="btn d" id="wkx">إغلاق</button></div>';$('wkx').onclick=()=>{$('modal').style.display='none'};
+ c.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const i=+b.dataset.q,q=WCH[i];if(w.cl.indexOf(i)>=0||q[1](wkProg())<q[2])return;w.cl.push(i);me.coins+=q[3];updCoins();saveMe();sfx('win');toast('🎁 +'+q[3]+'🪙 تحدي الأسبوع',1600);openWeekly()})})}
 function openChamps(){const e={};modal(c=>{let cur=1;c.innerHTML='<h2>🏆 لوحة الأبطال</h2><div class="row" id="cg" style="flex-wrap:wrap"></div><div id="cl"></div><div class="row"><button class="btn d" id="cx">إغلاق</button></div>';
 const render=()=>{const l=$('cl');if(!l)return;l.innerHTML='';const G0=GBG[cur];const a=Object.entries(e).map(([id,v])=>({id,n:v.n,v:v.g[G0[0]]})).filter(x=>x.v>0).sort((x,y)=>G0[2]?x.v-y.v:y.v-x.v).slice(0,10);if(!a.length)l.textContent='لسه مفيش أرقام، العب وسجل رقمك!';a.forEach((v,i)=>{const d=document.createElement('div');d.className='qrow';d.textContent=(i+1)+'. '+v.n+' · '+v.v+(v.id===me.id?' (إنت)':'');l.appendChild(d)})};
 GBG.forEach((g,i)=>{const b=document.createElement('button');b.className='btn o';b.style.margin='3px';b.textContent=g[1];b.onclick=()=>{cur=i;render()};$('cg').appendChild(b)});
