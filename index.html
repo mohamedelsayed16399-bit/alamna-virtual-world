@@ -230,7 +230,7 @@ class Actor{
  emote(e){if(e==='💃')this.dance=3;if(this.emo)this.root.remove(this.emo);this.emo=emojiSprite(e);this.emo.position.y=3.0;this.root.add(this.emo);this.emoT=2.2}
  tick(dt,t){
   const f=this.av.userData.feet,ar=this.av.userData.arms,pet=this.av.userData.pet;
-  if(pet){pet.position.y=Math.abs(Math.sin(t*6+this.phase))*(this.moving?0.12:0.03);if(this.dance>0){pet.position.y=Math.abs(Math.sin(t*9))*0.5;pet.rotation.y+=dt*10}else if(pet.rotation.y){pet.rotation.y=0}}
+  if(pet){pet.position.y=Math.abs(Math.sin(t*6+this.phase))*(this.moving?0.12:0.03);if(this.dance>0){pet.position.y=Math.abs(Math.sin(t*9))*0.5;pet.rotation.y+=dt*10}else if(pet.rotation.y){pet.rotation.y=0}pet.rotation.z=(!this.moving&&this.dance<=0)?Math.sin(t*7+this.phase)*0.12:0}
   if(this.dance>0){this.dance-=dt;this.av.rotation.y+=dt*7;this.av.position.y=Math.abs(Math.sin(t*10))*0.15;ar[0].rotation.z=2.4+Math.sin(t*14)*0.4;ar[1].rotation.z=-2.4-Math.sin(t*14)*0.4;if(this.dance<=0){this.av.rotation.y=0;ar[0].rotation.z=ar[1].rotation.z=0}}
   else if(this.moving){ar[0].rotation.x=Math.sin(this.phase)*0.7;ar[1].rotation.x=-Math.sin(this.phase)*0.7}else{ar[0].rotation.x*=0.8;ar[1].rotation.x*=0.8;ar[0].rotation.z=ar[1].rotation.z=0}
   if(this.moving&&this.dance<=0){this.phase+=dt*11;f[0].position.z=0.04+Math.sin(this.phase)*0.18;f[1].position.z=0.04-Math.sin(this.phase)*0.18;this.av.position.y=Math.abs(Math.sin(this.phase))*0.08}
@@ -1071,7 +1071,7 @@ function pubPet(){const l=Math.floor((me.fed||0)/3);if(!me.pet||l<1||!netOK||!cl
 function openPetBoard(){const e={};modal(c=>{c.innerHTML='<h2>🏆 أكبر الحيوانات</h2><div id="pl"></div><div class="row"><button class="btn d" id="px">إغلاق</button></div>';const nm=['','🐱','🐶','🦆'];const render=()=>{const l=$('pl');if(!l)return;l.innerHTML='';const a=Object.values(e).sort((x,y)=>y.l-x.l).slice(0,10);if(!a.length)l.textContent='لسه مفيش أرقام';a.forEach((v,i)=>{const d=document.createElement('div');d.className='qrow';d.textContent=(i+1)+'. '+v.n+' · '+(nm[v.p]||'🐾')+' مستوى '+v.l;l.appendChild(d)})};plCb=(id,m)=>{e[id]=m;render()};if(netOK)try{client.subscribe(NS+'/pl/+')}catch(x){}const l0=Math.floor((me.fed||0)/3);if(me.pet&&l0>0)e[me.id]={n:me.name,l:Math.min(l0,30),p:me.pet};$('px').onclick=()=>{try{client.unsubscribe(NS+'/pl/+')}catch(x){}plCb=null;closeModal()};render()})}
 
 /* ===== achievements ===== */
-const ACH=[['friend','🤝','أول صاحب',()=>me.friends.length>=1],['rich','💰','٣٠٠ عملة',()=>me.coins>=300],['pet3','🐾','حيوان مستوى ٣',()=>(me.fed||0)>=9],['tres','🧰','صياد كنوز اليوم',()=>me.tr&&me.tr.got.length>=5],['hats','🎩','٣ قبعات مشتراة',()=>(me.owned||[]).length>=3],['bfly','🦋','٢٠ فراشة',()=>(me.bfBest||0)>=20],['race','🏁','أنهيت سباق',()=>!!me.raceBest],['mem','🃏','ذاكرة قوية',()=>(me.memWins||0)>=1],['fish','🎣','٥ سمكات',()=>(me.fish||0)>=5],['sg','🌠','١٠ نجوم في لعبة',()=>(me.sgBest||0)>=10],['shell','🐚','٦ صدفات',()=>(me.shells||0)>=6],['ride','⛵','رحلة قارب',()=>(me.rides||0)>=1]];
+const ACH=[['friend','🤝','أول صاحب',()=>me.friends.length>=1],['rich','💰','٣٠٠ عملة',()=>me.coins>=300],['pet3','🐾','حيوان مستوى ٣',()=>(me.fed||0)>=9],['tres','🧰','صياد كنوز اليوم',()=>me.tr&&me.tr.got.length>=5],['hats','🎩','٣ قبعات مشتراة',()=>(me.owned||[]).length>=3],['bfly','🦋','٢٠ فراشة',()=>(me.bfBest||0)>=20],['race','🏁','أنهيت سباق',()=>!!me.raceBest],['mem','🃏','ذاكرة قوية',()=>(me.memWins||0)>=1],['fish','🎣','٥ سمكات',()=>(me.fish||0)>=5],['sg','🌠','١٠ نجوم في لعبة',()=>(me.sgBest||0)>=10],['shell','🐚','٦ صدفات',()=>(me.shells||0)>=6],['ride','⛵','رحلة قارب',()=>(me.rides||0)>=1],['photo','📷','أول صورة',()=>(me.photos||0)>=1]];
 let achT=0;
 function achTick(dt){achT-=dt;if(achT>0||!me)return;achT=3;me.ach=me.ach||{};for(const [k,e,n,f] of ACH){if(!me.ach[k]){let ok=false;try{ok=f()}catch(x){}if(ok){me.ach[k]=1;me.coins+=10;updCoins();saveMe();sfx('win');toast('🏅 إنجاز جديد: '+e+' '+n+' · +10🪙',3500);break}}}}
 function openAch(){modal(c=>{c.innerHTML='<h2>🏅 إنجازاتك</h2><div id="al"></div><div class="row"><button class="btn g" id="ok">تمام</button></div>';me.ach=me.ach||{};for(const [k,e,n] of ACH){const d=document.createElement('div');d.className='qrow';d.textContent=(me.ach[k]?'✅ ':'🔒 ')+e+' '+n;$('al').appendChild(d)}$('ok').onclick=closeModal})}
@@ -1121,6 +1121,11 @@ function openWheel(){
 }
 let chests=[];
 function dayKey(){return new Date().toISOString().slice(0,10)}
+function takePhoto(){
+ try{renderer.render(scene,camera);const src=renderer.domElement,w=src.width,h=src.height,c=document.createElement('canvas');c.width=w;c.height=h+Math.round(h*0.07);const x=c.getContext('2d');x.fillStyle='#101830';x.fillRect(0,0,c.width,c.height);x.drawImage(src,0,0);x.fillStyle='#fff';x.font='bold '+Math.round(h*0.035)+'px sans-serif';x.textAlign='center';x.fillText('عالمنا · '+me.name+' · '+(RN[room.type]||'غرفة'),w/2,h+Math.round(h*0.05));const url=c.toDataURL('image/png');sfx('star');
+  modal(m=>{m.innerHTML='<h2>📷 صورتك</h2><img id="phimg" style="display:block;margin:0 auto;max-width:100%;max-height:46vh;object-fit:contain;border-radius:10px" alt=""><div style="text-align:center;font-size:13px;opacity:.8;margin:6px">دوس مطوّل على الصورة أو اضغط حفظ</div><div class="row"><a class="btn g" id="phsave" download="alamna.png" style="text-decoration:none;text-align:center">💾 حفظ</a><button class="btn d" id="phx">إغلاق</button></div>';$('phimg').src=url;$('phsave').href=url;$('phx').onclick=closeModal});me.photos=(me.photos||0)+1;saveMe()}catch(e){toast('مقدرتش آخد الصورة')}
+}
+(function(){const b=document.createElement('button');b.id='bPhoto';b.textContent='📷';b.setAttribute('aria-label','صورة');b.style.cssText='position:fixed;left:8px;bottom:150px;z-index:9;width:42px;height:42px;border-radius:50%;border:0;background:#000a;color:#fff;font-size:20px';b.onclick=takePhoto;document.body.appendChild(b)})();
 function chestHud(){let h=$('chestHud');if(!h){h=document.createElement('div');h.id='chestHud';h.style.cssText='position:fixed;right:8px;top:148px;z-index:9;background:#000a;color:#ffd43b;padding:4px 12px;border-radius:14px;font:700 13px system-ui;direction:rtl;pointer-events:none';document.body.appendChild(h)}return h}
 function setupChests(){
  chests=[];const k=dayKey();if(!me.tr||me.tr.d!==k)me.tr={d:k,got:[]};
@@ -1148,4 +1153,4 @@ requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
 </script>
 </body>
- </html>
+   </html>
