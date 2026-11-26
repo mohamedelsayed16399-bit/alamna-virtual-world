@@ -819,7 +819,7 @@ $('bInfo').onclick=()=>modal(c=>{
 let last=performance.now(),tClock=0;
 function frame(now){
  requestAnimationFrame(frame);
- const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick(dt);if(wheelObj&&room.type==='plaza')wheelObj.rotation.z+=dt*0.8;fpsTick(dt);
+ const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick(dt);snowTick(dt);if(wheelObj&&room.type==='plaza')wheelObj.rotation.z+=dt*0.8;fpsTick(dt);
  if(player){
   let ix=joy.x+((keys['d']||keys['arrowright'])?1:0)-((keys['a']||keys['arrowleft'])?1:0),iy=joy.y+((keys['w']||keys['arrowup'])?1:0)-((keys['s']||keys['arrowdown'])?1:0);
   const m=Math.hypot(ix,iy);let vx=0,vz=0,mov=false;
@@ -885,10 +885,10 @@ function buildGarden(){
  sign(g,'🚿 اسقِ الورد',0,1.8,-3);interacts.push({x:0,z:-2,label:'🚿 اسقِ الورد (+3🪙)',fn:waterFlowers});
  sign(g,'🌷 الحديقة',0,4,-7.5,'rgba(190,40,100,.85)');sign(g,'🦋 اصطد الفراشات',5.5,2.2,3.5);interacts.push({x:5.5,z:4.5,label:'🦋 العب اصطياد الفراشات',fn:startButter});
  finishRoom(g);
- for(let i=0;i<8;i++){const m=new THREE.Group(),c=cols[i%6];for(const sx of[-1,1]){const w=new THREE.Mesh(new THREE.PlaneGeometry(0.28,0.22),new THREE.MeshBasicMaterial({color:c,side:2}));w.position.x=sx*0.14;w.userData.sx=sx;m.add(w)}room.group.add(m);butter.push({m,a:rng()*6.28,r:2+rng()*4.5,h:1.2+rng()*1.2,sp:0.4+rng()*0.5,cx:(rng()-0.5)*6,cz:(rng()-0.5)*5})}
+ for(let i=0;i<8;i++){const m=new THREE.Group(),c=cols[i%6];for(const sx of[-1,1]){const w=new THREE.Mesh(new THREE.PlaneGeometry(0.28,0.22),new THREE.MeshBasicMaterial({color:c,side:2}));w.position.x=sx*0.14;w.userData.sx=sx;m.add(w)}room.group.add(m);butter.push({m,a:rng()*6.28,r:2+rng()*4.5,h:1.2+rng()*1.2,sp:0.3+rng()*0.4,cx:(rng()-0.5)*6,cz:(rng()-0.5)*5})}
 }
 function waterFlowers(){const t=Date.now();if(t-lastWater<20000){toast('🌱 الورد لسه مبلول، استنى '+Math.ceil((20000-(t-lastWater))/1000)+' ثانية');return}lastWater=t;me.coins+=3;sfx('star');burst(player.root.position,0x74c0fc,12);toast('🌷 الورد فرحان! +3🪙');updCoins();saveMe()}
-function gardenTick(dt){dt=dt||0.016;butterGame(dt);if(!butter.length||!room||room.type!=='garden')return;for(const b of butter){b.a+=dt*b.sp*1.1;b.m.position.set(b.cx+Math.cos(b.a)*b.r,b.h+Math.sin(b.a*3)*0.3,b.cz+Math.sin(b.a)*b.r*0.7);b.m.rotation.y=-b.a;const f=Math.sin(tClock*14+b.a*5)*0.9;b.m.children[0].rotation.y=f;b.m.children[1].rotation.y=-f}}
+function gardenTick(dt){dt=dt||0.016;butterGame(dt);if(!butter.length||!room||room.type!=='garden')return;for(const b of butter){b.a+=dt*b.sp;b.m.position.set(b.cx+Math.cos(b.a)*b.r,b.h+Math.sin(b.a*3)*0.3,b.cz+Math.sin(b.a)*b.r*0.7);b.m.rotation.y=-b.a;const f=Math.sin(tClock*14+b.a*5)*0.9;b.m.children[0].rotation.y=f;b.m.children[1].rotation.y=-f}}
 
 const QUICK=['مرحبا 👋','تعالى بيتي 🏠','نلعب؟ 🎮','شكراً 🙏','ههه 😂','يلا بينا!'];
 (function(){const cb=$('chatbox');const row=document.createElement('div');cb.style.flexWrap='wrap';row.style.cssText='flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;direction:rtl';QUICK.forEach(t=>{const b=document.createElement('button');b.className='btn';b.style.cssText='padding:6px 10px;min-height:40px;font-size:13px';b.textContent=t;b.onclick=()=>{$('chatin').value=t;sendChat()};row.appendChild(b)});cb.appendChild(row)})();
@@ -916,6 +916,15 @@ function openPetShop(){
   $('f1').onclick=()=>{if(me.coins<5){toast('محتاج 5 عملات');return}me.coins-=5;me.fed=(me.fed||0)+1;player.setApp(myApp());updCoins();saveMe();sfx('star');player.emote('❤️');burst(player.root.position,0xff6b9d,10);toast('😻 حيوانك شبع! مستوى '+(Math.floor(me.fed/3)+1)+' · وجبات '+me.fed);if(me.fed%3===0){me.coins+=15;updCoins();saveMe();toast('🎉 مستوى جديد! +15🪙')}closeModal()}
  })
 }
+
+const SNOW=(()=>{const d=new Date(),m=d.getMonth()+1,dy=d.getDate();return (m===11&&dy>=15)||m===12||(m===1&&dy<=15)||/[?&]snow/.test(location.search)})();
+let snowPts=null;
+function snowTick(dt){
+ if(!SNOW||(me&&me.lq)||window.autoLQ){if(snowPts)snowPts.visible=false;return}
+ if(!snowPts){const n=260,p=new Float32Array(n*3);for(let i=0;i<n;i++){p[i*3]=(Math.random()-0.5)*36;p[i*3+1]=Math.random()*14;p[i*3+2]=(Math.random()-0.5)*36}const gm=new THREE.BufferGeometry();gm.setAttribute('position',new THREE.BufferAttribute(p,3));snowPts=new THREE.Points(gm,new THREE.PointsMaterial({color:0xffffff,size:0.22,transparent:true,opacity:0.85,depthWrite:false}));snowPts.frustumCulled=false;scene.add(snowPts)}
+ snowPts.visible=!!room&&(room.type==='plaza'||room.type==='park'||room.type==='garden');if(!snowPts.visible||!player)return;
+ const a=snowPts.geometry.attributes.position,px=player.root.position.x,pz=player.root.position.z;
+ for(let i=0;i<a.count;i++){let y=a.getY(i)-dt*(1.2+(i%5)*0.25);let x=a.getX(i)+Math.sin(tClock+i)*dt*0.4,z=a.getZ(i);if(y<0){y=14;x=px+(Math.random()-0.5)*36;z=pz+(Math.random()-0.5)*36}a.setXYZ(i,x,y,z)}a.needsUpdate=true}
 let wheelObj=null;
 const WPRIZE=[5,10,5,20,10,50,15,100,10,30];
 function addWheel(){
