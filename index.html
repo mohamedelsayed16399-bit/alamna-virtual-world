@@ -421,6 +421,7 @@ function buildCafe(){
  for(const[x,z]of[[-4,0],[4,0],[-4,3],[4,3],[0,1.5]]){const t=new THREE.Group();t.position.set(x,0,z);t.add(mesh(G.cyl(0.8,0.8,0.1,16),0x8d6e63,0,0.8,0),mesh(G.cyl(0.1,0.15,0.8,6),0x4e342e,0,0.4,0));for(const dx of[-1.1,1.1])t.add(mesh(G.cyl(0.3,0.3,0.1,10),0xc2410c,dx,0.5,0),mesh(G.cyl(0.05,0.05,0.5,6),0x333,dx,0.25,0));g.add(t)}
  g.add(mesh(G.box(0.1,2,3),0x74c0fc,-8.0,2.4,3,0x112244));
  g.add(portalMesh('🎡 عجلة الحظ',6,5.8,0x9775fa,'wheel'));
+ g.add(portalMesh('📸 استوديو الصور',-6,5.8,0xffd43b,'photo'));
  finishRoom(g);
 }
 let ball=null,ballV={x:0,z:0},lastKick=null,goalCool=0,goals=0,ballSend=0;
@@ -614,7 +615,7 @@ function drawMM(){const cv=$('mm'),x=cv.getContext('2d'),W=184,sc=84/room.bounds
  for(const [,r] of remotes)dot(r.root.position.x,r.root.position.z,'#4dabf7',5);
  dot(player.root.position.x,player.root.position.z,'#fff',6);x.restore()}
 /* ===================== friends presence ===================== */
-const friendPres={};const RN={plaza:'الساحة',arcade:'الأركيد',cafe:'الكافيه',home:'بيت',garden:'الحديقة',beach:'الشاطئ',cave:'الكهف',disco:'الديسكو',haunt:'البيت المسكون',space:'محطة الفضاء',maze:'المتاهة',fun:'الملاهي',show:'عرض الأزياء',farm:'المزرعة',studio:'الاستوديو',jump:'الترامبولين',tag:'الطاردة',gallery:'ميدان الرماية',wheel:'عجلة الحظ',bowl:'البولينج',hoops:'تحدي السلة',golf:'الميني جولف',fish:'ميناء الصيد'};
+const friendPres={};const RN={plaza:'الساحة',arcade:'الأركيد',cafe:'الكافيه',home:'بيت',garden:'الحديقة',beach:'الشاطئ',cave:'الكهف',disco:'الديسكو',haunt:'البيت المسكون',space:'محطة الفضاء',maze:'المتاهة',fun:'الملاهي',show:'عرض الأزياء',farm:'المزرعة',studio:'الاستوديو',photo:'استوديو الصور',jump:'الترامبولين',tag:'الطاردة',gallery:'ميدان الرماية',wheel:'عجلة الحظ',bowl:'البولينج',hoops:'تحدي السلة',golf:'الميني جولف',fish:'ميناء الصيد'};
 function presTopic(c){return NS+'/u/'+c}
 function subFriends(){if(!netOK||!client)return;try{client.subscribe(NS+'/fr/'+me.id)}catch(e){}me.friends.forEach(f=>{try{client.subscribe(presTopic(f.code))}catch(e){}})}
 function pubPres(){if(!netOK||!client)return;try{client.publish(presTopic(me.id),JSON.stringify({n:me.name,r:room.type,h:room.type==='home'?room.owner:null}))}catch(e){}}
@@ -699,6 +700,7 @@ function enterRoom(type,opts={}){bg=null;
  else if(type==='gallery'){room.id='gallery';buildGallery();$('roomName').textContent='🎯 ميدان الرماية';starObjs=[]}
  else if(type==='tag'){room.id='tag';buildTag();$('roomName').textContent='🏃 الطاردة';starObjs=[]}
  else if(type==='jump'){room.id='jump';buildJump();$('roomName').textContent='🤸 الترامبولين';starObjs=[]}
+ else if(type==='photo'){room.id='photo';buildPhoto();$('roomName').textContent='📸 استوديو الصور';starObjs=[]}
  else if(type==='studio'){room.id='studio';buildStudio();$('roomName').textContent='🎹 الاستوديو';starObjs=[]}
  else if(type==='cafe'){room.id='cafe';buildCafe();$('roomName').textContent='☕ الكافيه';starObjs=[]}
  else{room.owner=opts.owner;room.id='home-'+opts.owner;const d=opts.data;buildHome(d);$('roomName').textContent='🏠 بيت '+(d.n||opts.owner);starObjs=[]}
@@ -1422,6 +1424,24 @@ function jumpTick(dt){if(!room||room.type!=='jump'||!jp||!player)return;const p=
   for(let i=0;i<jp.stars.length;i++){const st=jp.stars[i];if(st.visible&&Math.hypot(st.position.x-p.x,st.position.z-p.z)<1.3&&Math.abs(st.position.y-(p.y+0.9))<1.3){st.visible=false;jp.got++;me.jstars=(me.jstars||0)+1;sfx('star');burst(st.position.clone(),[0xffd43b,0xffffff],8);if(jp.got%5===0){const t=today();if(!me.jpd||me.jpd.d!==t)me.jpd={d:t,c:0};if(me.jpd.c<15){me.jpd.c+=3;me.coins+=3;updCoins();toast('⭐ '+jp.got+' نجمة +3🪙',1200)}saveMe()}setTimeout(()=>{if(room&&room.type==='jump')jumpStar(i)},1500)}}
   if(p.y<=0){p.y=0;if(jumpPad()){if(jp.press>0){jp.combo=Math.min(6,jp.combo+1);if(jp.combo>=2)toast('🔥 كومبو x'+jp.combo,700)}else jp.combo=0;jp.vy=8+jp.combo*1.5;sfx('place');jp.press=0;me.jumpBest=Math.max(me.jumpBest||0,jp.combo);if(jp.combo>=3)saveMe()}else{jp.air=false;jp.vy=0;jp.combo=0}}}
 }
+
+const BACKS=[['🌅 غروب',0xff8c42,['🌴','🌊','☀️']],['🌌 فضاء',0x1a1b4b,['🚀','⭐','🪐']],['🌸 ربيع',0xf783ac,['🌷','🦋','🌸']],['🏰 قلعة',0x7a8aa0,['🏰','🐉','👑']],['🎉 حفلة',0x9775fa,['🎈','🎁','🎊']],['❄️ شتا',0x74c0fc,['⛄','❄️','🎄']]];
+let ps=null;
+function buildPhoto(){
+ interacts=[];const g=indoor(0x222230,0x2f2f44,0xfff3bf);
+ g.add(mesh(G.box(15,0.06,15),0x343a40,0,0.02,0),mesh(G.cyl(2.2,2.2,0.12,24),0xf8f9fa,0,0.1,-1.5));
+ ps={i:0,back:mesh(G.box(11,4.4,0.3),BACKS[0][1],0,2.2,-5.5,0x222222),props:[],grp:new THREE.Group(),n:0};g.add(ps.back);
+ for(const x of[-4.5,4.5])g.add(mesh(G.cyl(0.08,0.08,3.5,6),0x495057,x,1.75,-2),mesh(G.sph(0.4,8),0xfff3bf,x,3.7,-2,0xffee99));
+ sign(g,'📸 استوديو الصور',0,5.2,-5.2,'rgba(255,212,59,.9)');
+ ps.it1={x:-2.2,z:2,label:'🎨 غيّر الخلفية',fn:photoNext};interacts.push(ps.it1);ps.it2={x:2.2,z:2,label:'📸 صوّر',fn:photoSnap};interacts.push(ps.it2);
+ sign(g,'🎨 الخلفية',-2.2,1.6,1.1);sign(g,'📸 صوّر',2.2,1.6,1.1);
+ g.add(portalMesh('ارجع للكافيه',-5.5,5,0xff8787,'cafe'));
+ mergeStatic(g);scene.add(g);room.group=g;room.bounds=7.5;room.pickables=[];g.add(ps.grp);
+ photoApply();player.root.position.set(0,0,-1.5);toast('📸 استوديو الصور! اختار خلفية وقف في الدايرة وصوّر',3200)
+}
+function photoApply(){const B=BACKS[ps.i];ps.back.material.color.set(B[1]);while(ps.grp.children.length)ps.grp.remove(ps.grp.children[0]);B[2].forEach((e,k)=>{const l=labelSprite(e,{s:2.2,bg:'rgba(0,0,0,0)'});l.position.set(-3.6+k*3.6,1.3+(k===1?1.2:0),-5.0);ps.grp.add(l)});const t=labelSprite(B[0],{s:2.4,bg:'rgba(0,0,0,.5)'});t.position.set(0,3.9,-5.0);ps.grp.add(t);ps.it1.label='🎨 غيّر الخلفية ('+B[0]+')'}
+function photoNext(){if(!ps)return;ps.i=(ps.i+1)%BACKS.length;photoApply();sfx('place');burst(new THREE.Vector3(0,3,-5),[0xffd43b,0xffffff],10)}
+function photoSnap(){if(!ps)return;ps.n++;me.studioPics=(me.studioPics||0)+1;saveMe();sfx('star');takePhoto()}
 function buildStudio(){
  interacts=[];const g=indoor(0x1f2a3a,0x2b3a52,0x15aabf);
  g.add(mesh(G.box(3,0.9,1),0xf8f9fa,-3,0.45,-5),mesh(G.box(3,0.2,0.2),0x212529,-3,0.95,-5.45));for(let i=0;i<8;i++)g.add(mesh(G.box(0.3,0.05,0.9),0x212529,-4.2+i*0.34,0.93,-4.9));
@@ -1520,7 +1540,7 @@ function buildPrivate(){
 let discoBall=null;
 
 let ambN=null,ambT=0;
-const AMB={plaza:[220,277,330],park:[196,247,294],garden:[262,330,392],beach:[196,262,330],cave:[110,147,175],disco:[262,330,392],haunt:[98,123,147],space:[131,165,196],maze:[185,233,277],fun:[262,330,392],show:[294,370,440],farm:[196,247,294],fish:[196,247,294],jump:[262,330,392],tag:[196,262,330],gallery:[220,277,330],wheel:[262,330,392],bowl:[185,233,277],hoops:[196,247,294],golf:[262,330,392],studio:[220,277,330],cafe:[175,220,262],arcade:[165,208,247],race:[147,185,220],private:[233,294,349],home:[196,262,311]};
+const AMB={plaza:[220,277,330],park:[196,247,294],garden:[262,330,392],beach:[196,262,330],cave:[110,147,175],disco:[262,330,392],haunt:[98,123,147],space:[131,165,196],maze:[185,233,277],fun:[262,330,392],show:[294,370,440],farm:[196,247,294],fish:[196,247,294],photo:[262,330,392],jump:[262,330,392],tag:[196,262,330],gallery:[220,277,330],wheel:[262,330,392],bowl:[185,233,277],hoops:[196,247,294],golf:[262,330,392],studio:[220,277,330],cafe:[175,220,262],arcade:[165,208,247],race:[147,185,220],private:[233,294,349],home:[196,262,311]};
 function ambTick(dt){
  ambT-=dt;if(ambT>0)return;ambT=1;
  const on=!(me&&me.mute)&&AC&&AC.state==='running'&&!document.hidden;
@@ -1558,11 +1578,11 @@ function pubPet(){const l=Math.floor((me.fed||0)/3);if(!me.pet||l<1||!netOK||!cl
 function openPetBoard(){const e={};modal(c=>{c.innerHTML='<h2>🏆 أكبر الحيوانات</h2><div id="pl"></div><div class="row"><button class="btn d" id="px">إغلاق</button></div>';const nm=['','🐱','🐶','🦆'];const render=()=>{const l=$('pl');if(!l)return;l.innerHTML='';const a=Object.values(e).sort((x,y)=>y.l-x.l).slice(0,10);if(!a.length)l.textContent='لسه مفيش أرقام';a.forEach((v,i)=>{const d=document.createElement('div');d.className='qrow';d.textContent=(i+1)+'. '+v.n+' · '+(nm[v.p]||'🐾')+' مستوى '+v.l;l.appendChild(d)})};plCb=(id,m)=>{e[id]=m;render()};if(netOK)try{client.subscribe(NS+'/pl/+')}catch(x){}const l0=Math.floor((me.fed||0)/3);if(me.pet&&l0>0)e[me.id]={n:me.name,l:Math.min(l0,30),p:me.pet};$('px').onclick=()=>{try{client.unsubscribe(NS+'/pl/+')}catch(x){}plCb=null;closeModal()};render()})}
 
 /* ===== achievements ===== */
-const ACH=[['friend','🤝','أول صاحب',()=>me.friends.length>=1],['rich','💰','٣٠٠ عملة',()=>me.coins>=300],['pet3','🐾','حيوان مستوى ٣',()=>(me.fed||0)>=9],['tres','🧰','صياد كنوز اليوم',()=>me.tr&&me.tr.got.length>=5],['hats','🎩','٣ قبعات مشتراة',()=>(me.owned||[]).length>=3],['bfly','🦋','٢٠ فراشة',()=>(me.bfBest||0)>=20],['race','🏁','أنهيت سباق',()=>!!me.raceBest],['mem','🃏','ذاكرة قوية',()=>(me.memWins||0)>=1],['fish','🎣','٥ سمكات',()=>(me.fish||0)>=5],['sg','🌠','١٠ نجوم في لعبة',()=>(me.sgBest||0)>=10],['shell','🐚','٦ صدفات',()=>(me.shells||0)>=6],['gem','💎','٨ جواهر',()=>(me.gemsGot||0)>=8],['mine','⛏️','كسّرت ٣ صخور',()=>(me.mined||0)>=3],['rhy','🎵','أول لعبة إيقاع',()=>(me.rhPlays||0)>=1],['ghost','👻','٥ أشباح',()=>(me.ghostsGot||0)>=5],['orb','⚡','١٠ طاقات',()=>(me.orbsGot||0)>=10],['scope','🔭','بُصيت في التليسكوب',()=>(me.scopes||0)>=1],['fest','🎆','حضرت مهرجان',()=>(me.fests||0)>=1],['maze','🌀','خلصت المتاهة',()=>(me.mazes||0)>=1],['fun','🎢','ركبت الأفعوانية',()=>(me.funRides||0)>=1],['trick','🎓','حيوان اتعلم حيلتين',()=>(me.tricks||[]).length>=2],['th','🏴‍☠️','لقيت الكنز الكبير',()=>(me.thWins||0)>=1],['show','👗','عرضت إطلالتك',()=>(me.shows||0)>=1],['farm','🧺','حصدت ٥ محاصيل',()=>(me.harv||0)>=5],['mus','🎵','٥٠ نوتة',()=>(me.notes||0)>=50],['ride','⛵','رحلة قارب',()=>(me.rides||0)>=1],['photo','📷','أول صورة',()=>(me.photos||0)>=1],['gift','🎁','أول هدية',()=>(me.giftsSent||0)+(me.giftsGot||0)>=1],['fish','🎣','١٠ سمكات',()=>(me.fishN||0)>=10],['golf','⛳','خلّصت جولة جولف',()=>(me.golfRounds||0)>=1],['hoops','🏀','٢٠ نقطة في السلة',()=>(me.hoopBest||0)>=20],['bowl','🎳','٢٥ نقطة بولينج',()=>(me.bowlBest||0)>=25],['wheel','🎡','أول لفّة',()=>(me.wheelSpins||0)>=1],['gal','🎯','١٥ نقطة رماية',()=>(me.galBest||0)>=15],['tag','🏃','أول طاردة',()=>(me.tagGames||0)>=1],['jump','🤸','كومبو x4 ترامبولين',()=>(me.jumpBest||0)>=4],['simon','🔴','سيمون مستوى ٥',()=>(me.simBest||0)>=5],['react','⚡','أقل من ٣٠٠ms',()=>me.reactBest&&me.reactBest<300]];
+const ACH=[['friend','🤝','أول صاحب',()=>me.friends.length>=1],['rich','💰','٣٠٠ عملة',()=>me.coins>=300],['pet3','🐾','حيوان مستوى ٣',()=>(me.fed||0)>=9],['tres','🧰','صياد كنوز اليوم',()=>me.tr&&me.tr.got.length>=5],['hats','🎩','٣ قبعات مشتراة',()=>(me.owned||[]).length>=3],['bfly','🦋','٢٠ فراشة',()=>(me.bfBest||0)>=20],['race','🏁','أنهيت سباق',()=>!!me.raceBest],['mem','🃏','ذاكرة قوية',()=>(me.memWins||0)>=1],['fish','🎣','٥ سمكات',()=>(me.fish||0)>=5],['sg','🌠','١٠ نجوم في لعبة',()=>(me.sgBest||0)>=10],['shell','🐚','٦ صدفات',()=>(me.shells||0)>=6],['gem','💎','٨ جواهر',()=>(me.gemsGot||0)>=8],['mine','⛏️','كسّرت ٣ صخور',()=>(me.mined||0)>=3],['rhy','🎵','أول لعبة إيقاع',()=>(me.rhPlays||0)>=1],['ghost','👻','٥ أشباح',()=>(me.ghostsGot||0)>=5],['orb','⚡','١٠ طاقات',()=>(me.orbsGot||0)>=10],['scope','🔭','بُصيت في التليسكوب',()=>(me.scopes||0)>=1],['fest','🎆','حضرت مهرجان',()=>(me.fests||0)>=1],['maze','🌀','خلصت المتاهة',()=>(me.mazes||0)>=1],['fun','🎢','ركبت الأفعوانية',()=>(me.funRides||0)>=1],['trick','🎓','حيوان اتعلم حيلتين',()=>(me.tricks||[]).length>=2],['th','🏴‍☠️','لقيت الكنز الكبير',()=>(me.thWins||0)>=1],['show','👗','عرضت إطلالتك',()=>(me.shows||0)>=1],['farm','🧺','حصدت ٥ محاصيل',()=>(me.harv||0)>=5],['mus','🎵','٥٠ نوتة',()=>(me.notes||0)>=50],['ride','⛵','رحلة قارب',()=>(me.rides||0)>=1],['photo','📷','أول صورة',()=>(me.photos||0)>=1],['gift','🎁','أول هدية',()=>(me.giftsSent||0)+(me.giftsGot||0)>=1],['fish','🎣','١٠ سمكات',()=>(me.fishN||0)>=10],['golf','⛳','خلّصت جولة جولف',()=>(me.golfRounds||0)>=1],['hoops','🏀','٢٠ نقطة في السلة',()=>(me.hoopBest||0)>=20],['bowl','🎳','٢٥ نقطة بولينج',()=>(me.bowlBest||0)>=25],['wheel','🎡','أول لفّة',()=>(me.wheelSpins||0)>=1],['gal','🎯','١٥ نقطة رماية',()=>(me.galBest||0)>=15],['tag','🏃','أول طاردة',()=>(me.tagGames||0)>=1],['jump','🤸','كومبو x4 ترامبولين',()=>(me.jumpBest||0)>=4],['spic','📸','صوّرت في الاستوديو',()=>(me.studioPics||0)>=1],['simon','🔴','سيمون مستوى ٥',()=>(me.simBest||0)>=5],['react','⚡','أقل من ٣٠٠ms',()=>me.reactBest&&me.reactBest<300]];
 let achT=0;
 function achTick(dt){achT-=dt;if(achT>0||!me)return;achT=3;me.ach=me.ach||{};for(const [k,e,n,f] of ACH){if(!me.ach[k]){let ok=false;try{ok=f()}catch(x){}if(ok){me.ach[k]=1;me.coins+=10;updCoins();saveMe();sfx('win');toast('🏅 إنجاز جديد: '+e+' '+n+' · +10🪙',3500);break}}}}
 
-const STAMPS=[['plaza','🌳','الساحة'],['maze','🌀','المتاهة'],['fun','🎢','الملاهي'],['show','👗','عرض الأزياء'],['farm','🚜','المزرعة'],['studio','🎹','الاستوديو'],['jump','🤸','الترامبولين'],['tag','🏃','الطاردة'],['gallery','🎯','ميدان الرماية'],['wheel','🎡','عجلة الحظ'],['bowl','🎳','البولينج'],['hoops','🏀','تحدي السلة'],['golf','⛳','الميني جولف'],['fish','🎣','ميناء الصيد'],['arcade','🕹️','الأركيد'],['cafe','☕','الكافيه'],['garden','🌷','الحديقة'],['park','⚽','الملعب'],['race','🏁','السباق'],['beach','🏖️','الشاطئ'],['cave','💎','الكهف'],['disco','🪩','الديسكو'],['haunt','👻','البيت المسكون'],['space','🚀','محطة الفضاء']];
+const STAMPS=[['plaza','🌳','الساحة'],['maze','🌀','المتاهة'],['fun','🎢','الملاهي'],['show','👗','عرض الأزياء'],['farm','🚜','المزرعة'],['studio','🎹','الاستوديو'],['photo','📸','استوديو الصور'],['jump','🤸','الترامبولين'],['tag','🏃','الطاردة'],['gallery','🎯','ميدان الرماية'],['wheel','🎡','عجلة الحظ'],['bowl','🎳','البولينج'],['hoops','🏀','تحدي السلة'],['golf','⛳','الميني جولف'],['fish','🎣','ميناء الصيد'],['arcade','🕹️','الأركيد'],['cafe','☕','الكافيه'],['garden','🌷','الحديقة'],['park','⚽','الملعب'],['race','🏁','السباق'],['beach','🏖️','الشاطئ'],['cave','💎','الكهف'],['disco','🪩','الديسكو'],['haunt','👻','البيت المسكون'],['space','🚀','محطة الفضاء']];
 function stampRoom(type){const st=STAMPS.find(x=>x[0]===type);if(!st||!me)return;me.stamps=me.stamps||{};if(me.stamps[type])return;me.stamps[type]=1;sfx('star');const n=STAMPS.filter(x=>me.stamps[x[0]]).length;toast('🛂 ختم جديد: '+st[1]+' '+st[2]+' ('+n+'/'+STAMPS.length+')',2600);if(n>=STAMPS.length&&!me.pspDone){me.pspDone=1;me.coins+=100;me.owned=me.owned||[];if(!me.owned.includes(24))me.owned.push(24);updCoins();setTimeout(()=>{toast('🎉 جواز السفر اكتمل! +100🪙 وتاج المستكشف اتفتح',5000);sfx('win')},2800)}saveMe()}
 function openPassport(){modal(c=>{me.stamps=me.stamps||{};const n=STAMPS.filter(x=>me.stamps[x[0]]).length;c.innerHTML='<h2>🛂 جواز السفر</h2><div style="text-align:center;margin:4px">'+n+'/'+STAMPS.length+' ختم'+(me.pspDone?' · ✅ مكتمل':' · اكمله واخد ١٠٠🪙 وتاج المستكشف')+'</div><div id="pg" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0"></div><div class="row"><button class="btn g" id="ok">تمام</button></div>';for(const [k,e,nm] of STAMPS){const d=document.createElement('div');const got=me.stamps[k];d.style.cssText='border-radius:12px;padding:10px 4px;text-align:center;font-size:12px;border:2px dashed '+(got?'#40c057':'#666')+';background:'+(got?'rgba(64,192,87,.18)':'rgba(255,255,255,.05)')+';opacity:'+(got?1:0.55);d.innerHTML='<div style="font-size:26px">'+(got?e:'❔')+'</div>'+nm;$('pg').appendChild(d)}$('ok').onclick=closeModal})}
 
@@ -1653,4 +1673,4 @@ requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
 </script>
 </body>
- </html>
+                                                                   </html>
