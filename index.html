@@ -627,7 +627,7 @@ function enterRoom(type,opts={}){
  if(player)scene.remove(player.root);
  disposeRoom();room={type,id:'plaza',owner:null,group:null,pickables:[],bounds:26};
  editing=false;sel=null;hold=null;$('shop').style.display='none';
- if(type==='plaza'){room.id='plaza';buildPlaza();$('roomName').textContent='🌳 الساحة العامة';initBots();setupStars()}
+ if(type==='plaza'){room.id='plaza';buildPlaza();addWheel();$('roomName').textContent='🌳 الساحة العامة';initBots();setupStars()}
  else if(type==='arcade'){room.id='arcade';buildArcade();$('roomName').textContent='🕹️ الأركيد';starObjs=[]}
  else if(type==='race'){room.id='race';buildRace();$('roomName').textContent='🏁 حلبة السباق';starObjs=[]}
  else if(type==='park'){room.id='park';buildPark();$('roomName').textContent='⚽ الملعب';starObjs=[]}
@@ -818,7 +818,7 @@ $('bInfo').onclick=()=>modal(c=>{
 let last=performance.now(),tClock=0;
 function frame(now){
  requestAnimationFrame(frame);
- const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick();fpsTick(dt);
+ const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick();if(wheelObj&&room.type==='plaza')wheelObj.rotation.z+=dt*0.8;fpsTick(dt);
  if(player){
   let ix=joy.x+((keys['d']||keys['arrowright'])?1:0)-((keys['a']||keys['arrowleft'])?1:0),iy=joy.y+((keys['w']||keys['arrowup'])?1:0)-((keys['s']||keys['arrowdown'])?1:0);
   const m=Math.hypot(ix,iy);let vx=0,vz=0,mov=false;
@@ -883,6 +883,29 @@ const QUICK=['مرحبا 👋','تعالى بيتي 🏠','نلعب؟ 🎮','ش�
 (function(){const cb=$('chatbox');const row=document.createElement('div');cb.style.flexWrap='wrap';row.style.cssText='flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;direction:rtl';QUICK.forEach(t=>{const b=document.createElement('button');b.className='btn';b.style.cssText='padding:6px 10px;min-height:40px;font-size:13px';b.textContent=t;b.onclick=()=>{$('chatin').value=t;sendChat()};row.appendChild(b)});cb.appendChild(row)})();
 let fpsAcc=0,fpsN=0,fpsLow=0;
 function fpsTick(dt){if(window.autoLQ||document.hidden)return;fpsAcc+=dt;fpsN++;if(fpsAcc>=1){const f=fpsN/fpsAcc;fpsAcc=0;fpsN=0;if(f<25)fpsLow++;else fpsLow=Math.max(0,fpsLow-1);if(fpsLow>=5){window.autoLQ=1;applyQ();toast('⚙️ خفّفنا الجودة تلقائياً عشان اللعب يبقى أسلس')}}}
+
+let wheelObj=null;
+const WPRIZE=[5,10,5,20,10,50,15,100,10,30];
+function addWheel(){
+ const g=new THREE.Group();g.position.set(8,0,12.5);
+ g.add(mesh(G.cyl(0.12,0.12,3,8),0x495057,-0.9,1.5,0),mesh(G.cyl(0.12,0.12,3,8),0x495057,0.9,1.5,0));
+ const w=new THREE.Group();w.position.y=2.4;const cols=[0xff6b6b,0xffd43b,0x51cf66,0x4dabf7,0xb197fc];
+ for(let i=0;i<10;i++){const sg=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,0.2,10,1,false,i*Math.PI/5,Math.PI/5),new THREE.MeshLambertMaterial({color:cols[i%5]}));w.add(sg)}
+ w.rotation.x=Math.PI/2;const holder=new THREE.Group();holder.position.y=0;holder.add(w);g.add(holder);holder.position.set(0,0,0);
+ const pt=mesh(G.cone(0.2,0.5,4),0xe03131,0,4.1,0.15);pt.rotation.x=Math.PI;g.add(pt);
+ const sgn=labelSprite('🎡 عجلة الحظ',{s:3.2,bg:'rgba(180,40,120,.9)'});sgn.position.set(0,4.9,0);g.add(sgn);
+ g.rotation.y=-0.6;room.group.add(g);wheelObj=w;
+ interacts.push({x:8,z:12.5-1.2,label:'🎡 لف عجلة الحظ',fn:openWheel});
+}
+function openWheel(){
+ const t=today();
+ modal(c=>{
+  if(me.wheel===t){c.innerHTML='<h2>🎡 عجلة الحظ</h2><div style="text-align:center;font-size:18px;margin:14px">لفيت النهارده خلاص، ارجع بكرة 🌙</div><div class="row"><button class="btn g" id="ok">تمام</button></div>';$('ok').onclick=closeModal;return}
+  c.innerHTML='<h2>🎡 عجلة الحظ</h2><div id="wn" style="text-align:center;font-size:56px;margin:12px">🎡</div><div style="text-align:center;color:#aab4de">لفة واحدة كل يوم</div><div class="row"><button class="btn g" id="sp">لف العجلة!</button><button class="btn" id="no">لاحقاً</button></div>';
+  $('no').onclick=closeModal;
+  $('sp').onclick=()=>{$('sp').disabled=true;me.wheel=t;const idx=Math.floor(Math.random()*WPRIZE.length),pr=WPRIZE[idx];let n=0;const iv=setInterval(()=>{n++;$('wn').textContent=WPRIZE[Math.floor(Math.random()*WPRIZE.length)]+' 🪙';sfx('chat');if(n>=18){clearInterval(iv);$('wn').textContent='🪙 +'+pr;me.coins+=pr;updCoins();saveMe();sfx('star');burst(player.root.position,0xffd43b,16);$('sp').textContent='تمام';$('sp').disabled=false;$('sp').onclick=closeModal;$('no').style.display='none'}},110)}
+ })
+}
 let chests=[];
 function dayKey(){return new Date().toISOString().slice(0,10)}
 function chestHud(){let h=$('chestHud');if(!h){h=document.createElement('div');h.id='chestHud';h.style.cssText='position:fixed;left:50%;top:62px;transform:translateX(-50%);z-index:9;background:#000a;color:#ffd43b;padding:4px 12px;border-radius:14px;font:700 13px system-ui;direction:rtl;pointer-events:none';document.body.appendChild(h)}return h}
