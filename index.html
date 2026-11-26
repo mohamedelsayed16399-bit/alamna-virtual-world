@@ -623,7 +623,7 @@ function openCafeMenu(){
   [['شاي','🍵',5],['قهوة','☕',8],['عصير','🧃',10],['كأس الفخامة','🏆',40]].forEach(([n,e,p])=>{const d=document.createElement('div');d.className='friend';const sp=document.createElement('span');sp.textContent=e+' '+n+' · 🪙'+p;const b=document.createElement('button');b.className='btn g';b.style.padding='6px 12px';b.textContent='اطلب';b.onclick=()=>{if(me.coins<p){toast('فلوسك مش كفاية');sfx('err');return}me.coins-=p;saveMe();sfx('drink');qAdd('drink');player.emote(e);pub({t:'e',i:me.id,e});addLog('','طلبت '+n);closeModal()};d.append(sp,b);$('cm').appendChild(d)});
   $('cx').onclick=closeModal})}
 let stars=0,starSlot=-1,starObjs=[],starTaken=new Set();
-function enterRoom(type,opts={}){
+function enterRoom(type,opts={}){bg=null;
  pub({t:'bye',i:me.id});
  if(player)scene.remove(player.root);
  disposeRoom();room={type,id:'plaza',owner:null,group:null,pickables:[],bounds:26};
@@ -819,7 +819,7 @@ $('bInfo').onclick=()=>modal(c=>{
 let last=performance.now(),tClock=0;
 function frame(now){
  requestAnimationFrame(frame);
- const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick();if(wheelObj&&room.type==='plaza')wheelObj.rotation.z+=dt*0.8;fpsTick(dt);
+ const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick(dt);if(wheelObj&&room.type==='plaza')wheelObj.rotation.z+=dt*0.8;fpsTick(dt);
  if(player){
   let ix=joy.x+((keys['d']||keys['arrowright'])?1:0)-((keys['a']||keys['arrowleft'])?1:0),iy=joy.y+((keys['w']||keys['arrowup'])?1:0)-((keys['s']||keys['arrowdown'])?1:0);
   const m=Math.hypot(ix,iy);let vx=0,vz=0,mov=false;
@@ -863,7 +863,16 @@ function onboard(){if(me.ob||document.getElementById('ob')||/nomerge|noob/.test(
 window.addEventListener('orientationchange',()=>setTimeout(()=>window.dispatchEvent(new Event('resize')),250));
 
 
-let butter=[];let lastWater=0;
+let butter=[];
+let bg=null;
+function startButter(){if(bg){toast('اللعبة شغالة!');return}bg={t:30,n:0};const h=chestHud();h.style.display='block';toast('🦋 اجري ورا الفراشات! 30 ثانية');sfx('star')}
+function butterGame(dt){
+ if(!bg)return;const h=chestHud();bg.t-=dt;h.style.display='block';h.textContent='🦋 '+bg.n+' · ⏱ '+Math.max(0,Math.ceil(bg.t));
+ const p=player.root.position;
+ for(const b of butter){if(b.hide>0){b.hide-=dt;if(b.hide<=0)b.m.visible=true;continue}const q=b.m.position;if(Math.hypot(p.x-q.x,p.z-q.z)<1.1){b.m.visible=false;b.hide=1.5;bg.n++;sfx('chat');burst(q,0xf783ac,6)}}
+ if(bg.t<=0){const n=bg.n,pr=Math.min(n*2,40);bg=null;me.bfBest=Math.max(me.bfBest||0,n);me.coins+=pr;updCoins();saveMe();sfx('star');burst(p,0xffd43b,14);toast('🦋 اصطدت '+n+' فراشة! +'+pr+'🪙 · أفضل نتيجة '+me.bfBest,3500);chestUpd()}
+}
+let lastWater=0;
 function buildGarden(){
  interacts=[];butter=[];const g=indoor(0x3f8f3f,0xbfe3a8,0xf783ac);
  const rng=mulberry(4242),cols=[0xff6b9d,0xffd43b,0xb197fc,0xff922b,0xf8f9fa,0x74c0fc];
@@ -873,12 +882,12 @@ function buildGarden(){
  const b=new THREE.Group();b.position.set(-3,0,1);b.add(mesh(G.box(2,0.12,0.7),0x8d6e63,0,0.55,0),mesh(G.box(2,0.5,0.1),0x8d6e63,0,0.9,-0.3),mesh(G.box(0.12,0.5,0.6),0x5c4033,-0.9,0.25,0),mesh(G.box(0.12,0.5,0.6),0x5c4033,0.9,0.25,0));g.add(b);
  const wc=new THREE.Group();wc.position.set(0,0,-3);wc.add(mesh(G.cyl(0.3,0.4,0.6,10),0x1c7ed6,0,0.3,0),mesh(G.cyl(0.05,0.05,0.5,6),0x1864ab,0.3,0.55,0));g.add(wc);
  sign(g,'🚿 اسقِ الورد',0,1.8,-3);interacts.push({x:0,z:-2,label:'🚿 اسقِ الورد (+3🪙)',fn:waterFlowers});
- sign(g,'🌷 الحديقة',0,4,-7.5,'rgba(190,40,100,.85)');
+ sign(g,'🌷 الحديقة',0,4,-7.5,'rgba(190,40,100,.85)');sign(g,'🦋 اصطد الفراشات',5.5,2.2,3.5);interacts.push({x:5.5,z:4.5,label:'🦋 العب اصطياد الفراشات',fn:startButter});
  finishRoom(g);
  for(let i=0;i<8;i++){const m=new THREE.Group(),c=cols[i%6];for(const sx of[-1,1]){const w=new THREE.Mesh(new THREE.PlaneGeometry(0.28,0.22),new THREE.MeshBasicMaterial({color:c,side:2}));w.position.x=sx*0.14;w.userData.sx=sx;m.add(w)}room.group.add(m);butter.push({m,a:rng()*6.28,r:2+rng()*4.5,h:1.2+rng()*1.2,sp:0.4+rng()*0.5,cx:(rng()-0.5)*6,cz:(rng()-0.5)*5})}
 }
 function waterFlowers(){const t=Date.now();if(t-lastWater<20000){toast('🌱 الورد لسه مبلول، استنى '+Math.ceil((20000-(t-lastWater))/1000)+' ثانية');return}lastWater=t;me.coins+=3;sfx('star');burst(player.root.position,0x74c0fc,12);toast('🌷 الورد فرحان! +3🪙');updCoins();saveMe()}
-function gardenTick(){if(!butter.length||!room||room.type!=='garden')return;for(const b of butter){b.a+=0.016*b.sp*3;b.m.position.set(b.cx+Math.cos(b.a)*b.r,b.h+Math.sin(b.a*3)*0.3,b.cz+Math.sin(b.a)*b.r*0.7);b.m.rotation.y=-b.a;const f=Math.sin(tClock*14+b.a*5)*0.9;b.m.children[0].rotation.y=f;b.m.children[1].rotation.y=-f}}
+function gardenTick(dt){butterGame(dt||0.016);if(!butter.length||!room||room.type!=='garden')return;for(const b of butter){b.a+=0.016*b.sp*3;b.m.position.set(b.cx+Math.cos(b.a)*b.r,b.h+Math.sin(b.a*3)*0.3,b.cz+Math.sin(b.a)*b.r*0.7);b.m.rotation.y=-b.a;const f=Math.sin(tClock*14+b.a*5)*0.9;b.m.children[0].rotation.y=f;b.m.children[1].rotation.y=-f}}
 
 const QUICK=['مرحبا 👋','تعالى بيتي 🏠','نلعب؟ 🎮','شكراً 🙏','ههه 😂','يلا بينا!'];
 (function(){const cb=$('chatbox');const row=document.createElement('div');cb.style.flexWrap='wrap';row.style.cssText='flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;direction:rtl';QUICK.forEach(t=>{const b=document.createElement('button');b.className='btn';b.style.cssText='padding:6px 10px;min-height:40px;font-size:13px';b.textContent=t;b.onclick=()=>{$('chatin').value=t;sendChat()};row.appendChild(b)});cb.appendChild(row)})();
@@ -951,7 +960,7 @@ function chestTick(dt){
   if(me.tr.got.length>=5){me.coins+=100;msg='🏆 لقيت كل كنوز اليوم! +100🪙 مكافأة';for(const c of [0xff6b6b,0x51cf66,0x4dabf7,0xffd43b])burst(p,c,12)}
   toast(msg,2800);updCoins();saveMe();chestUpd()}}
 }
-window.__vw={get autoLQ(){return window.autoLQ},get chests(){return chests},get tr(){return me.tr},get pos(){return player.root.position},renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
+window.__vw={get butter(){return butter},get me(){return me},get autoLQ(){return window.autoLQ},get chests(){return chests},get tr(){return me.tr},get pos(){return player.root.position},renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
 applyQ();updCoins();enterRoom('plaza');netConnect();setOnline();dailyCheck();ensureQ();
 requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
