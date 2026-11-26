@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#1b2340">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%234dabf7'/%3E%3Ccircle cx='32' cy='26' r='10' fill='%23ffd43b'/%3E%3Crect x='18' y='38' width='28' height='18' rx='9' fill='%2351cf66'/%3E%3C/svg%3E">
 <title>عالمنا | عالم افتراضي اجتماعي</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -119,7 +120,7 @@ function updCoins(){$('coins').textContent='🪙 '+me.coins}
 /* ===================== three setup ===================== */
 const canvas=$('c');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
-function applyQ(){renderer.setPixelRatio(me&&me.lq?1:Math.min(devicePixelRatio||1,1.75));renderer.setSize(innerWidth,innerHeight,false)}
+function applyQ(){renderer.setPixelRatio((me&&me.lq)||window.autoLQ?1:Math.min(devicePixelRatio||1,1.75));renderer.setSize(innerWidth,innerHeight,false)}
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(50,1,0.1,200);
 const hemi=new THREE.HemisphereLight(0xffffff,0x556677,0.85);scene.add(hemi);
@@ -817,7 +818,7 @@ $('bInfo').onclick=()=>modal(c=>{
 let last=performance.now(),tClock=0;
 function frame(now){
  requestAnimationFrame(frame);
- const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick();
+ const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick();fpsTick(dt);
  if(player){
   let ix=joy.x+((keys['d']||keys['arrowright'])?1:0)-((keys['a']||keys['arrowleft'])?1:0),iy=joy.y+((keys['w']||keys['arrowup'])?1:0)-((keys['s']||keys['arrowdown'])?1:0);
   const m=Math.hypot(ix,iy);let vx=0,vz=0,mov=false;
@@ -877,6 +878,11 @@ function buildGarden(){
 }
 function waterFlowers(){const t=Date.now();if(t-lastWater<20000){toast('🌱 الورد لسه مبلول، استنى '+Math.ceil((20000-(t-lastWater))/1000)+' ثانية');return}lastWater=t;me.coins+=3;sfx('star');burst(player.root.position,0x74c0fc,12);toast('🌷 الورد فرحان! +3🪙');updCoins();saveMe()}
 function gardenTick(){if(!butter.length||!room||room.type!=='garden')return;for(const b of butter){b.a+=0.016*b.sp*3;b.m.position.set(b.cx+Math.cos(b.a)*b.r,b.h+Math.sin(b.a*3)*0.3,b.cz+Math.sin(b.a)*b.r*0.7);b.m.rotation.y=-b.a;const f=Math.sin(tClock*14+b.a*5)*0.9;b.m.children[0].rotation.y=f;b.m.children[1].rotation.y=-f}}
+
+const QUICK=['مرحبا 👋','تعالى بيتي 🏠','نلعب؟ 🎮','شكراً 🙏','ههه 😂','يلا بينا!'];
+(function(){const cb=$('chatbox');const row=document.createElement('div');cb.style.flexWrap='wrap';row.style.cssText='flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;direction:rtl';QUICK.forEach(t=>{const b=document.createElement('button');b.className='btn';b.style.cssText='padding:6px 10px;min-height:40px;font-size:13px';b.textContent=t;b.onclick=()=>{$('chatin').value=t;sendChat()};row.appendChild(b)});cb.appendChild(row)})();
+let fpsAcc=0,fpsN=0,fpsLow=0;
+function fpsTick(dt){if(window.autoLQ||document.hidden)return;fpsAcc+=dt;fpsN++;if(fpsAcc>=1){const f=fpsN/fpsAcc;fpsAcc=0;fpsN=0;if(f<25)fpsLow++;else fpsLow=Math.max(0,fpsLow-1);if(fpsLow>=5){window.autoLQ=1;applyQ();toast('⚙️ خفّفنا الجودة تلقائياً عشان اللعب يبقى أسلس')}}}
 let chests=[];
 function dayKey(){return new Date().toISOString().slice(0,10)}
 function chestHud(){let h=$('chestHud');if(!h){h=document.createElement('div');h.id='chestHud';h.style.cssText='position:fixed;left:50%;top:62px;transform:translateX(-50%);z-index:9;background:#000a;color:#ffd43b;padding:4px 12px;border-radius:14px;font:700 13px system-ui;direction:rtl;pointer-events:none';document.body.appendChild(h)}return h}
@@ -900,7 +906,7 @@ function chestTick(dt){
   if(me.tr.got.length>=5){me.coins+=100;msg='🏆 لقيت كل كنوز اليوم! +100🪙 مكافأة';for(const c of [0xff6b6b,0x51cf66,0x4dabf7,0xffd43b])burst(p,c,12)}
   toast(msg,2800);updCoins();saveMe();chestUpd()}}
 }
-window.__vw={get chests(){return chests},get tr(){return me.tr},get pos(){return player.root.position},renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
+window.__vw={get autoLQ(){return window.autoLQ},get chests(){return chests},get tr(){return me.tr},get pos(){return player.root.position},renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
 applyQ();updCoins();enterRoom('plaza');netConnect();setOnline();dailyCheck();ensureQ();
 requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
