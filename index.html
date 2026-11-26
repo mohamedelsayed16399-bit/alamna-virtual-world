@@ -756,7 +756,7 @@ function frame(now){
   if(room.type==='plaza'){const r=Math.hypot(p.x,p.z);if(r>b){p.x*=b/r;p.z*=b/r}if(r<3.5){p.x*=3.5/Math.max(r,0.01);p.z*=3.5/Math.max(r,0.01)}}
   else{p.x=clamp(p.x,-b,b);p.z=clamp(p.z,-b,b)}
   player.moving=mov;player.tick(dt,tClock);
-  camT.lerp(new THREE.Vector3(p.x,1,p.z),Math.min(1,dt*6));
+  {const f=(room.type==='plaza'||room.type==='park')?1:0.4;camT.lerp(new THREE.Vector3(p.x*f,1,p.z*f),Math.min(1,dt*6))}
   camera.position.set(camT.x+Math.sin(yaw)*Math.cos(pitch)*dist,camT.y+Math.sin(pitch)*dist,camT.z+Math.cos(yaw)*Math.cos(pitch)*dist);camera.lookAt(camT);
   sendPos(false);
   for(const pt of portals){const dx=p.x-pt.x,dz=p.z-pt.z;pt.ring.rotation.z+=dt*2;if(!nearCool&&dx*dx+dz*dz<1.1){nearCool=true;setTimeout(()=>nearCool=false,1500);gotoPortal(pt.to);break}}
