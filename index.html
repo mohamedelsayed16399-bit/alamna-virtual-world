@@ -255,7 +255,7 @@ let isNight=false,fwT=3;
 /* ===================== rooms ===================== */
 let room={type:'plaza',id:'plaza',owner:null,group:null,stars:[],bounds:26,pickables:[]};
 let lamps=[],fountainWater=null,portals=[],ground=null,clouds=[];
-const remotes=new Map();
+const remotes=new Map();const joinLog={};
 let player=null,bots=[];
 let walkTarget=null;
 
@@ -490,7 +490,7 @@ function netConnect(){
  try{
   if(client){try{client.end(true)}catch(e){}}
   client=mqtt.connect(BROKERS[bi],{clientId:'ealam_'+me.id+'_'+rnd(5),clean:true,reconnectPeriod:0,connectTimeout:7000,keepalive:30});
-  client.on('connect',()=>{netOK=true;subRoom=null;subscribeRoom();subFriends();pubPres();publishHome();setOnline()});
+  client.on('connect',()=>{netOK=true;subRoom=null;subscribeRoom();subFriends();pubPres();publishHome();pubPet();setOnline()});
   client.on('message',onMsg);
   const fail=()=>{if(netOK||client){netOK=false;setOnline()}bi=(bi+1)%BROKERS.length;clearTimeout(netConnect.t);netConnect.t=setTimeout(netConnect,4000)};
   client.on('error',fail);client.on('close',fail);
@@ -508,7 +508,7 @@ const num=(v,a,b,d=0)=>{v=+v;return isFinite(v)?clamp(v,a,b):d};
 function getRemote(m){
  let r=remotes.get(m.i);
  const app={b:num(m.b,0,20,0)|0,h:num(m.h,0,20,0)|0,a:num(m.a,0,15,0)|0,p:num(m.p,0,3,0)|0,l:num(m.l,0,50,0)|0};
- if(!r){r=new Actor(app,str(m.n,16)||'لاعب');r.tx=0;r.tz=0;r.root.position.set(num(m.x,-50,50),0,num(m.z,-50,50));scene.add(r.root);remotes.set(m.i,r);setOnline();addLog('','🔔 '+r.name+' دخل الغرفة');if(room&&room.type==='home'&&room.owner===me.id){toast('🏡 '+r.name+' زار بيتك!',3000);sfx('star');qAdd('visit')}}
+ if(!r){r=new Actor(app,str(m.n,16)||'لاعب');r.tx=0;r.tz=0;r.root.position.set(num(m.x,-50,50),0,num(m.z,-50,50));scene.add(r.root);remotes.set(m.i,r);setOnline();{const tn=Date.now();joinLog[m.i]=joinLog[m.i]||0;if(tn-joinLog[m.i]>20000){joinLog[m.i]=tn;addLog('','🔔 '+r.name+' دخل الغرفة')}};if(room&&room.type==='home'&&room.owner===me.id){toast('🏡 '+r.name+' زار بيتك!',3000);sfx('star');qAdd('visit')}}
  else{if(r.app.b!==app.b||r.app.h!==app.h||r.app.a!==app.a||r.app.p!==app.p||r.app.l!==app.l)r.setApp(app);r.setName(str(m.n,16)||'لاعب')}
  r.seen=performance.now();return r;
 }
@@ -517,6 +517,7 @@ function onMsg(topic,payload){
  if(!m||typeof m!=='object')return;
  if(topic.startsWith(NS+'/u/')){const c=topic.slice(NS.length+3);if(typeof m.r==='string')friendPres[c]={n:str(m.n,14),r:str(m.r,8),h:m.h?str(m.h,8):null,seen:Date.now()};return}
  if(topic.startsWith(NS+'/fr/')){frMsg(m);return}
+ if(topic.startsWith(NS+'/pl/')){const pp=topic.split('/');if(plCb&&pp[2]&&typeof m.l==='number')plCb(pp[2],{n:str(m.n,14),l:num(m.l,0,30)|0,p:num(m.p,0,3)|0});return}
  if(topic.startsWith(NS+'/bl/')){const pp=topic.split('/');if(blCb&&pp[2]&&typeof m.s==='number')blCb(pp[2],{n:str(m.n,14),s:num(m.s,0,60)});return}
  if(topic.startsWith(NS+'/lb/')){const pp=topic.split('/');if(lbCb&&pp[2]&&typeof m.t==='number')lbCb(pp[2],{n:str(m.n,14),t:num(m.t,0,9999)});return}
  if(topic.startsWith(NS+'/gb/')){const pp=topic.split('/');if(gbCb&&pp[2]===room.owner&&pp[3])gbCb(pp[3],{n:str(m.n,14),m:str(m.m,60),t:num(m.t,0,9e15)});return}
@@ -822,13 +823,13 @@ $('bVisit').onclick=()=>modal(c=>{
  me.friends.forEach(f=>{const d=document.createElement('div');d.className='friend';const pr=friendPres[f.code],on=pr&&Date.now()-pr.seen<40000;const s=document.createElement('span');s.textContent=(on?'🟢 ':'⚪ ')+f.name+' · '+f.code+(on?' · '+(RN[pr.r]||''):'');const b=document.createElement('button');b.className='btn g';b.style.padding='6px 12px';b.textContent='زيارة';b.onclick=()=>{closeModal();visit(f.code)};d.append(s);if(on&&pr.r!=='home'&&RN[pr.r]){const j=document.createElement('button');j.className='btn o';j.style.cssText='padding:6px 12px;margin-inline-end:6px';j.textContent='انضم';j.onclick=()=>{closeModal();enterRoom(pr.r,{})};d.append(j)}d.append(b);fl.appendChild(d)});
 });
 $('bInfo').onclick=()=>modal(c=>{
- c.innerHTML='<h2>ℹ️ إزاي تلعب</h2><div style="line-height:1.9;font-size:15px">• اضغط في أي مكان أو استخدم العصا عشان تمشي. اسحب الشاشة تلف الكاميرا.<br>• اجمع ⭐ في الساحة (بتتجدد كل ٣٠ ثانية للكل) وخد 🪙.<br>• 🏠 بيتي: فرّش بيتك بالفلوس اللي جمعتها.<br>• 🔑 زيارة: اكتب كود صاحبك وادخل بيته. كودك في زر "شكلي".<br>• اللاعبين اللي عليهم 🤖 بوتات بتحاول تخلي الساحة حية، وباقي اللاعبين حقيقيين أونلاين.</div><div class="row"><button class="btn d" id="sm"></button><button class="btn d" id="sq"></button></div><div class="row"><button class="btn g" id="ok">تمام</button></div>';const lab=()=>{$('sm').textContent=me.mute?'🔇 الصوت: مكتوم':'🔊 الصوت: شغال';$('sq').textContent=me.lq?'🖼️ الجودة: خفيفة':'🖼️ الجودة: عالية'};lab();$('sm').onclick=()=>{me.mute=!me.mute;saveMe();lab();if(me.mute&&jukeT){jukebox()}};$('sq').onclick=()=>{me.lq=!me.lq;saveMe();applyQ();lab()};$('ok').onclick=closeModal});
+ c.innerHTML='<h2>ℹ️ إزاي تلعب</h2><div style="line-height:1.9;font-size:15px">• اضغط في أي مكان أو استخدم العصا عشان تمشي. اسحب الشاشة تلف الكاميرا.<br>• اجمع ⭐ في الساحة (بتتجدد كل ٣٠ ثانية للكل) وخد 🪙.<br>• 🏠 بيتي: فرّش بيتك بالفلوس اللي جمعتها.<br>• 🔑 زيارة: اكتب كود صاحبك وادخل بيته. كودك في زر "شكلي".<br>• اللاعبين اللي عليهم 🤖 بوتات بتحاول تخلي الساحة حية، وباقي اللاعبين حقيقيين أونلاين.</div><div class="row"><button class="btn d" id="sm"></button><button class="btn d" id="sq"></button></div><div class="row"><button class="btn d" id="st"></button></div><div class="row"><button class="btn g" id="ok">تمام</button></div>';const lab=()=>{$('sm').textContent=me.mute?'🔇 الصوت: مكتوم':'🔊 الصوت: شغال';$('sq').textContent=me.lq?'🖼️ الجودة: خفيفة':'🖼️ الجودة: عالية'};lab();$('sm').onclick=()=>{me.mute=!me.mute;saveMe();lab();if(me.mute&&jukeT){jukebox()}};$('sq').onclick=()=>{me.lq=!me.lq;saveMe();applyQ();lab()};const tl=()=>{$('st').textContent='🔤 حجم الكتابة: '+['عادي','كبير','كبير جداً'][me.ts|0]};tl();$('st').onclick=()=>{me.ts=((me.ts|0)+1)%3;saveMe();applyTS();tl()};$('ok').onclick=closeModal});
 
 /* ===================== main loop ===================== */
 let last=performance.now(),tClock=0;
 function frame(now){
  requestAnimationFrame(frame);
- const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick(dt);snowTick(dt);if(discoBall&&room.type==='private'){discoBall.rotation.y+=dt;discoBall.material.color.setHSL((tClock*0.3)%1,0.8,0.65)}fireflyTick(dt);ambTick(dt);if(wheelObj&&room.type==='plaza')wheelObj.rotation.z+=dt*0.8;fpsTick(dt);
+ const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick(dt);snowTick(dt);rainTick(dt);if(discoBall&&room.type==='private'){discoBall.rotation.y+=dt;discoBall.material.color.setHSL((tClock*0.3)%1,0.8,0.65)}fireflyTick(dt);ambTick(dt);if(wheelObj&&room.type==='plaza')wheelObj.rotation.z+=dt*0.8;fpsTick(dt);
  if(player){
   let ix=joy.x+((keys['d']||keys['arrowright'])?1:0)-((keys['a']||keys['arrowleft'])?1:0),iy=joy.y+((keys['w']||keys['arrowup'])?1:0)-((keys['s']||keys['arrowdown'])?1:0);
   const m=Math.hypot(ix,iy);let vx=0,vz=0,mov=false;
@@ -922,9 +923,9 @@ function openPetShop(){
  modal(c=>{
   if(!me.pet){c.innerHTML='<h2>🐾 أكل الحيوانات</h2><div style="text-align:center;margin:14px;font-size:17px">معندكش حيوان. اختار واحد من "شكلي" الأول 🐱🐶🦆</div><div class="row"><button class="btn g" id="ok">تمام</button></div>';$('ok').onclick=closeModal;return}
   const lv=Math.floor((me.fed||0)/3)+1;
-  c.innerHTML='<h2>🐾 أطعم ال'+names[me.pet]+'</h2><div style="text-align:center;font-size:17px;margin:10px">وجبات: '+(me.fed||0)+' · مستوى '+lv+'</div><div class="row"><button class="btn g" id="f1">🍖 وجبة (5🪙)</button><button class="btn" id="no">إغلاق</button></div>';
-  $('no').onclick=closeModal;
-  $('f1').onclick=()=>{if(me.coins<5){toast('محتاج 5 عملات');return}me.coins-=5;me.fed=(me.fed||0)+1;player.setApp(myApp());updCoins();saveMe();sfx('star');player.emote('❤️');burst(player.root.position,0xff6b9d,10);toast('😻 حيوانك شبع! مستوى '+(Math.floor(me.fed/3)+1)+' · وجبات '+me.fed);if(me.fed%3===0){me.coins+=15;updCoins();saveMe();toast('🎉 مستوى جديد! +15🪙')}closeModal()}
+  c.innerHTML='<h2>🐾 أطعم ال'+names[me.pet]+'</h2><div style="text-align:center;font-size:17px;margin:10px">وجبات: '+(me.fed||0)+' · مستوى '+lv+'</div><div class="row"><button class="btn g" id="f1">🍖 وجبة (5🪙)</button><button class="btn o" id="pbd">🏆 اللوحة</button><button class="btn" id="no">إغلاق</button></div>';
+  $('no').onclick=closeModal;$('pbd').onclick=openPetBoard;
+  $('f1').onclick=()=>{if(me.coins<5){toast('محتاج 5 عملات');return}me.coins-=5;me.fed=(me.fed||0)+1;pubPet();player.setApp(myApp());updCoins();saveMe();sfx('star');player.emote('❤️');burst(player.root.position,0xff6b9d,10);toast('😻 حيوانك شبع! مستوى '+(Math.floor(me.fed/3)+1)+' · وجبات '+me.fed);if(me.fed%3===0){me.coins+=15;updCoins();saveMe();toast('🎉 مستوى جديد! +15🪙')}closeModal()}
  })
 }
 
@@ -985,6 +986,25 @@ function fireflyTick(dt){
  ffPts.visible=true;const a=ffPts.geometry.attributes.position,px=player.root.position.x,pz=player.root.position.z;
  for(let i=0;i<a.count;i++){let x=a.getX(i)+Math.sin(tClock*0.7+i*1.7)*dt*0.8,y=a.getY(i)+Math.cos(tClock*0.9+i)*dt*0.4,z=a.getZ(i)+Math.cos(tClock*0.6+i*2.3)*dt*0.8;if(Math.abs(x-px)>16)x=px+(Math.random()-0.5)*28;if(Math.abs(z-pz)>16)z=pz+(Math.random()-0.5)*28;a.setXYZ(i,x,clamp(y,0.5,3),z)}a.needsUpdate=true;ffPts.material.opacity=0.55+0.4*Math.sin(tClock*3);
 }
+function applyTS(){document.body.classList.toggle('ts1',(me.ts|0)===1);document.body.classList.toggle('ts2',(me.ts|0)===2)}
+const tsCss=document.createElement('style');tsCss.textContent='body.ts1 #modal .card{zoom:1.15}body.ts2 #modal .card{zoom:1.3}body.ts1 #bar .btn,body.ts1 #toast,body.ts1 #log div{font-size:calc(1em + 2px)}body.ts2 #bar .btn,body.ts2 #toast,body.ts2 #log div{font-size:calc(1em + 4px)}body.ts1 #chatbox input,body.ts2 #chatbox input{font-size:18px}';document.head.appendChild(tsCss);setTimeout(applyTS,0);
+
+const RAIN_PERIOD=300000,RAIN_LEN=70000;let rainObjs=[],rainSlot=-1,rainTaken=new Set(),rainAnn=-1;
+function rainTick(dt){
+ if(!room||room.type!=='plaza'||!player){if(rainObjs.length&&room&&room.group){for(const o of rainObjs)room.group.remove(o.m)}rainObjs=[];rainSlot=-1;return}
+ const now=Date.now(),slot=Math.floor(now/RAIN_PERIOD),el=now-slot*RAIN_PERIOD;
+ if(el>=RAIN_LEN){if(rainObjs.length){for(const o of rainObjs)room.group.remove(o.m);rainObjs=[]}rainSlot=slot;return}
+ if(slot!==rainSlot){rainSlot=slot;rainTaken=new Set();for(const o of rainObjs)room.group.remove(o.m);rainObjs=[];const rng=mulberry(slot*7919+5);
+  for(let k=0;k<26;k++){const an=rng()*6.283,r=4+rng()*19;const m=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,0.1,14),new THREE.MeshLambertMaterial({color:0xffd43b,emissive:0xaa7700}));m.rotation.x=Math.PI/2;m.visible=false;room.group.add(m);rainObjs.push({m,k,x:Math.cos(an)*r,z:Math.sin(an)*r,t:k*2400+rng()*800})}}
+ if(rainAnn!==slot){rainAnn=slot;toast('🪙 مطر العملات بدأ في الساحة! اجمع بسرعة',3500);sfx('win')}
+ const p=player.root.position;
+ for(const o of rainObjs){if(rainTaken.has(o.k))continue;const age=el-o.t;if(age<0){o.m.visible=false;continue}const fall=Math.max(0,1-age/900);o.m.visible=true;o.m.position.set(o.x,0.7+fall*9,o.z);o.m.rotation.z+=dt*4;
+  if(fall===0&&Math.hypot(p.x-o.x,p.z-o.z)<1.2){rainTaken.add(o.k);o.m.visible=false;me.coins+=2;updCoins();saveMe();sfx('star');burst(o.m.position,0xffd43b,5)}}
+}
+
+let plCb=null;
+function pubPet(){const l=Math.floor((me.fed||0)/3);if(!me.pet||l<1||!netOK||!client)return;try{client.publish(NS+'/pl/'+me.id,JSON.stringify({n:me.name,l:Math.min(l,30),p:me.pet}),{retain:true})}catch(e){}}
+function openPetBoard(){const e={};modal(c=>{c.innerHTML='<h2>🏆 أكبر الحيوانات</h2><div id="pl"></div><div class="row"><button class="btn d" id="px">إغلاق</button></div>';const nm=['','🐱','🐶','🦆'];const render=()=>{const l=$('pl');if(!l)return;l.innerHTML='';const a=Object.values(e).sort((x,y)=>y.l-x.l).slice(0,10);if(!a.length)l.textContent='لسه مفيش أرقام';a.forEach((v,i)=>{const d=document.createElement('div');d.className='qrow';d.textContent=(i+1)+'. '+v.n+' · '+(nm[v.p]||'🐾')+' مستوى '+v.l;l.appendChild(d)})};plCb=(id,m)=>{e[id]=m;render()};if(netOK)try{client.subscribe(NS+'/pl/+')}catch(x){}const l0=Math.floor((me.fed||0)/3);if(me.pet&&l0>0)e[me.id]={n:me.name,l:Math.min(l0,30),p:me.pet};$('px').onclick=()=>{try{client.unsubscribe(NS+'/pl/+')}catch(x){}plCb=null;closeModal()};render()})}
 let wheelObj=null;
 const WPRIZE=[5,10,5,20,10,50,15,100,10,30];
 function addWheel(){
@@ -1030,10 +1050,10 @@ function chestTick(dt){
   if(me.tr.got.length>=5){me.coins+=100;msg='🏆 لقيت كل كنوز اليوم! +100🪙 مكافأة';for(const c of [0xff6b6b,0x51cf66,0x4dabf7,0xffd43b])burst(p,c,12)}
   toast(msg,2800);updCoins();saveMe();chestUpd()}}
 }
-window.__vw={get friends(){return me.friends},get amb(){return ambN},get butter(){return butter},get me(){return me},get autoLQ(){return window.autoLQ},get chests(){return chests},get tr(){return me.tr},get pos(){return player.root.position},renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
+window.__vw={get rain(){return rainObjs},get friends(){return me.friends},get amb(){return ambN},get butter(){return butter},get me(){return me},get autoLQ(){return window.autoLQ},get chests(){return chests},get tr(){return me.tr},get pos(){return player.root.position},renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
 applyQ();updCoins();enterRoom('plaza');netConnect();setOnline();dailyCheck();ensureQ();
 requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
 </script>
 </body>
-</html>
+ </html>
