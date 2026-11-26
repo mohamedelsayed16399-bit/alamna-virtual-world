@@ -19,6 +19,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#101830;font-family:sy
 #log div{background:rgba(16,24,48,.62);border-radius:10px;padding:3px 8px;width:fit-content;max-width:100%;word-break:break-word}
 #log div i{font-style:normal;color:#7fd6ff;font-weight:700}
 #bar{position:fixed;bottom:0;left:0;right:0;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:flex;gap:4px;justify-content:center;flex-wrap:nowrap;overflow-x:auto;z-index:6;background:linear-gradient(transparent,rgba(10,16,34,.85))}
+#bar{justify-content:flex-start!important}#bar .btn:first-child{margin-inline-start:auto}#bar .btn:last-child{margin-inline-end:auto}
+@media(max-width:420px){#bar{gap:3px;padding-left:4px;padding-right:4px}#bar .btn{flex:1 1 0;min-width:0;padding:6px 2px;font-size:11px}#bar .btn span{font-size:18px}}
 .btn{min-height:52px;flex:0 0 auto;border:0;border-radius:14px;padding:8px 6px;font:inherit;font-size:12px;font-weight:700;color:#fff;background:#3b5bdb;box-shadow:0 3px 0 rgba(0,0,0,.35);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:50px}
 .btn span{font-size:20px;line-height:1}
 .btn.g{background:#2f9e44}.btn.o{background:#e8590c}.btn.p{background:#9c36b5}.btn.r{background:#c92a2a}.btn.d{background:#495057}
@@ -952,7 +954,7 @@ function openWheel(){
 }
 let chests=[];
 function dayKey(){return new Date().toISOString().slice(0,10)}
-function chestHud(){let h=$('chestHud');if(!h){h=document.createElement('div');h.id='chestHud';h.style.cssText='position:fixed;left:50%;top:62px;transform:translateX(-50%);z-index:9;background:#000a;color:#ffd43b;padding:4px 12px;border-radius:14px;font:700 13px system-ui;direction:rtl;pointer-events:none';document.body.appendChild(h)}return h}
+function chestHud(){let h=$('chestHud');if(!h){h=document.createElement('div');h.id='chestHud';h.style.cssText='position:fixed;right:8px;top:148px;z-index:9;background:#000a;color:#ffd43b;padding:4px 12px;border-radius:14px;font:700 13px system-ui;direction:rtl;pointer-events:none';document.body.appendChild(h)}return h}
 function setupChests(){
  chests=[];const k=dayKey();if(!me.tr||me.tr.d!==k)me.tr={d:k,got:[]};
  let seed=0;for(const c of k)seed=(seed*31+c.charCodeAt(0))>>>0;const rng=mulberry(seed+7);
