@@ -672,7 +672,7 @@ function tickBots(dt){
 
 /* ===================== stars minigame ===================== */
 const SLOT_MS=30000;
-function setupStars(){starObjs=[];starTaken=new Set();starSlot=-1;rollStars()}
+function setupStars(){setupChests();starObjs=[];starTaken=new Set();starSlot=-1;rollStars()}
 function rollStars(){
  const slot=Math.floor(Date.now()/SLOT_MS);if(slot===starSlot)return;starSlot=slot;
  for(const s of starObjs)room.group.remove(s.m);starObjs=[];starTaken=new Set();
@@ -816,7 +816,7 @@ $('bInfo').onclick=()=>modal(c=>{
 let last=performance.now(),tClock=0;
 function frame(now){
  requestAnimationFrame(frame);
- const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;
+ const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);
  if(player){
   let ix=joy.x+((keys['d']||keys['arrowright'])?1:0)-((keys['a']||keys['arrowleft'])?1:0),iy=joy.y+((keys['w']||keys['arrowup'])?1:0)-((keys['s']||keys['arrowdown'])?1:0);
   const m=Math.hypot(ix,iy);let vx=0,vz=0,mov=false;
@@ -858,7 +858,31 @@ function gotoPortal(to){if(to==='home')goMyHome();else if(to==='plaza')goPlaza(r
 function onboard(){if(me.ob||document.getElementById('ob')||/nomerge|noob/.test(location.search))return;const steps=['👋 أهلاً في عالمنا! اسحب بإصبعك في الشاشة عشان تتحرك','💬 اضغط زر الشات عشان تكلم اللاعبين','🚪 ادخل البوابات للألعاب والكافيه وبيتك','🎁 خد هديتك اليومية من القائمة، وجمّع عملات!'];let i=0;const b=document.createElement('div');b.id='ob';b.style.cssText='position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:50;max-width:86vw;background:#fff;color:#111;border-radius:16px;padding:14px 18px;font:600 15px system-ui;text-align:center;box-shadow:0 6px 24px #0006;direction:rtl';const t=document.createElement('div'),n=document.createElement('button');n.className='btn g';n.style.cssText='margin-top:10px';b.append(t,n);document.body.appendChild(b);function show(){t.textContent=steps[i];n.textContent=i<steps.length-1?'التالي ◀':'يلا نلعب!'}n.onclick=()=>{i++;if(i>=steps.length){b.remove();me.ob=1;saveMe()}else show()};show()}
 (function w(){if($('modal').style.display==='flex')return setTimeout(w,700);onboard()})();
 window.addEventListener('orientationchange',()=>setTimeout(()=>window.dispatchEvent(new Event('resize')),250));
-window.__vw={renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
+
+let chests=[];
+function dayKey(){return new Date().toISOString().slice(0,10)}
+function chestHud(){let h=$('chestHud');if(!h){h=document.createElement('div');h.id='chestHud';h.style.cssText='position:fixed;left:50%;top:62px;transform:translateX(-50%);z-index:9;background:#000a;color:#ffd43b;padding:4px 12px;border-radius:14px;font:700 13px system-ui;direction:rtl;pointer-events:none';document.body.appendChild(h)}return h}
+function setupChests(){
+ chests=[];const k=dayKey();if(!me.tr||me.tr.d!==k)me.tr={d:k,got:[]};
+ let seed=0;for(const c of k)seed=(seed*31+c.charCodeAt(0))>>>0;const rng=mulberry(seed+7);
+ for(let i=0;i<5;i++){let x,z;do{const an=rng()*6.283,r=6+rng()*17;x=Math.cos(an)*r;z=Math.sin(an)*r}while(Math.hypot(x,z)<5);
+  if(me.tr.got.includes(i))continue;
+  const g=new THREE.Group();g.add(mesh(G.box(0.8,0.5,0.55),0x8d5524,0,0.25,0));g.add(mesh(G.cyl(0.27,0.27,0.8,10),0xffd43b,0,0.55,0,0x886600));g.children[1].rotation.z=Math.PI/2;g.add(mesh(G.sph(0.09,6),0xfff3bf,0,0.35,0.3,0xaa8800));
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,6,6),new THREE.MeshBasicMaterial({color:0xffe066,transparent:true,opacity:0.35}));beam.position.y=3;g.add(beam);
+  g.position.set(x,0,z);room.group.add(g);chests.push({g,i,x,z})}
+ chestUpd()}
+function chestUpd(){const h=chestHud();if(room&&room.type==='plaza'){h.style.display='block';h.textContent='🧰 كنوز اليوم '+me.tr.got.length+'/5'+(me.tr.got.length>=5?' ✅':'')}else h.style.display='none'}
+function chestTick(dt){
+ if(!chests.length||!room||room.type!=='plaza'||!player)return;
+ for(const c of chests){c.g.rotation.y+=dt*1.5;c.g.position.y=Math.sin(tClock*2+c.i)*0.1}
+ const p=player.root.position;
+ for(let n=chests.length-1;n>=0;n--){const c=chests[n];if(Math.hypot(p.x-c.x,p.z-c.z)<1.3){
+  room.group.remove(c.g);chests.splice(n,1);me.tr.got.push(c.i);me.coins+=15;sfx('star');burst(p,0xffd43b,14);
+  let msg='🧰 لقيت كنز! +15🪙';
+  if(me.tr.got.length>=5){me.coins+=100;msg='🏆 لقيت كل كنوز اليوم! +100🪙 مكافأة';for(const c of [0xff6b6b,0x51cf66,0x4dabf7,0xffd43b])burst(p,c,12)}
+  toast(msg,2800);updCoins();saveMe();chestUpd()}}
+}
+window.__vw={get chests(){return chests},get tr(){return me.tr},get pos(){return player.root.position},renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
 applyQ();updCoins();enterRoom('plaza');netConnect();setOnline();dailyCheck();ensureQ();
 requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
