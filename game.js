@@ -5,7 +5,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rnd=n=>Array.from({length:n},()=>'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)]).join('');
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function toast(msg,ms=2200){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',ms)}
-const BODY=['#e8590c','#2f9e44','#3b5bdb','#9c36b5','#e03131','#f08c00','#0c8599','#495057','#d6336c','#1098ad','#74b816','#f783ac'];
+const BODY=['#e8590c','#2f9e44','#3b5bdb','#9c36b5','#e03131','#f08c00','#0c8599','#495057','#d6336c','#1098ad','#74b816','#f783ac','#f2c94c','#dee2e6','#38d9a9'];const CLV={12:4,13:7,14:10};
 const HEAD=['#ffd8a8','#f1b98a','#d9a066','#a9744f','#7a4b2a','#ffe3e3'];
 const HATS=['بدون','كاب','تاج','طاقية','هوائي','نظارة','قرون','طربوش','شعر ملون','هالة','أجنحة','تاج ملكي','أذن قطة','قبعة ساحر','كعكة','سماعات','نجمة','تاج ورد','خوذة فضاء','قبعة صياد','قبعة قرصان','خوذة فايكنج','تاج جواهر','قبعة نحلة','تاج المستكشف','قبعة الجنرال','تاج الأسطورة','إكليل النجوم'];const LVH={25:3,26:5,27:8};
 const HPRICE={9:60,10:120,11:250,12:40,13:90,14:30,15:70,16:50,17:60,18:110,19:35,20:55,21:65,22:140,23:30,24:99999,25:99999,26:99999,27:99999};
@@ -21,7 +21,7 @@ addEventListener('pointerdown',()=>{try{if(AC&&AC.state==='suspended')AC.resume(
 const DEFAULT_ITEMS=[['rug',5,6,0],['sofa',3,3,0],['plant',1,1,0]];
 let me;
 try{me=JSON.parse(localStorage.getItem('ealam_me')||'null')}catch(e){me=null}
-if(!me||!me.id){me={id:rnd(6),name:'زائر'+Math.floor(Math.random()*900+100),body:Math.floor(Math.random()*BODY.length),head:0,hat:0,coins:150,floor:0,wall:0,items:DEFAULT_ITEMS.map(a=>a.slice()),friends:[],best:0}}
+if(!me||!me.id){me={id:rnd(6),name:'زائر'+Math.floor(Math.random()*900+100),body:Math.floor(Math.random()*12),head:0,hat:0,coins:150,floor:0,wall:0,items:DEFAULT_ITEMS.map(a=>a.slice()),friends:[],best:0}}
 me.friends=me.friends||[];me.best=me.best||0;me.owned=me.owned||[];me.daily=me.daily||{d:'',streak:0};
 function saveMe(){try{localStorage.setItem('ealam_me',JSON.stringify(me))}catch(e){}updCoins()}
 function updCoins(){$('coins').textContent='🪙 '+me.coins}
@@ -785,7 +785,7 @@ $('act').onclick=()=>{if(actFn)actFn.fn()};
 $('bMe').onclick=()=>modal(c=>{
 c.innerHTML='<h2>🎨 شكلك واسمك</h2><label>الاسم</label><input type="text" id="nm" maxlength="14"><label>لون الجسم</label><div class="sw" id="s1"></div><label>لون البشرة</label><div class="sw" id="s2"></div><label>القبعة</label><div class="sw" id="s3"></div><label>الحيوان الأليف</label><div class="sw" id="s4"></div><label>إكسسوار الحيوان</label><div class="sw" id="s5"></div><label>كودك (ابعته لصحابك عشان يزوروا بيتك)</label><div style="font-size:26px;letter-spacing:4px;font-weight:800;color:#ffd35c" id="code"></div><div class="row"><button class="btn g" id="ok">تم</button></div>';
 $('nm').value=me.name;$('code').textContent=me.id;
-const sw=(id,arr,key,isCol)=>{if(key==='hat'&&typeof lvUnlock==='function')lvUnlock();const el=$(id);arr.forEach((v,i)=>{const b=document.createElement(isCol?'b':'u');const lock=key==='hat'&&HPRICE[i]&&!me.owned.includes(i);if(isCol)b.style.background=v;else b.textContent=v+(lock?(i===24?' 🔒 جواز السفر':i>=25?' 🔒 مستوى '+LVH[i]:' 🔒'+HPRICE[i]):'');if(me[key]===i)b.classList.add('on');b.onclick=()=>{if(lock&&!b.dataset.u){if(HPRICE[i]>=99999){toast(i===24?'🛂 بتتفتح من جواز السفر':'🎖️ بتتفتح عند مستوى '+LVH[i]);sfx('err');return}if(me.coins<HPRICE[i]){toast('محتاج '+HPRICE[i]+' 🪙');sfx('err');return}me.coins-=HPRICE[i];me.owned.push(i);b.dataset.u=1;b.textContent=v;sfx('win');burst(player.root.position,0xffd43b,30)}me[key]=i;[...el.children].forEach(x=>x.classList.remove('on'));b.classList.add('on');player.setApp(myApp());saveMe();sendPos(true)};el.appendChild(b)})};
+const sw=(id,arr,key,isCol)=>{if(key==='hat'&&typeof lvUnlock==='function')lvUnlock();const el=$(id);arr.forEach((v,i)=>{const b=document.createElement(isCol?'b':'u');const cl=key==='body'&&CLV[i]&&plLevel().lv<CLV[i];if(cl){b.style.opacity='.4';b.textContent='🔒';b.style.fontSize='11px';b.style.textAlign='center'}const lock=key==='hat'&&HPRICE[i]&&!me.owned.includes(i);if(isCol)b.style.background=v;else b.textContent=v+(lock?(i===24?' 🔒 جواز السفر':i>=25?' 🔒 مستوى '+LVH[i]:' 🔒'+HPRICE[i]):'');if(me[key]===i)b.classList.add('on');b.onclick=()=>{if(cl){toast('🎖️ اللون ده بيتفتح عند مستوى '+CLV[i]);sfx('err');return}if(lock&&!b.dataset.u){if(HPRICE[i]>=99999){toast(i===24?'🛂 بتتفتح من جواز السفر':'🎖️ بتتفتح عند مستوى '+LVH[i]);sfx('err');return}if(me.coins<HPRICE[i]){toast('محتاج '+HPRICE[i]+' 🪙');sfx('err');return}me.coins-=HPRICE[i];me.owned.push(i);b.dataset.u=1;b.textContent=v;sfx('win');burst(player.root.position,0xffd43b,30)}me[key]=i;[...el.children].forEach(x=>x.classList.remove('on'));b.classList.add('on');player.setApp(myApp());saveMe();sendPos(true)};el.appendChild(b)})};
 sw('s4',['بدون','🐱 قطة','🐶 كلب','🦆 بطة'],'pet',false);sw('s5',['بدون','🎀 فيونكة','😎 نضارة','🧣 وشاح'],'pacc',false);sw('s1',BODY,'body',true);sw('s2',HEAD,'head',true);sw('s3',HATS,'hat',false);
 $('ok').onclick=()=>{const n=str($('nm').value,14).trim();if(n){me.name=n;player.setName(n)}saveMe();publishHome();sendPos(true);closeModal()};
 });
