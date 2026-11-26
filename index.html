@@ -497,7 +497,7 @@ const num=(v,a,b,d=0)=>{v=+v;return isFinite(v)?clamp(v,a,b):d};
 function getRemote(m){
  let r=remotes.get(m.i);
  const app={b:num(m.b,0,20,0)|0,h:num(m.h,0,20,0)|0,a:num(m.a,0,12,0)|0,p:num(m.p,0,3,0)|0};
- if(!r){r=new Actor(app,str(m.n,16)||'لاعب');r.tx=0;r.tz=0;r.root.position.set(num(m.x,-50,50),0,num(m.z,-50,50));scene.add(r.root);remotes.set(m.i,r);setOnline();addLog('','🔔 '+r.name+' دخل الغرفة')}
+ if(!r){r=new Actor(app,str(m.n,16)||'لاعب');r.tx=0;r.tz=0;r.root.position.set(num(m.x,-50,50),0,num(m.z,-50,50));scene.add(r.root);remotes.set(m.i,r);setOnline();addLog('','🔔 '+r.name+' دخل الغرفة');if(room&&room.type==='home'&&room.owner===me.id){toast('🏡 '+r.name+' زار بيتك!',3000);sfx('star');qAdd('visit')}}
  else{if(r.app.b!==app.b||r.app.h!==app.h||r.app.a!==app.a||r.app.p!==app.p)r.setApp(app);r.setName(str(m.n,16)||'لاعب')}
  r.seen=performance.now();return r;
 }
@@ -848,6 +848,10 @@ function frame(now){
 }
 let nearCool=false;
 function gotoPortal(to){if(to==='home')goMyHome();else if(to==='plaza')goPlaza(room.type);else enterRoom(to,{})}
+
+function onboard(){if(me.ob||/nomerge|noob/.test(location.search))return;const steps=['👋 أهلاً في عالمنا! اسحب بإصبعك في الشاشة عشان تتحرك','💬 اضغط زر الشات عشان تكلم اللاعبين','🚪 ادخل البوابات للألعاب والكافيه وبيتك','🎁 خد هديتك اليومية من القائمة، وجمّع عملات!'];let i=0;const b=document.createElement('div');b.id='ob';b.style.cssText='position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:50;max-width:86vw;background:#fff;color:#111;border-radius:16px;padding:14px 18px;font:600 15px system-ui;text-align:center;box-shadow:0 6px 24px #0006;direction:rtl';const t=document.createElement('div'),n=document.createElement('button');n.className='btn g';n.style.cssText='margin-top:10px';b.append(t,n);document.body.appendChild(b);function show(){t.textContent=steps[i];n.textContent=i<steps.length-1?'التالي ◀':'يلا نلعب!'}n.onclick=()=>{i++;if(i>=steps.length){b.remove();me.ob=1;saveMe()}else show()};show()}
+setTimeout(onboard,1200);
+window.addEventListener('orientationchange',()=>setTimeout(()=>window.dispatchEvent(new Event('resize')),250));
 window.__vw={renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
 applyQ();updCoins();enterRoom('plaza');netConnect();setOnline();dailyCheck();ensureQ();
 requestAnimationFrame(frame);
