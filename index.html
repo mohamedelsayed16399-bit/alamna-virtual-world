@@ -18,7 +18,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#101830;font-family:sy
 #log div{background:rgba(16,24,48,.62);border-radius:10px;padding:3px 8px;width:fit-content;max-width:100%;word-break:break-word}
 #log div i{font-style:normal;color:#7fd6ff;font-weight:700}
 #bar{position:fixed;bottom:0;left:0;right:0;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:flex;gap:4px;justify-content:center;flex-wrap:nowrap;overflow-x:auto;z-index:6;background:linear-gradient(transparent,rgba(10,16,34,.85))}
-.btn{flex:0 0 auto;border:0;border-radius:14px;padding:8px 6px;font:inherit;font-size:12px;font-weight:700;color:#fff;background:#3b5bdb;box-shadow:0 3px 0 rgba(0,0,0,.35);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:50px}
+.btn{min-height:52px;flex:0 0 auto;border:0;border-radius:14px;padding:8px 6px;font:inherit;font-size:12px;font-weight:700;color:#fff;background:#3b5bdb;box-shadow:0 3px 0 rgba(0,0,0,.35);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:50px}
 .btn span{font-size:20px;line-height:1}
 .btn.g{background:#2f9e44}.btn.o{background:#e8590c}.btn.p{background:#9c36b5}.btn.r{background:#c92a2a}.btn.d{background:#495057}
 .btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
@@ -154,6 +154,20 @@ function emojiSprite(e){
 }
 
 /* ===================== avatar ===================== */
+const AVM=new THREE.MeshLambertMaterial({vertexColors:true});
+function mergeAvatar(g){
+ if(location.search.indexOf('nomerge')>=0)return;
+ g.updateMatrixWorld(true);const P=[],N=[],C=[],rm=[],feet=g.userData.feet;
+ for(const o of g.children){if(!o.isMesh||feet.includes(o)||!o.material.isMeshLambertMaterial)continue;
+  const geo=(o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone());geo.applyMatrix4(o.matrix);
+  const pa=geo.attributes.position.array,na=geo.attributes.normal.array,col=o.material.color,em=o.material.emissive;
+  const r=Math.min(1,col.r+em.r),gg=Math.min(1,col.g+em.g),b=Math.min(1,col.b+em.b);
+  P.push(pa);N.push(na);const ca=new Float32Array(pa.length);for(let i=0;i<pa.length;i+=3){ca[i]=r;ca[i+1]=gg;ca[i+2]=b}C.push(ca);rm.push(o)}
+ const cat=(arr)=>{let t=0;for(const a of arr)t+=a.length;const r=new Float32Array(t);let i=0;for(const a of arr){r.set(a,i);i+=a.length}return r};
+ for(const o of rm)g.remove(o);
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(cat(P),3));geo.setAttribute('normal',new THREE.BufferAttribute(cat(N),3));geo.setAttribute('color',new THREE.BufferAttribute(cat(C),3));
+ g.add(new THREE.Mesh(geo,AVM));
+}
 function buildAvatar(a){
  const g=new THREE.Group();
  const bc=BODY[a.b%BODY.length]||BODY[0],hc=HEAD[a.h%HEAD.length]||HEAD[0];
@@ -186,6 +200,7 @@ function buildAvatar(a){
   if(a.p===3){pg.add(mesh(G.box(0.14,0.05,0.12),0xff922b,0,0.5,0.38))}
   g.add(pg);g.userData.pet=pg}
  const sh=new THREE.Mesh(new THREE.CircleGeometry(0.5,16),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:0.25}));sh.rotation.x=-Math.PI/2;sh.position.y=0.02;g.add(sh);
+ mergeAvatar(g);
  return g;
 }
 class Actor{
@@ -216,6 +231,19 @@ const myApp=()=>({b:me.body,h:me.head,a:me.hat,p:me.pet|0});
 const parts=[],pGeo=new THREE.SphereGeometry(0.09,5,4);
 function burst(p,col,n){for(let i=0;i<n;i++){const m=new THREE.Mesh(pGeo,new THREE.MeshBasicMaterial({color:Array.isArray(col)?col[i%col.length]:col}));m.position.set(p.x,p.y+1.6,p.z);scene.add(m);const a=Math.random()*6.283,u=1+Math.random()*3;parts.push({m,vx:Math.cos(a)*u,vy:2+Math.random()*4,vz:Math.sin(a)*u,t:1.3})}}
 function tickParts(dt){for(let i=parts.length-1;i>=0;i--){const q=parts[i];q.t-=dt;q.vy-=9*dt;q.m.position.x+=q.vx*dt;q.m.position.y+=q.vy*dt;q.m.position.z+=q.vz*dt;if(q.t<=0){scene.remove(q.m);q.m.material.dispose();parts.splice(i,1)}}}
+/* ===================== static merge (performance) ===================== */
+function mergeStatic(root){
+ if(location.search.indexOf('nomerge')>=0)return;
+ root.updateMatrixWorld(true);const B=new Map(),rm=[];
+ root.traverse(o=>{if(!o.isMesh||o.userData.keep||!o.material||!o.material.isMeshLambertMaterial||o.material.map||!o.geometry||!o.geometry.attributes.position)return;
+  let b=B.get(o.material.uuid);if(!b){b={m:o.material,p:[],n:[]};B.set(o.material.uuid,b)}
+  const g=(o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone());g.applyMatrix4(o.matrixWorld);b.p.push(g.attributes.position.array);b.n.push(g.attributes.normal.array);rm.push(o)});
+ for(const o of rm)if(o.parent)o.parent.remove(o);
+ for(const b of B.values()){const cat=(arr)=>{let t=0;for(const a of arr)t+=a.length;const r=new Float32Array(t);let i=0;for(const a of arr){r.set(a,i);i+=a.length}return r};
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(cat(b.p),3));g.setAttribute('normal',new THREE.BufferAttribute(cat(b.n),3));
+  const m=new THREE.Mesh(g,b.m);root.add(m)}
+}
+let isNight=false,fwT=3;
 /* ===================== rooms ===================== */
 let room={type:'plaza',id:'plaza',owner:null,group:null,stars:[],bounds:26,pickables:[]};
 let lamps=[],fountainWater=null,portals=[],ground=null,clouds=[];
@@ -268,10 +296,10 @@ function buildPlaza(){
  g.add(portalMesh('ادخل بيتك',dx,dz+2,0xffd43b,'home'));
  g.add(portalMesh('🕹️ الأركيد',16,6,0xff6b9d,'arcade'));g.add(portalMesh('⚽ الملعب',16,-8,0x69db7c,'park'));g.add(portalMesh('🏁 السباق',-16,-8,0xffa94d,'race'));g.add(portalMesh('☕ الكافيه',-16,6,0x74c0fc,'cafe'));
  for(let i=0;i<14;i++){const an=rng()*6.283,r=4+rng()*9;g.add(mesh(G.sph(0.12,6),[0xff6b6b,0xffd43b,0xf783ac,0xffffff][i%4],Math.cos(an)*r*1.9,0.12,Math.sin(an)*r*1.9))}
- clouds=[];for(let i=0;i<6;i++){const c=new THREE.Group();for(let k=0;k<4;k++){const sp=mesh(G.sph(2+k%2,8),0xffffff,k*2.2,k%2,0);sp.scale.y=0.6;c.add(sp)}c.position.set(-60+i*24,28+i%3*4,-30+(i*13)%50);g.add(c);clouds.push(c)}
+ clouds=[];for(let i=0;i<6;i++){const c=new THREE.Group();for(let k=0;k<4;k++){const sp=mesh(G.sph(2+k%2,8),0xffffff,k*2.2,k%2,0);sp.scale.y=0.6;sp.userData.keep=true;c.add(sp)}c.position.set(-60+i*24,28+i%3*4,-30+(i*13)%50);g.add(c);clouds.push(c)}
  const board=new THREE.Group();board.position.set(-7,0,-4);board.add(mesh(G.box(0.2,2,0.2),0x6d4c2a,0,1,0),mesh(G.box(2.4,1.4,0.15),0xe9d8a6,0,2,0));g.add(board);
  const bl=labelSprite('⭐ اجمع النجوم',{s:2.6,bg:'rgba(255,211,92,.95)',fg:'#222'});bl.position.set(-7,3.3,-4);g.add(bl);
- room.bounds=26;room.group=g;scene.add(g);
+ room.bounds=26;mergeStatic(g);room.group=g;scene.add(g);
 }
 /* ----- furniture ----- */
 const CAT={
@@ -322,7 +350,7 @@ function indoor(fc,wc,neon){
  g.add(mesh(G.box(16.4,5,0.4),wc,0,2.5,-8.2),mesh(G.box(0.4,5,16.4),wc,-8.2,2.5,0));
  if(neon){g.add(mesh(G.box(16,0.15,0.1),neon,0,3.8,-7.95,neon),mesh(G.box(0.1,0.15,16),neon,-7.95,3.8,0,neon),mesh(G.box(16,0.15,0.1),neon,0,0.4,-7.95,neon))}
  const pm=portalMesh('اخرج للساحة',0,7.2,0xff8787,'plaza');g.add(pm);return g}
-function finishRoom(g){scene.add(g);room.group=g;room.bounds=7.5;room.pickables=[]}
+function finishRoom(g){mergeStatic(g);scene.add(g);room.group=g;room.bounds=7.5;room.pickables=[]}
 function sign(g,t,x,y,z,col){const l=labelSprite(t,{s:3.2,bg:col||'rgba(16,24,48,.85)'});l.position.set(x,y,z);g.add(l)}
 function buildArcade(){
  interacts=[];const g=indoor(0x22254d,0x2b2f6a,0xff4dc4);
@@ -355,10 +383,10 @@ function buildPark(){
  const circ=new THREE.Mesh(new THREE.RingGeometry(3,3.15,32),new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.DoubleSide}));circ.rotation.x=-Math.PI/2;circ.position.y=0.03;g.add(circ);
  for(const sx of[-1,1]){const gx=sx*16.4;g.add(mesh(G.box(0.2,2.2,0.2),0xf8f9fa,gx,1.1,-2.6),mesh(G.box(0.2,2.2,0.2),0xf8f9fa,gx,1.1,2.6),mesh(G.box(0.2,0.2,5.4),0xf8f9fa,gx,2.2,0));const net=mesh(G.box(0.05,2.1,5.2),0xdee2e6,gx+sx*1.2,1.05,0);net.material=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.25});g.add(net)}
  const rng=mulberry(21);for(let i=0;i<16;i++){const an=i/16*6.283,r=22,t=new THREE.Group();t.position.set(Math.cos(an)*r,0,Math.sin(an)*r);t.add(mesh(G.cyl(0.18,0.25,1.4,6),0x7b4a2a,0,0.7,0),mesh(G.cone(1.1,2.2,7),0x2b8a3e,0,2.2,0));g.add(t)}
- ball=new THREE.Mesh(new THREE.SphereGeometry(0.45,12,10),new THREE.MeshLambertMaterial({color:0xffffff}));ball.position.set(0,0.45,0);g.add(ball);ballV={x:0,z:0};lastKick=null;goalCool=0;
+ ball=new THREE.Mesh(new THREE.SphereGeometry(0.45,12,10),new THREE.MeshLambertMaterial({color:0xffffff}));ball.userData.keep=true;ball.position.set(0,0.45,0);g.add(ball);ballV={x:0,z:0};lastKick=null;goalCool=0;
  g.add(portalMesh('اخرج للساحة',0,15.8,0xff8787,'plaza'));
  const sc=labelSprite('⚽ كورة جماعية: اضرب الكورة!',{s:5,bg:'rgba(47,158,68,.9)'});sc.position.set(0,3.5,-10);g.add(sc);
- scene.add(g);room.group=g;room.bounds=17;room.pickables=[];
+ mergeStatic(g);scene.add(g);room.group=g;room.bounds=17;room.pickables=[];
 }
 function ballKick(x,z,vx,vz){ballV.x=vx;ballV.z=vz;lastKick=me.id}
 function tickBall(dt){
@@ -393,7 +421,7 @@ function buildRace(){
  const ls=labelSprite('🏁 لوحة الأسرع',{s:2.8,bg:'rgba(255,169,77,.95)',fg:'#222'});ls.position.set(-3,3.2,12.8);g.add(ls);
  interacts.push({x:-3,z:12.2,label:'🏁 لوحة الأسرع',fn:openRaceLB});
  g.add(portalMesh('اخرج للساحة',0,15.8,0xff8787,'plaza'));
- scene.add(g);room.group=g;room.bounds=17;room.pickables=[];colorGates();
+ for(const gg of race.gates)gg.mesh.userData.keep=true;mergeStatic(g);scene.add(g);room.group=g;room.bounds=17;room.pickables=[];colorGates();
 }
 function tickRace(){
  const p=player.root.position;
@@ -438,7 +466,7 @@ function applySky(){
  scene.background=inHome?new THREE.Color(0x1b2340):c;scene.fog=inHome?null:new THREE.Fog(c,50,110);
  hemi.intensity=inHome?0.95:0.2+0.75*k;sun.intensity=inHome?0.55:0.05+0.75*k;
  for(const l of lamps)l.material.color.set(k<0.5?0xffee88:0x666655);
- winMat.emissive.set(k<0.5?0xffbb44:0x000000);nightStars.visible=!inHome;nightStars.material.opacity=clamp(1.2-k*2.4,0,1);
+ winMat.emissive.set(k<0.5?0xffbb44:0x000000);isNight=k<0.45;nightStars.visible=!inHome;nightStars.material.opacity=clamp(1.2-k*2.4,0,1);
 }
 
 /* ===================== network ===================== */
@@ -800,7 +828,7 @@ function frame(now){
   for(const pt of portals){const dx=p.x-pt.x,dz=p.z-pt.z;pt.ring.rotation.z+=dt*2;if(!nearCool&&dx*dx+dz*dz<1.1){nearCool=true;setTimeout(()=>nearCool=false,1500);gotoPortal(pt.to);break}}
  }
  {let best=null,bd=9;if(player)for(const it of interacts){const d=Math.hypot(player.root.position.x-it.x,player.root.position.z-it.z);if(d<2.6&&d<bd){bd=d;best=it}}const a=$('act');if(best){if(actFn!==best){actFn=best;a.textContent=best.label;a.style.display='flex'}}else if(actFn){actFn=null;a.style.display='none'}}
- tickParts(dt);tickBall(dt);{const rc=$('race');if(room.type==='race'&&player){tickRace();rc.style.display='block'}else if(rc.style.display!=='none')rc.style.display='none'}if(player&&(frame.n%6===0))drawMM();
+ tickParts(dt);tickBall(dt);if(isNight&&room.type==='plaza'){fwT-=dt;if(fwT<=0){fwT=4+Math.random()*5;const fx=(Math.random()-0.5)*20,fz=(Math.random()-0.5)*20,fc=[[0xff6b6b,0xffd43b],[0x4dabf7,0xffffff],[0x69db7c,0xffd43b],[0xf783ac,0xb197fc]][Math.floor(Math.random()*4)];burst({x:fx,y:8,z:fz},fc,45);sfx('tick')}}{const rc=$('race');if(room.type==='race'&&player){tickRace();rc.style.display='block'}else if(rc.style.display!=='none')rc.style.display='none'}if(player&&(frame.n%6===0))drawMM();
  for(const c of clouds){c.position.x+=dt*0.8;if(c.position.x>70)c.position.x=-70}
  const nowMs=performance.now();
  for(const [id,r] of remotes){
@@ -820,7 +848,7 @@ function frame(now){
 }
 let nearCool=false;
 function gotoPortal(to){if(to==='home')goMyHome();else if(to==='plaza')goPlaza(room.type);else enterRoom(to,{})}
-window.__vw={get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
+window.__vw={renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
 applyQ();updCoins();enterRoom('plaza');netConnect();setOnline();dailyCheck();ensureQ();
 requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
