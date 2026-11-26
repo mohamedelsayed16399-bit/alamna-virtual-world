@@ -266,11 +266,12 @@ const remotes=new Map();const joinLog={};
 let player=null,bots=[];
 let walkTarget=null;
 
+function disposeTree(o){try{o.traverse(n=>{if(n.geometry)n.geometry.dispose();const ms=n.material?(Array.isArray(n.material)?n.material:[n.material]):[];for(const m of ms){if(m.map)m.map.dispose();m.dispose()}})}catch(e){}}
 function disposeRoom(){
- if(room.group){scene.remove(room.group)}
+ if(room.group){scene.remove(room.group);disposeTree(room.group)}
  lamps=[];portals=[];fountainWater=null;interacts=[];clouds=[];
- for(const [,r] of remotes){scene.remove(r.root)}remotes.clear();
- for(const b of bots)scene.remove(b.root);bots=[];
+ for(const [,r] of remotes){scene.remove(r.root);disposeTree(r.root)}remotes.clear();
+ for(const b of bots){scene.remove(b.root);disposeTree(b.root)}bots=[];
 }
 function portalMesh(label,x,z,color,to){
  const g=new THREE.Group();g.position.set(x,0,z);
@@ -576,8 +577,8 @@ const QD={race:['خلّص دور في حلبة السباق',1,30],stars:['اج�
 function today(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function ensureQ(){if(!me.q||me.q.d!==today())me.q={d:today(),p:{stars:0,drink:0,ttt:0,visit:0,race:0},c:{}};if(me.q.p.race==null)me.q.p.race=0}
 function qAdd(k){ensureQ();const q=me.q,def=QD[k];if(q.c[k])return;q.p[k]=Math.min(def[1],(q.p[k]||0)+1);if(q.p[k]>=def[1]){q.c[k]=1;me.coins+=def[2];toast('🎯 خلصت مهمة: '+def[0]+' +'+def[2]+'🪙',3000);sfx('win')}saveMe()}
-function dailyCheck(){const t=today();if(me.daily.d===t)return;const y=new Date(Date.now()-864e5),ys=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();me.daily.streak=me.daily.d===ys?me.daily.streak+1:1;me.daily.d=t;const r=20+10*Math.min(me.daily.streak-1,6);me.coins+=r;saveMe();
- setTimeout(()=>{modal(c=>{c.innerHTML='<h2>🎁 هدية اليوم</h2><div style="font-size:42px;text-align:center">🪙 +'+r+'</div><div style="text-align:center;color:#aab4de">يوم متتالي رقم '+me.daily.streak+' · ارجع بكرة لهدية أكبر</div><div class="row"><button class="btn g" id="ok">شكراً</button></div>';$('ok').onclick=closeModal});burst(player.root.position,[0xff6b6b,0xffd43b,0x4dabf7,0x69db7c],40);sfx('win')},900)}
+function dailyCheck(){const t=today();if(me.daily.d===t)return;const y=new Date(Date.now()-864e5),ys=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();me.daily.streak=me.daily.d===ys?me.daily.streak+1:1;me.daily.d=t;const fri=new Date().getDay()===5,r=(20+10*Math.min(me.daily.streak-1,6))*(fri?2:1);me.coins+=r;saveMe();
+ setTimeout(()=>{modal(c=>{c.innerHTML='<h2>🎁 هدية اليوم</h2><div style="font-size:42px;text-align:center">🪙 +'+r+'</div><div style="text-align:center;color:#aab4de">يوم متتالي رقم '+me.daily.streak+' · ارجع بكرة لهدية أكبر</div>'+(fri?'<div style="text-align:center;color:#ffd43b;margin-top:6px">🎉 جمعة مباركة! هدية اليوم ضعف</div>':'')+'<div class="row"><button class="btn g" id="ok">شكراً</button></div>';$('ok').onclick=closeModal});burst(player.root.position,[0xff6b6b,0xffd43b,0x4dabf7,0x69db7c],40);sfx('win')},900)}
 $('bQ').onclick=()=>{ensureQ();modal(c=>{c.innerHTML='<h2>🎯 مهام النهارده</h2><div id="ql"></div><div class="row"><button class="btn o" id="ach">🏅 إنجازات</button><button class="btn g" id="ok">تمام</button></div>';$('ach').onclick=openAch;Object.keys(QD).forEach(k=>{const d=QD[k],p=me.q.p[k]||0,r=document.createElement('div');r.className='qrow';r.textContent=(me.q.c[k]?'✅ ':'⬜ ')+d[0]+' · +'+d[2]+'🪙 ('+p+'/'+d[1]+')';const b=document.createElement('div');b.className='qbar';b.innerHTML='<i style="width:'+(p/d[1]*100)+'%"></i>';r.appendChild(b);$('ql').appendChild(r)});$('ok').onclick=closeModal})};
 /* minimap */
 function drawMM(){const cv=$('mm'),x=cv.getContext('2d'),W=184,sc=84/room.bounds;x.clearRect(0,0,W,W);x.save();x.translate(92,92);
@@ -1147,4 +1148,4 @@ requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
 </script>
 </body>
-  </html>
+ </html>
