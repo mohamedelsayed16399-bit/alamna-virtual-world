@@ -516,6 +516,7 @@ function onMsg(topic,payload){
  let m;try{m=JSON.parse(payload.toString())}catch(e){return}
  if(!m||typeof m!=='object')return;
  if(topic.startsWith(NS+'/u/')){const c=topic.slice(NS.length+3);if(typeof m.r==='string')friendPres[c]={n:str(m.n,14),r:str(m.r,8),h:m.h?str(m.h,8):null,seen:Date.now()};return}
+ if(topic.startsWith(NS+'/fr/')){frMsg(m);return}
  if(topic.startsWith(NS+'/bl/')){const pp=topic.split('/');if(blCb&&pp[2]&&typeof m.s==='number')blCb(pp[2],{n:str(m.n,14),s:num(m.s,0,60)});return}
  if(topic.startsWith(NS+'/lb/')){const pp=topic.split('/');if(lbCb&&pp[2]&&typeof m.t==='number')lbCb(pp[2],{n:str(m.n,14),t:num(m.t,0,9999)});return}
  if(topic.startsWith(NS+'/gb/')){const pp=topic.split('/');if(gbCb&&pp[2]===room.owner&&pp[3])gbCb(pp[3],{n:str(m.n,14),m:str(m.m,60),t:num(m.t,0,9e15)});return}
@@ -570,9 +571,9 @@ function drawMM(){const cv=$('mm'),x=cv.getContext('2d'),W=184,sc=84/room.bounds
  for(const [,r] of remotes)dot(r.root.position.x,r.root.position.z,'#4dabf7',5);
  dot(player.root.position.x,player.root.position.z,'#fff',6);x.restore()}
 /* ===================== friends presence ===================== */
-const friendPres={};const RN={plaza:'الساحة',arcade:'الأركيد',cafe:'الكافيه',home:'بيت'};
+const friendPres={};const RN={plaza:'الساحة',arcade:'الأركيد',cafe:'الكافيه',home:'بيت',garden:'الحديقة'};
 function presTopic(c){return NS+'/u/'+c}
-function subFriends(){if(!netOK||!client)return;me.friends.forEach(f=>{try{client.subscribe(presTopic(f.code))}catch(e){}})}
+function subFriends(){if(!netOK||!client)return;try{client.subscribe(NS+'/fr/'+me.id)}catch(e){}me.friends.forEach(f=>{try{client.subscribe(presTopic(f.code))}catch(e){}})}
 function pubPres(){if(!netOK||!client)return;try{client.publish(presTopic(me.id),JSON.stringify({n:me.name,r:room.type,h:room.type==='home'?room.owner:null}))}catch(e){}}
 setInterval(pubPres,15000);
 /* ===================== room switching ===================== */
@@ -636,6 +637,7 @@ function enterRoom(type,opts={}){bg=null;
  else if(type==='arcade'){room.id='arcade';buildArcade();$('roomName').textContent='🕹️ الأركيد';starObjs=[]}
  else if(type==='race'){room.id='race';buildRace();$('roomName').textContent='🏁 حلبة السباق';starObjs=[]}
  else if(type==='park'){room.id='park';buildPark();$('roomName').textContent='⚽ الملعب';starObjs=[]}
+ else if(type==='private'){const pc=cleanCode(opts.code).slice(0,4);room.id='priv-'+pc;room.code=pc;buildPrivate();$('roomName').textContent='🔒 غرفة خاصة '+pc;starObjs=[]}
  else if(type==='garden'){room.id='garden';buildGarden();$('roomName').textContent='🌷 الحديقة';starObjs=[]}
  else if(type==='cafe'){room.id='cafe';buildCafe();$('roomName').textContent='☕ الكافيه';starObjs=[]}
  else{room.owner=opts.owner;room.id='home-'+opts.owner;const d=opts.data;buildHome(d);$('roomName').textContent='🏠 بيت '+(d.n||opts.owner);starObjs=[]}
@@ -811,8 +813,11 @@ $('bMe').onclick=()=>modal(c=>{
  $('ok').onclick=()=>{const n=str($('nm').value,14).trim();if(n){me.name=n;player.setName(n)}saveMe();publishHome();sendPos(true);closeModal()};
 });
 $('bVisit').onclick=()=>modal(c=>{
- c.innerHTML='<h2>🔑 زيارة صاحب</h2><label>اكتب كود صاحبك</label><input type="text" id="vc" maxlength="8" style="text-transform:uppercase;letter-spacing:3px" autocomplete="off"><div class="row"><button class="btn g" id="go">زيارة</button></div><label>أصحابك</label><div id="fl"></div>';
+ c.innerHTML='<h2>🔑 زيارة صاحب</h2><label>اكتب كود صاحبك</label><input type="text" id="vc" maxlength="8" style="text-transform:uppercase;letter-spacing:3px" autocomplete="off"><div class="row"><button class="btn g" id="go">زيارة</button><button class="btn o" id="fq">➕ طلب صداقة</button></div><div class="row"><button class="btn" id="pn">🔒 غرفة خاصة جديدة</button><button class="btn" id="pj">🔑 ادخل غرفة خاصة</button></div><label>أصحابك</label><div id="fl"></div>';
  $('go').onclick=()=>{const v=$('vc').value;closeModal();visit(v)};
+ $('fq').onclick=()=>{sendFriendReq($('vc').value)};
+ $('pn').onclick=()=>{closeModal();const code=Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)]).join('');enterRoom('private',{code});setTimeout(()=>toast('🔒 كود الغرفة: '+code+' · ابعته لصحابك',6000),400)};
+ $('pj').onclick=()=>{const v=cleanCode($('vc').value).slice(0,4);if(v.length!==4){toast('اكتب كود الغرفة (٤ حروف) فوق');return}closeModal();enterRoom('private',{code:v})};
  const fl=$('fl');if(!me.friends.length)fl.textContent='لسه مفيش. أي بيت تزوره بيتضاف هنا.';
  me.friends.forEach(f=>{const d=document.createElement('div');d.className='friend';const pr=friendPres[f.code],on=pr&&Date.now()-pr.seen<40000;const s=document.createElement('span');s.textContent=(on?'🟢 ':'⚪ ')+f.name+' · '+f.code+(on?' · '+(RN[pr.r]||''):'');const b=document.createElement('button');b.className='btn g';b.style.padding='6px 12px';b.textContent='زيارة';b.onclick=()=>{closeModal();visit(f.code)};d.append(s);if(on&&pr.r!=='home'&&RN[pr.r]){const j=document.createElement('button');j.className='btn o';j.style.cssText='padding:6px 12px;margin-inline-end:6px';j.textContent='انضم';j.onclick=()=>{closeModal();enterRoom(pr.r,{})};d.append(j)}d.append(b);fl.appendChild(d)});
 });
@@ -823,7 +828,7 @@ $('bInfo').onclick=()=>modal(c=>{
 let last=performance.now(),tClock=0;
 function frame(now){
  requestAnimationFrame(frame);
- const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick(dt);snowTick(dt);if(wheelObj&&room.type==='plaza')wheelObj.rotation.z+=dt*0.8;fpsTick(dt);
+ const dt=Math.min(0.05,(now-last)/1000);last=now;tClock+=dt;chestTick(dt);gardenTick(dt);snowTick(dt);if(discoBall&&room.type==='private'){discoBall.rotation.y+=dt;discoBall.material.color.setHSL((tClock*0.3)%1,0.8,0.65)}fireflyTick(dt);ambTick(dt);if(wheelObj&&room.type==='plaza')wheelObj.rotation.z+=dt*0.8;fpsTick(dt);
  if(player){
   let ix=joy.x+((keys['d']||keys['arrowright'])?1:0)-((keys['a']||keys['arrowleft'])?1:0),iy=joy.y+((keys['w']||keys['arrowup'])?1:0)-((keys['s']||keys['arrowdown'])?1:0);
   const m=Math.hypot(ix,iy);let vx=0,vz=0,mov=false;
@@ -931,6 +936,55 @@ function snowTick(dt){
  snowPts.visible=!!room&&(room.type==='plaza'||room.type==='park'||room.type==='garden');if(!snowPts.visible||!player)return;
  const a=snowPts.geometry.attributes.position,px=player.root.position.x,pz=player.root.position.z;
  for(let i=0;i<a.count;i++){let y=a.getY(i)-dt*(1.2+(i%5)*0.25);let x=a.getX(i)+Math.sin(tClock+i)*dt*0.4,z=a.getZ(i);if(y<0){y=14;x=px+(Math.random()-0.5)*36;z=pz+(Math.random()-0.5)*36}a.setXYZ(i,x,y,z)}a.needsUpdate=true}
+
+let frPend=[],frLast={};
+function cleanCode(c){return str(c,8).toUpperCase().replace(/[^A-Z0-9]/g,'')}
+function sendFriendReq(code){code=cleanCode(code);if(!code||code===me.id){toast('اكتب كود صحيح');return}if(me.friends.some(f=>f.code===code)){toast('هو صاحبك أصلاً 👍');return}if(!netOK||!client){toast('الإنترنت واقع');return}frSent[code]=1;try{client.publish(NS+'/fr/'+code,JSON.stringify({t:'req',f:me.id,n:me.name}))}catch(e){}toast('📨 اتبعت الطلب. لازم صاحبك يكون أونلاين دلوقتي')}
+function addFriendLocal(code,name){if(!me.friends.some(f=>f.code===code)){me.friends.push({code,name:str(name,16)||code});saveMe();subFriends()}}
+function frMsg(m){
+ const f=cleanCode(m.f),n=str(m.n,16)||f;if(!f||f===me.id)return;
+ if(m.t==='req'){if(me.friends.some(x=>x.code===f)||frPend.some(x=>x.f===f))return;const t=Date.now();if(t-(frLast[f]||0)<30000)return;frLast[f]=t;if(frPend.length>=3)return;frPend.push({f,n});showFrModal()}
+ else if(m.t==='acc'){if(!frSent[f])return;addFriendLocal(f,n);delete frSent[f];sfx('star');toast('🤝 '+n+' وافق وبقى صاحبك!')}
+}
+const frSent={};
+function showFrModal(){
+ if(!frPend.length||$('modal').style.display==='flex')return setTimeout(showFrModal,2500);
+ const q=frPend[0];
+ modal(c=>{c.innerHTML='<h2>👋 طلب صداقة</h2><div style="text-align:center;font-size:18px;margin:14px"></div><div class="row"><button class="btn g" id="fa">قبول</button><button class="btn d" id="fd">رفض</button></div>';c.children[1].textContent=q.n+' ('+q.f+') عايز يبقى صاحبك';
+  $('fa').onclick=()=>{frPend.shift();addFriendLocal(q.f,q.n);if(netOK&&client)try{client.publish(NS+'/fr/'+q.f,JSON.stringify({t:'acc',f:me.id,n:me.name}))}catch(e){}closeModal();toast('🤝 بقيتوا أصحاب');if(frPend.length)setTimeout(showFrModal,600)};
+  $('fd').onclick=()=>{frPend.shift();closeModal();if(frPend.length)setTimeout(showFrModal,600)}});
+}
+
+function buildPrivate(){
+ interacts=[];const g=indoor(0x2b2350,0x4c3a8a,0x9775fa);
+ g.add(mesh(G.cyl(3.2,3.2,0.05,24),0x7048e8,0,0.03,0),mesh(G.cyl(2.2,2.2,0.06,24),0xf783ac,0,0.05,0,0x661133));
+ for(const[x,z,r]of[[-5,-5,0],[5,-5,0],[-5,3,Math.PI/2],[5,3,-Math.PI/2]]){const c=new THREE.Group();c.position.set(x,0,z);c.rotation.y=r;c.add(mesh(G.box(2.4,0.5,1),0x6741d9,0,0.25,0),mesh(G.box(2.4,0.7,0.25),0x5f3dc4,0,0.75,-0.4),mesh(G.box(0.25,0.5,1),0x5f3dc4,-1.1,0.5,0),mesh(G.box(0.25,0.5,1),0x5f3dc4,1.1,0.5,0));g.add(c)}
+ for(let i=0;i<8;i++){const an=i/8*6.283;g.add(mesh(G.cyl(0.05,0.05,2.2,6),0xffd43b,Math.cos(an)*6.6,1.1,Math.sin(an)*6.6,0x665500),mesh(G.sph(0.18,8),[0xff6b9d,0x4dabf7,0xffd43b,0x69db7c][i%4],Math.cos(an)*6.6,2.3,Math.sin(an)*6.6,0xffffff))}
+ sign(g,'🔒 غرفة '+room.code,0,4.1,-7.5,'rgba(112,72,232,.9)');
+ interacts.push({x:0,z:0,label:'💃 ارقص',fn:()=>{player.emote('💃');sfx('star')}});
+ finishRoom(g);
+ const ball=new THREE.Mesh(new THREE.SphereGeometry(0.5,12,10),new THREE.MeshBasicMaterial({color:0xffffff}));ball.position.set(0,4.2,0);room.group.add(ball);discoBall=ball;
+}
+let discoBall=null;
+
+let ambN=null,ambT=0;
+const AMB={plaza:[220,277,330],park:[196,247,294],garden:[262,330,392],cafe:[175,220,262],arcade:[165,208,247],race:[147,185,220],private:[233,294,349],home:[196,262,311]};
+function ambTick(dt){
+ ambT-=dt;if(ambT>0)return;ambT=1;
+ const on=!(me&&me.mute)&&AC&&AC.state==='running'&&!document.hidden;
+ if(!ambN){if(!AC||AC.state!=='running')return;const o=[0,1,2].map(i=>{const x=AC.createOscillator();x.type=i===1?'triangle':'sine';return x}),gn=AC.createGain(),lp=AC.createBiquadFilter(),lfo=AC.createOscillator(),lg=AC.createGain();lp.type='lowpass';lp.frequency.value=700;gn.gain.value=0;lfo.frequency.value=0.12;lg.gain.value=0.004;lfo.connect(lg);lg.connect(gn.gain);o.forEach(x=>{x.connect(lp);x.start()});lfo.start();lp.connect(gn);gn.connect(AC.destination);ambN={o,gn}}
+ const ch=AMB[room.type]||AMB.plaza;ambN.o.forEach((x,i)=>x.frequency.setTargetAtTime(ch[i],AC.currentTime,1.5));
+ ambN.gn.gain.setTargetAtTime(on?0.012:0,AC.currentTime,0.8);
+}
+
+let ffPts=null;
+function fireflyTick(dt){
+ const want=(isNight||/[?&]firefly/.test(location.search))&&room&&(room.type==='plaza'||room.type==='garden'||room.type==='park')&&!(me&&me.lq)&&!window.autoLQ&&player;
+ if(!want){if(ffPts)ffPts.visible=false;return}
+ if(!ffPts){const n=45,p=new Float32Array(n*3);for(let i=0;i<n;i++){p[i*3]=(Math.random()-0.5)*30;p[i*3+1]=0.6+Math.random()*2.2;p[i*3+2]=(Math.random()-0.5)*30}const gm=new THREE.BufferGeometry();gm.setAttribute('position',new THREE.BufferAttribute(p,3));ffPts=new THREE.Points(gm,new THREE.PointsMaterial({color:0xfff3a0,size:0.35,transparent:true,opacity:0.9,depthWrite:false,blending:THREE.AdditiveBlending}));ffPts.frustumCulled=false;ffPts.userData.c=new THREE.Vector3();scene.add(ffPts)}
+ ffPts.visible=true;const a=ffPts.geometry.attributes.position,px=player.root.position.x,pz=player.root.position.z;
+ for(let i=0;i<a.count;i++){let x=a.getX(i)+Math.sin(tClock*0.7+i*1.7)*dt*0.8,y=a.getY(i)+Math.cos(tClock*0.9+i)*dt*0.4,z=a.getZ(i)+Math.cos(tClock*0.6+i*2.3)*dt*0.8;if(Math.abs(x-px)>16)x=px+(Math.random()-0.5)*28;if(Math.abs(z-pz)>16)z=pz+(Math.random()-0.5)*28;a.setXYZ(i,x,clamp(y,0.5,3),z)}a.needsUpdate=true;ffPts.material.opacity=0.55+0.4*Math.sin(tClock*3);
+}
 let wheelObj=null;
 const WPRIZE=[5,10,5,20,10,50,15,100,10,30];
 function addWheel(){
@@ -976,7 +1030,7 @@ function chestTick(dt){
   if(me.tr.got.length>=5){me.coins+=100;msg='🏆 لقيت كل كنوز اليوم! +100🪙 مكافأة';for(const c of [0xff6b6b,0x51cf66,0x4dabf7,0xffd43b])burst(p,c,12)}
   toast(msg,2800);updCoins();saveMe();chestUpd()}}
 }
-window.__vw={get butter(){return butter},get me(){return me},get autoLQ(){return window.autoLQ},get chests(){return chests},get tr(){return me.tr},get pos(){return player.root.position},renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
+window.__vw={get friends(){return me.friends},get amb(){return ambN},get butter(){return butter},get me(){return me},get autoLQ(){return window.autoLQ},get chests(){return chests},get tr(){return me.tr},get pos(){return player.root.position},renderer,get isNight(){return isNight},get race(){return race},get goals(){return goals},get ball(){return ball},get ballV(){return ballV},friendPres,subFriends,qAdd,dailyCheck,get q(){return me.q},get room(){return room},me,get player(){return player},visit,enterRoom,goMyHome,goPlaza,remotes,get stars(){return stars},get home(){return home}};
 applyQ();updCoins();enterRoom('plaza');netConnect();setOnline();dailyCheck();ensureQ();
 requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
