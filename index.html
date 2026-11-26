@@ -884,10 +884,31 @@ const QUICK=['مرحبا 👋','تعالى بيتي 🏠','نلعب؟ 🎮','ش�
 let fpsAcc=0,fpsN=0,fpsLow=0;
 function fpsTick(dt){if(window.autoLQ||document.hidden)return;fpsAcc+=dt;fpsN++;if(fpsAcc>=1){const f=fpsN/fpsAcc;fpsAcc=0;fpsN=0;if(f<25)fpsLow++;else fpsLow=Math.max(0,fpsLow-1);if(fpsLow>=5){window.autoLQ=1;applyQ();toast('⚙️ خفّفنا الجودة تلقائياً عشان اللعب يبقى أسلس')}}}
 
+
+function addPetShop(){
+ const g=new THREE.Group();g.position.set(-10.5,0,10);
+ g.add(mesh(G.box(3,0.2,2),0x8d6e63,0,1.0,0),mesh(G.cyl(0.08,0.08,1,6),0x5c4033,-1.3,0.5,-0.8),mesh(G.cyl(0.08,0.08,1,6),0x5c4033,1.3,0.5,-0.8),mesh(G.cyl(0.08,0.08,1,6),0x5c4033,-1.3,0.5,0.8),mesh(G.cyl(0.08,0.08,1,6),0x5c4033,1.3,0.5,0.8));
+ for(const[x,c]of[[-1,0xe03131],[0,0xf8f9fa],[1,0xe03131]])g.add(mesh(G.box(1,0.08,2.4),c,x,2.6,0));
+ g.add(mesh(G.cyl(0.06,0.06,1.6,6),0x495057,-1.4,1.8,-1),mesh(G.cyl(0.06,0.06,1.6,6),0x495057,1.4,1.8,-1));
+ g.add(mesh(G.sph(0.3,8),0xc2410c,-0.7,1.35,0),mesh(G.sph(0.25,8),0xd9480f,0.2,1.3,0.2),mesh(G.sph(0.28,8),0xe8590c,0.9,1.33,-0.1));
+ const sgn=labelSprite('🐾 أكل الحيوانات',{s:3.2,bg:'rgba(30,110,60,.9)'});sgn.position.set(0,3.5,0);g.add(sgn);
+ g.rotation.y=0.6;room.group.add(g);
+ interacts.push({x:-10.5,z:10-1.5,label:'🐾 أطعم حيوانك',fn:openPetShop});
+}
+function openPetShop(){
+ const names=['','قطة','كلب','بطة'];
+ modal(c=>{
+  if(!me.pet){c.innerHTML='<h2>🐾 أكل الحيوانات</h2><div style="text-align:center;margin:14px;font-size:17px">معندكش حيوان. اختار واحد من "شكلي" الأول 🐱🐶🦆</div><div class="row"><button class="btn g" id="ok">تمام</button></div>';$('ok').onclick=closeModal;return}
+  const lv=Math.floor((me.fed||0)/3)+1;
+  c.innerHTML='<h2>🐾 أطعم ال'+names[me.pet]+'</h2><div style="text-align:center;font-size:17px;margin:10px">وجبات: '+(me.fed||0)+' · مستوى '+lv+'</div><div class="row"><button class="btn g" id="f1">🍖 وجبة (5🪙)</button><button class="btn" id="no">إغلاق</button></div>';
+  $('no').onclick=closeModal;
+  $('f1').onclick=()=>{if(me.coins<5){toast('محتاج 5 عملات');return}me.coins-=5;me.fed=(me.fed||0)+1;updCoins();saveMe();sfx('star');player.emote('❤️');burst(player.root.position,0xff6b9d,10);toast('😻 حيوانك شبع! مستوى '+(Math.floor(me.fed/3)+1)+' · وجبات '+me.fed);if(me.fed%3===0){me.coins+=15;updCoins();saveMe();toast('🎉 مستوى جديد! +15🪙')}closeModal()}
+ })
+}
 let wheelObj=null;
 const WPRIZE=[5,10,5,20,10,50,15,100,10,30];
 function addWheel(){
- const g=new THREE.Group();g.position.set(8,0,12.5);
+ const g=new THREE.Group();g.position.set(10.5,0,10);
  g.add(mesh(G.cyl(0.12,0.12,3,8),0x495057,-0.9,1.5,0),mesh(G.cyl(0.12,0.12,3,8),0x495057,0.9,1.5,0));
  const w=new THREE.Group();w.position.y=2.4;const cols=[0xff6b6b,0xffd43b,0x51cf66,0x4dabf7,0xb197fc];
  for(let i=0;i<10;i++){const sg=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,0.2,10,1,false,i*Math.PI/5,Math.PI/5),new THREE.MeshLambertMaterial({color:cols[i%5]}));w.add(sg)}
@@ -895,7 +916,7 @@ function addWheel(){
  const pt=mesh(G.cone(0.2,0.5,4),0xe03131,0,4.1,0.15);pt.rotation.x=Math.PI;g.add(pt);
  const sgn=labelSprite('🎡 عجلة الحظ',{s:3.2,bg:'rgba(180,40,120,.9)'});sgn.position.set(0,4.9,0);g.add(sgn);
  g.rotation.y=-0.6;room.group.add(g);wheelObj=w;
- interacts.push({x:8,z:12.5-1.2,label:'🎡 لف عجلة الحظ',fn:openWheel});
+ interacts.push({x:10.5,z:10-1.2,label:'🎡 لف عجلة الحظ',fn:openWheel});addPetShop();
 }
 function openWheel(){
  const t=today();
