@@ -513,6 +513,7 @@ function onMsg(topic,payload){
  let m;try{m=JSON.parse(payload.toString())}catch(e){return}
  if(!m||typeof m!=='object')return;
  if(topic.startsWith(NS+'/u/')){const c=topic.slice(NS.length+3);if(typeof m.r==='string')friendPres[c]={n:str(m.n,14),r:str(m.r,8),h:m.h?str(m.h,8):null,seen:Date.now()};return}
+ if(topic.startsWith(NS+'/bl/')){const pp=topic.split('/');if(blCb&&pp[2]&&typeof m.s==='number')blCb(pp[2],{n:str(m.n,14),s:num(m.s,0,60)});return}
  if(topic.startsWith(NS+'/lb/')){const pp=topic.split('/');if(lbCb&&pp[2]&&typeof m.t==='number')lbCb(pp[2],{n:str(m.n,14),t:num(m.t,0,9999)});return}
  if(topic.startsWith(NS+'/gb/')){const pp=topic.split('/');if(gbCb&&pp[2]===room.owner&&pp[3])gbCb(pp[3],{n:str(m.n,14),m:str(m.m,60),t:num(m.t,0,9e15)});return}
  if(topic.startsWith(NS+'/h/')){if(homeCb&&topic===NS+'/h/'+homeCb.code)homeCb.fn(m);return}
@@ -865,13 +866,15 @@ window.addEventListener('orientationchange',()=>setTimeout(()=>window.dispatchEv
 
 
 let butter=[];
-let bg=null;
+let bg=null,blCb=null;
+function openButterLB(){const e={};modal(c=>{c.innerHTML='<h2>🦋 أفضل الصيادين</h2><div id="bl"></div><div class="row"><button class="btn d" id="bx">إغلاق</button></div>';const render=()=>{const l=$('bl');if(!l)return;l.innerHTML='';const a=Object.values(e).sort((x,y)=>y.s-x.s).slice(0,10);if(!a.length)l.textContent='لسه مفيش أرقام';a.forEach((v,i)=>{const d=document.createElement('div');d.className='qrow';d.textContent=(i+1)+'. '+v.n+' · '+v.s+' فراشة';l.appendChild(d)})};blCb=(id,m)=>{e[id]=m;render()};if(netOK)try{client.subscribe(NS+'/bl/+')}catch(x){}if(me.bfBest)e[me.id]={n:me.name,s:Math.min(60,me.bfBest)};$('bx').onclick=()=>{try{client.unsubscribe(NS+'/bl/+')}catch(x){}blCb=null;closeModal()};render()})}
+
 function startButter(){if(bg){toast('اللعبة شغالة!');return}bg={t:30,n:0};const h=chestHud();h.style.display='block';toast('🦋 اجري ورا الفراشات! 30 ثانية');sfx('star')}
 function butterGame(dt){
  if(!bg)return;const h=chestHud();bg.t-=dt;h.style.display='block';h.textContent='🦋 '+bg.n+' · ⏱ '+Math.max(0,Math.ceil(bg.t));
  const p=player.root.position;
  for(const b of butter){if(b.hide>0){b.hide-=dt;if(b.hide<=0)b.m.visible=true;continue}const q=b.m.position;if(Math.hypot(p.x-q.x,p.z-q.z)<1.1){b.m.visible=false;b.hide=1.5;bg.n++;sfx('chat');burst(q,0xf783ac,6)}}
- if(bg.t<=0){const n=bg.n,pr=Math.min(n*2,40);bg=null;me.bfBest=Math.max(me.bfBest||0,n);me.coins+=pr;updCoins();saveMe();sfx('star');burst(p,0xffd43b,14);toast('🦋 اصطدت '+n+' فراشة! +'+pr+'🪙 · أفضل نتيجة '+me.bfBest,3500);chestUpd()}
+ if(bg.t<=0){const n=bg.n,pr=Math.min(n*2,40);bg=null;const nb=Math.min(60,n);if(nb>(me.bfBest||0)){me.bfBest=nb;if(netOK)try{client.publish(NS+'/bl/'+me.id,JSON.stringify({n:me.name,s:nb}),{retain:true})}catch(x){}}me.coins+=pr;updCoins();saveMe();sfx('star');burst(p,0xffd43b,14);toast('🦋 اصطدت '+n+' فراشة! +'+pr+'🪙 · أفضل نتيجة '+me.bfBest,3500);chestUpd()}
 }
 let lastWater=0;
 function buildGarden(){
@@ -883,7 +886,7 @@ function buildGarden(){
  const b=new THREE.Group();b.position.set(-3,0,1);b.add(mesh(G.box(2,0.12,0.7),0x8d6e63,0,0.55,0),mesh(G.box(2,0.5,0.1),0x8d6e63,0,0.9,-0.3),mesh(G.box(0.12,0.5,0.6),0x5c4033,-0.9,0.25,0),mesh(G.box(0.12,0.5,0.6),0x5c4033,0.9,0.25,0));g.add(b);
  const wc=new THREE.Group();wc.position.set(0,0,-3);wc.add(mesh(G.cyl(0.3,0.4,0.6,10),0x1c7ed6,0,0.3,0),mesh(G.cyl(0.05,0.05,0.5,6),0x1864ab,0.3,0.55,0));g.add(wc);
  sign(g,'🚿 اسقِ الورد',0,1.8,-3);interacts.push({x:0,z:-2,label:'🚿 اسقِ الورد (+3🪙)',fn:waterFlowers});
- sign(g,'🌷 الحديقة',0,4,-7.5,'rgba(190,40,100,.85)');sign(g,'🦋 اصطد الفراشات',5.5,2.2,3.5);interacts.push({x:5.5,z:4.5,label:'🦋 العب اصطياد الفراشات',fn:startButter});
+ sign(g,'🌷 الحديقة',0,4,-7.5,'rgba(190,40,100,.85)');sign(g,'🦋 اصطد الفراشات',5.5,2.2,3.5);interacts.push({x:5.5,z:4.5,label:'🦋 العب اصطياد الفراشات',fn:startButter});sign(g,'🏆 أفضل الصيادين',-5.5,2.2,3.5);interacts.push({x:-5.5,z:4.5,label:'🏆 أفضل الصيادين',fn:openButterLB});
  finishRoom(g);
  for(let i=0;i<8;i++){const m=new THREE.Group(),c=cols[i%6];for(const sx of[-1,1]){const w=new THREE.Mesh(new THREE.PlaneGeometry(0.28,0.22),new THREE.MeshBasicMaterial({color:c,side:2}));w.position.x=sx*0.14;w.userData.sx=sx;m.add(w)}room.group.add(m);butter.push({m,a:rng()*6.28,r:2+rng()*4.5,h:1.2+rng()*1.2,sp:0.3+rng()*0.4,cx:(rng()-0.5)*6,cz:(rng()-0.5)*5})}
 }
