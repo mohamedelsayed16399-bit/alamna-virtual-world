@@ -1194,7 +1194,7 @@ function playNote(ins,k){if(me&&me.mute)return;try{if(!AC)AC=new (window.AudioCo
 function noteIn(m,r){const ins=num(m.s,0,2)|0,k=num(m.k,0,7)|0;playNote(ins,k);r.emote(['🎹','🥁','🔔'][ins])}
 
 const FISH=[['🐟','سردين',1,60],['🐠','بلطي',1,60],['🐡','نفّاخ',2,40],['🦑','حبار',3,25],['🦈','قرش صغير',5,10],['🐙','أخطبوط',4,15],['🐋','حوت ذهبي',12,3]];
-let fishSt=null,bobber=null,fishDock=null;
+let fishSt=null,bobber=null,fishDock=null,fishTank=null;
 function fishData(){me.fish=me.fish||{};return me.fish}
 function buildFish(){
  interacts=[];fishSt={s:'idle',t:0,w:0};const g=new THREE.Group();
@@ -1209,8 +1209,12 @@ function buildFish(){
  interacts.push({x:-3.5,z:1.5,label:'📖 كتالوج السمك',fn:openFishBook});
  sign(g,'📖 كتالوج',-3.5,2.4,0.4);
  bobber=new THREE.Group();bobber.add(mesh(G.sph(0.2,8),0xff4757,0,0,0),mesh(G.sph(0.14,8),0xf8f9fa,0,0.18,0));bobber.visible=false;
+ {const tk=new THREE.Group();tk.position.set(4.6,0,1.5);const gl=mesh(G.box(2.6,1.6,1.4),0x74c0fc,0,1.2,0);gl.material=gl.material.clone();gl.material.transparent=true;gl.material.opacity=0.28;tk.add(mesh(G.box(2.8,0.3,1.6),0x5c3d1e,0,0.15,0),gl,mesh(G.box(2.6,0.12,1.4),0xe6c27a,0,0.5,0));g.add(tk);sign(g,'🐠 حوض السمك بتاعك',4.6,3.1,1.5);
+  fishTank=new THREE.Group();fishTank.position.copy(tk.position);const d=fishData();const cols=[0xadb5bd,0xffa94d,0x69db7c,0xb197fc,0x4dabf7,0xff6b6b,0xffd43b];let n=0;
+  for(let k=0;k<FISH.length;k++){const c=Math.min(2,d[k]||0);for(let j=0;j<c&&n<12;j++,n++){const f=new THREE.Group();f.add(mesh(G.sph(0.17,8),cols[k],0,0,0),mesh(G.cone(0.12,0.25,4),cols[k],-0.22,0,0));f.children[0].scale.set(1.5,1,0.6);f.children[1].rotation.z=Math.PI/2;f.userData={a:Math.random()*6.28,s:0.5+Math.random()*0.6,y:0.8+Math.random()*0.8,r:0.4+Math.random()*0.5};fishTank.add(f)}}
+  if(!n)sign(g,'اصطد سمك عشان يظهر هنا',4.6,2.4,1.5)}
  g.add(portalMesh('ارجع للشاطئ',0,7.2,0xff8787,'beach'));
- mergeStatic(g);scene.add(g);room.group=g;room.bounds=7.5;room.pickables=[];
+ mergeStatic(g);scene.add(g);room.group=g;room.bounds=7.5;room.pickables=[];g.add(fishTank);
  g.add(bobber);
  toast('🎣 ميناء الصيد! ارمي السنارة وشد لما تسحب',3200)
 }
@@ -1222,7 +1226,7 @@ function fishAct(){const F=fishSt;if(!F)return;
   me.coins+=pay;updCoins();saveMe();sfx('star');burst(new THREE.Vector3(0,1,-6.4),[0x74c0fc,0xffffff,0xffd43b],14);
   toast('🎉 اصطدت '+f[0]+' '+f[1]+(pay?' +'+pay+'🪙':' (وصلت حد النهاردة)'),2800);F.s='idle';bobber.visible=false;F.last=k;return}
 }
-function fishTick(dt){if(!room||room.type!=='fish'||!fishSt)return;const F=fishSt;F.t+=dt;
+function fishTick(dt){if(!room||room.type!=='fish'||!fishSt)return;const F=fishSt;F.t+=dt;if(fishTank)for(const f of fishTank.children){const u=f.userData;u.a+=dt*u.s;f.position.set(Math.cos(u.a)*u.r*1.8,u.y+Math.sin(u.a*2)*0.1,Math.sin(u.a)*u.r*0.8);f.rotation.y=-u.a-Math.PI/2*0}
  if(F.s==='idle'){fishDock.label='🎣 ارمي السنارة'}
  else if(F.s==='wait'){fishDock.label='⏳ استنى السحبة... (شد بدري = تهرب)';bobber.position.y=0.05+Math.sin(tClock*3)*0.03;if(F.t>F.w){F.s='bite';F.t=0;sfx('err');toast('❗ سحب! شد دلوقتي!',1200)}}
  else if(F.s==='bite'){fishDock.label='❗❗ شد دلوقتي!';bobber.position.y=-0.1+Math.sin(tClock*40)*0.08;if(F.t>1.4){F.s='idle';bobber.visible=false;toast('😅 السمكة هربت، حاول تاني',1800)}}
@@ -1712,4 +1716,4 @@ requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
 </script>
 </body>
-                                                                                                                                   </html>
+   </html>
