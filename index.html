@@ -542,8 +542,12 @@ function subscribeRoom(){
  client.subscribe(topicRoom(room.id));subRoom=room.id;sendPos(true);
 }
 function pub(obj){if(netOK&&client){try{client.publish(topicRoom(room.id),JSON.stringify(obj))}catch(e){}}}
-const BADRX=/(fuck\w*|shit\w*|bitch\w*|asshole|pussy|cunt|nigg\w*|whore|slut|dickhead|شرموط\S*|متناك\S*|منيوك\S*|قحب\S*|عرص\S*|خول\S*|ابن الكلب|ولاد الكلب|كسمك|كس امك|كسأمك|احا|طيزك)/gi;
-const str=(s,n)=>String(s==null?'':s).replace(/[\u0000-\u001f<>]/g,'').slice(0,n).replace(BADRX,m=>'*'.repeat(Math.min(m.length,4)));
+const BADRX=/(fuck\w*|shit\w*|bitch\w*|asshole|pussy|nigg\w*|whore|slut|شرموط\S*|متناك\S*|منيوك\S*|قحب\S*|ابن الكلب|ولاد الكلب|كسمك|كس امك)/gi;
+const BADN=['fuck','shit','bitch','whore','slut','nigg','pussy','asshole','dickhead','motherfuck','شرموط','متناك','منيوك','قحبه','كسمك','كساميك','كسامك','ابنالكلب','ولادالكلب','ابنالمتناكه','ابنالشرموطه'].map(w=>w.replace(/(.)\1+/g,'$1'));
+function modNorm(t){return String(t).toLowerCase().replace(/[\u064b-\u065f\u0670\u0640\u200b-\u200f]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[@4]/g,'a').replace(/[3]/g,'e').replace(/[0]/g,'o').replace(/[1!|]/g,'i').replace(/[$5]/g,'s').replace(/[^a-z\u0621-\u064a]/g,'').replace(/(.)\1+/g,'$1')}
+function modBad(t){const n=modNorm(t);return BADN.some(w=>n.includes(w))}
+const URLRX=/(https?:\/\/\S+|www\.\S+|\b\S+\.(com|net|org|io|me|ly|xyz|app|gg|tk)\b\S*)/gi;
+const str=(s,n)=>{let r=String(s==null?'':s).replace(/[\u0000-\u001f<>]/g,'').slice(0,n).replace(BADRX,m=>'*'.repeat(Math.min(m.length,4))).replace(URLRX,'[رابط]');return modBad(r)?'***':r};
 const num=(v,a,b,d=0)=>{v=+v;return isFinite(v)?clamp(v,a,b):d};
 function getRemote(m){
  let r=remotes.get(m.i);
@@ -863,7 +867,7 @@ function addLog(n,t){const l=$('log'),d=document.createElement('div');if(n){cons
 function modal(build){const c=$('mcard');c.innerHTML='';build(c);$('modal').style.display='flex'}
 function closeModal(){$('modal').style.display='none'}
 $('modal').addEventListener('pointerdown',e=>{if(e.target===$('modal'))closeModal()});
-function sendChat(){const i=$('chatin'),t=str(i.value,80).trim();if(!t)return;i.value='';sfx('chat');player.say(t);addLog('أنا',t);pub({t:'c',i:me.id,n:me.name,m:t});$('chatbox').style.display='none';i.blur()}
+let lastChatT=0;function sendChat(){const i=$('chatin'),t=str(i.value,80).trim();if(!t)return;if(Date.now()-lastChatT<1200){toast('🕐 براحة شوية على الرسايل',1200);return}lastChatT=Date.now();i.value='';sfx('chat');player.say(t);addLog('أنا',t);pub({t:'c',i:me.id,n:me.name,m:t});$('chatbox').style.display='none';i.blur()}
 $('chatsend').onclick=sendChat;$('chatin').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat()});
 $('bChat').onclick=()=>{$('emo').style.display='none';const b=$('chatbox');b.style.display=b.style.display==='flex'?'none':'flex';if(b.style.display==='flex')setTimeout(()=>$('chatin').focus(),50)};
 function renderEmo(){$('emo').innerHTML=EMOJIS.slice(0,8).concat(me.pet?(me.tricks||[]):[]).map(e=>'<b>'+e+'</b>').join('')}renderEmo();
@@ -1716,4 +1720,4 @@ requestAnimationFrame(frame);
 setTimeout(()=>{$('loading').style.display='none';if(!localStorage.getItem('ealam_seen')){localStorage.setItem('ealam_seen','1');$('bInfo').click()}},400);
 </script>
 </body>
-   </html>
+  </html>
