@@ -321,7 +321,7 @@ sign(g,'🎵 صندوق الموسيقى',-6,2.9,-6.5);interacts.push({x:-6,z:-5
 for(const[x,z]of[[-4,0],[4,0],[-4,3],[4,3],[0,1.5]]){const t=new THREE.Group();t.position.set(x,0,z);t.add(mesh(G.cyl(0.8,0.8,0.1,16),0x8d6e63,0,0.8,0),mesh(G.cyl(0.1,0.15,0.8,6),0x4e342e,0,0.4,0));for(const dx of[-1.1,1.1])t.add(mesh(G.cyl(0.3,0.3,0.1,10),0xc2410c,dx,0.5,0),mesh(G.cyl(0.05,0.05,0.5,6),0x333,dx,0.25,0));g.add(t)}
 g.add(mesh(G.box(0.1,2,3),0x74c0fc,-8.0,2.4,3,0x112244));
 g.add(portalMesh('🎡 عجلة الحظ',6,5.8,0x9775fa,'wheel'));
-g.add(portalMesh('📸 استوديو الصور',-6,5.8,0xffd43b,'photo'));
+g.add(portalMesh('📸 استوديو الصور',-6,5.8,0xffd43b,'photo'),portalMesh('🥐 المخبز',-6,-2.5,0xe8590c,'bake'));
 finishRoom(g);
 }
 let ball=null,ballV={x:0,z:0},lastKick=null,goalCool=0,goals=0,ballSend=0;
@@ -463,7 +463,7 @@ if(topic.startsWith(NS+'/fr/')){frMsg(m);return}
 if(topic.startsWith(NS+'/pl/')){const pp=topic.split('/');if(plCb&&pp[2]&&typeof m.l==='number')plCb(pp[2],{n:str(m.n,14),l:num(m.l,0,30)|0,p:num(m.p,0,3)|0});return}
 if(topic.startsWith(NS+'/sg/')){const pp=topic.split('/');if(slCb&&pp[2]&&typeof m.s==='number')slCb(pp[2],{n:str(m.n,14),s:num(m.s,0,80)});return}
 if(topic.startsWith(NS+'/bl/')){const pp=topic.split('/');if(blCb&&pp[2]&&typeof m.s==='number')blCb(pp[2],{n:str(m.n,14),s:num(m.s,0,60)});return}
-if(topic.startsWith(NS+'/ch/')){const pp=topic.split('/');if(chCb&&pp[2]&&m.g&&typeof m.g==='object'){const q={};for(const k of['golf','hoops','bowl','gal','tag','pen','seek','kite','bump'])q[k]=num(m.g[k],0,9999);chCb(pp[2],{n:str(m.n,14),g:q})}return}
+if(topic.startsWith(NS+'/ch/')){const pp=topic.split('/');if(chCb&&pp[2]&&m.g&&typeof m.g==='object'){const q={};for(const k of['golf','hoops','bowl','gal','tag','pen','seek','kite','bump','bake'])q[k]=num(m.g[k],0,9999);chCb(pp[2],{n:str(m.n,14),g:q})}return}
 if(topic.startsWith(NS+'/lb/')){const pp=topic.split('/');if(lbCb&&pp[2]&&typeof m.t==='number')lbCb(pp[2],{n:str(m.n,14),t:num(m.t,0,9999)});return}
 if(topic.startsWith(NS+'/gb/')){const pp=topic.split('/');if(gbCb&&pp[2]===room.owner&&pp[3])gbCb(pp[3],{n:str(m.n,14),m:str(m.m,60),t:num(m.t,0,9e15)});return}
 if(topic.startsWith(NS+'/h/')){if(homeCb&&topic===NS+'/h/'+homeCb.code)homeCb.fn(m);return}
@@ -521,7 +521,7 @@ for(const b of bots)dot(b.root.position.x,b.root.position.z,'#999',3);
 for(const [,r] of remotes)dot(r.root.position.x,r.root.position.z,'#4dabf7',5);
 dot(player.root.position.x,player.root.position.z,'#fff',6);x.restore()}
 /* ===================== friends presence ===================== */
-const friendPres={};const RN={bump:'التصادم',kite:'الطيارة الورق',plaza:'الساحة',arcade:'الأركيد',cafe:'الكافيه',home:'بيت',garden:'الحديقة',beach:'الشاطئ',cave:'الكهف',disco:'الديسكو',haunt:'البيت المسكون',space:'محطة الفضاء',maze:'المتاهة',fun:'الملاهي',show:'عرض الأزياء',farm:'المزرعة',studio:'الاستوديو',seek:'الاستغماية',pen:'ركلات الجزاء',photo:'استوديو الصور',jump:'الترامبولين',tag:'الطاردة',gallery:'ميدان الرماية',wheel:'عجلة الحظ',bowl:'البولينج',hoops:'تحدي السلة',golf:'الميني جولف',fish:'ميناء الصيد'};
+const friendPres={};const RN={bake:'المخبز',bump:'التصادم',kite:'الطيارة الورق',plaza:'الساحة',arcade:'الأركيد',cafe:'الكافيه',home:'بيت',garden:'الحديقة',beach:'الشاطئ',cave:'الكهف',disco:'الديسكو',haunt:'البيت المسكون',space:'محطة الفضاء',maze:'المتاهة',fun:'الملاهي',show:'عرض الأزياء',farm:'المزرعة',studio:'الاستوديو',seek:'الاستغماية',pen:'ركلات الجزاء',photo:'استوديو الصور',jump:'الترامبولين',tag:'الطاردة',gallery:'ميدان الرماية',wheel:'عجلة الحظ',bowl:'البولينج',hoops:'تحدي السلة',golf:'الميني جولف',fish:'ميناء الصيد'};
 function presTopic(c){return NS+'/u/'+c}
 function subFriends(){if(!netOK||!client)return;try{client.subscribe(NS+'/fr/'+me.id)}catch(e){}me.friends.forEach(f=>{try{client.subscribe(presTopic(f.code))}catch(e){}})}
 function pubPres(){if(!netOK||!client)return;try{client.publish(presTopic(me.id),JSON.stringify({n:me.name,r:room.type,h:room.type==='home'?room.owner:null}))}catch(e){}}
@@ -604,6 +604,7 @@ else if(type==='hoops'){room.id='hoops';buildHoops();$('roomName').textContent='
 else if(type==='bowl'){room.id='bowl';buildBowl();$('roomName').textContent='🎳 البولينج';starObjs=[]}
 else if(type==='wheel'){room.id='wheel';buildWheel();$('roomName').textContent='🎡 عجلة الحظ';starObjs=[]}
 else if(type==='gallery'){room.id='gallery';buildGallery();$('roomName').textContent='🎯 ميدان الرماية';starObjs=[]}
+else if(type==='bake'){room.id='bake';buildBake();$('roomName').textContent='🥐 المخبز';starObjs=[]}
 else if(type==='bump'){room.id='bump';buildBump();$('roomName').textContent='🚗 تصادم';starObjs=[]}
 else if(type==='tag'){room.id='tag';buildTag();$('roomName').textContent='🏃 الطاردة';starObjs=[]}
 else if(type==='jump'){room.id='jump';buildJump();$('roomName').textContent='🤸 الترامبولين';starObjs=[]}
