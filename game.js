@@ -184,7 +184,7 @@ const g=new THREE.Group();g.position.set(x,0,z);
 const ring=new THREE.Mesh(new THREE.TorusGeometry(1.1,0.14,8,28),new THREE.MeshBasicMaterial({color}));ring.rotation.x=Math.PI/2;ring.position.y=0.15;g.add(ring);
 const disc=new THREE.Mesh(new THREE.CircleGeometry(1.0,24),new THREE.MeshBasicMaterial({color,transparent:true,opacity:0.3}));disc.rotation.x=-Math.PI/2;disc.position.y=0.05;g.add(disc);
 const l=labelSprite(label,{s:2.6});l.position.y=2.1;g.add(l);
-g.userData={x,z,ring,to};portals.push(g.userData);return g;
+g.userData={x,z,ring,to,label};portals.push(g.userData);return g;
 }
 function grassTex(){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.fillStyle='#5aa85c';x.fillRect(0,0,128,128);const r=mulberry(5);for(let i=0;i<900;i++){x.fillStyle=['#4f9a52','#63b366','#6bbd6e','#4a8f4d'][i&3];x.fillRect(r()*128,r()*128,2+r()*3,2+r()*3)}for(let i=0;i<30;i++){x.fillStyle=['#fff','#ffd43b','#ff8787'][i%3];x.fillRect(r()*128,r()*128,2,2)}
 const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(24,24);return t}
