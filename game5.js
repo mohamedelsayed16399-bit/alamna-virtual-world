@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -135,6 +135,7 @@ function buildMpr(){
  g.add(mesh(G.box(0.3,2,0.3),0x7048e8,-5,1,-2),mesh(G.box(0.3,2,0.3),0x7048e8,5,1,-2));
  mprh={it:{x:0,z:0.2,label:'🃏 العب الذاكرة',fn:mprStart}};interacts.push(mprh.it);
  g.add(portalMesh('ارجع للبرج',5.8,5.8,0x4263eb,'skbroom'));
+ g.add(portalMesh('تحدّي السهام',-5.8,5.8,0xe03131,'dtbroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🃏 اقلب كارتين متشابهين. أقل حركات أحسن',3400)
 }
@@ -169,4 +170,42 @@ function mprStart(){
   cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width,py=(e.clientY-r.top)*CH/r.height;flip(Math.floor(py/ch)*C+Math.floor(px/cw))};
   $('mpN').onclick=()=>{if(lock)return;for(let i=15;i>0;i--){const j=Math.floor(Math.random()*(i+1));[face[i],face[j]]=[face[j],face[i]]}up.fill(false);done.fill(false);sel=[];moves=0;over=false;msg='';info()};
   $('mpX').onclick=()=>{$('modal').style.display='none'};
+  info();requestAnimationFrame(loop)})}
+function buildDtb(){
+ const g=indoor(0xe03131,0xfff5f5,0xffc9c9);
+ sign(g,'🎯 تحدّي السهام',0,4.6,-7.6,'rgba(224,49,49,.92)');
+ [[1.6,0xf8f9fa],[1.2,0xe03131],[0.8,0xf8f9fa],[0.4,0xe03131]].forEach((a,i)=>g.add(mesh(G.cyl(a[0],a[0],0.1+i*0.02,20),a[1],0,2.4,-6.8)));
+ g.add(mesh(G.box(0.3,2,0.3),0xe03131,-5,1,-2),mesh(G.box(0.3,2,0.3),0xe03131,5,1,-2));
+ dtbh={it:{x:0,z:0.2,label:'🎯 ارمي السهام',fn:dtbStart}};interacts.push(dtbh.it);
+ g.add(portalMesh('ارجع للذاكرة',5.8,5.8,0x7048e8,'mprroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🎯 5 رميات. دوس لما المؤشر يعدّي على النص',3400)
+}
+function dtbStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,320),CH=H?150:250,R=Math.min(W,CH)/2-6,A=W/2-14,B=CH/2-14;
+ let t=0,n=0,total=0,over=false,msg='',marks=[];
+ const pos=()=>[W/2+A*Math.sin(t*2.1),CH/2+B*Math.sin(t*3.3+1.2*0)];
+ window.dtbq=()=>({n,total,over,W,CH,R,coins:me.coins,aim:()=>{t=0},throw:()=>thr(),pos:pos()});
+ let thr=()=>{};
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🎯 تحدّي السهام</h2>')+'<div id="dtS" style="text-align:center;font-size:14px;margin:2px;min-height:1.4em"></div><div style="text-align:center"><canvas id="dtC" width="'+W+'" height="'+CH+'" style="border-radius:10px;max-width:100%;touch-action:none"></canvas></div><div id="dtM" style="text-align:center;font-size:13px;margin:5px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="dtN" style="width:auto!important;display:inline-block!important">🔁 من الأول</button><button class="btn d" id="dtX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('dtC'),x=cv.getContext('2d');
+  const open=()=>$('dtC')&&$('modal').style.display!=='none';
+  const info=()=>{if($('dtS'))$('dtS').textContent='رمية '+Math.min(n+1,5)+'/5 · المجموع '+total+' · أحسن '+(me.dtbBest||0);if($('dtM'))$('dtM').textContent=msg};
+  const finish=()=>{over=true;me.dtbGames=(me.dtbGames||0)+1;me.dtbBest=Math.max(me.dtbBest||0,total);const d=today();if(me.dtbDD!==d){me.dtbDD=d;me.dtbDC=0}
+   let c=total>=45?3:total>=38?2:total>=30?1:0;c=Math.min(c,Math.max(0,6-(me.dtbDC||0)));
+   if(c){me.coins+=c;me.dtbDC=(me.dtbDC||0)+c;updCoins();sfx('win')}
+   msg='🏁 المجموع '+total+'/50'+(c?' · +'+c+'🪙':' · وصّل 30 للجايزة');saveMe();info()};
+  thr=()=>{if(over)return;const p=pos(),d=Math.hypot(p[0]-W/2,p[1]-CH/2);const s=Math.max(0,10-Math.floor(d/(R/10)));marks.push(p);n++;total+=s;msg=s?'+'+s+(s>=9?' 🎯':''):'ضاعت';sfx(s?'place':'err');if(n>=5)setTimeout(finish,300);info()};
+  let tm=performance.now();
+  const loop=ts=>{if(!open())return;const dt=Math.min(.03,(ts-tm)/1000);tm=ts;if(!over)t+=dt;
+   x.fillStyle='#fff5f5';x.fillRect(0,0,W,CH);
+   [[1,'#f8f9fa'],[.8,'#e03131'],[.6,'#f8f9fa'],[.4,'#e03131'],[.2,'#212529']].forEach(a=>{x.fillStyle=a[1];x.beginPath();x.arc(W/2,CH/2,R*a[0],0,7);x.fill()});
+   x.strokeStyle='#868e96';x.lineWidth=1;x.beginPath();x.arc(W/2,CH/2,R,0,7);x.stroke();
+   x.fillStyle='#1c7ed6';marks.forEach(m=>{x.beginPath();x.arc(m[0],m[1],4,0,7);x.fill()});
+   if(!over){const p=pos();x.strokeStyle='#e8590c';x.lineWidth=2;x.beginPath();x.arc(p[0],p[1],9,0,7);x.moveTo(p[0]-14,p[1]);x.lineTo(p[0]+14,p[1]);x.moveTo(p[0],p[1]-14);x.lineTo(p[0],p[1]+14);x.stroke()}
+   info();requestAnimationFrame(loop)};
+  cv.onpointerdown=e=>{e.preventDefault();thr()};
+  $('dtN').onclick=()=>{n=0;total=0;over=false;msg='';marks=[];t=0;info()};
+  $('dtX').onclick=()=>{$('modal').style.display='none'};
   info();requestAnimationFrame(loop)})}
