@@ -999,3 +999,5 @@ function benchesBuild(g){if(!BENCHES)return;for(const[x,z,r]of BENCHES){const b=
 function benchNear(p){if(!BENCHES||!room||room.type!=='plaza')return false;for(const[x,z]of BENCHES)if(Math.hypot(p.x-x,p.z-(z+0.08))<0.35)return true;return false}
 {const oT=Actor.prototype.tick;Actor.prototype.tick=function(dt,t){oT.call(this,dt,t);if(!this.av||this.moving||!benchNear(this.root.position)){if(this.sitK){this.sitK=0}return}const f=this.av.userData.feet,ar=this.av.userData.arms;this.sitK=1;this.av.position.y=-0.22;if(f){f[0].position.z=f[1].position.z=0.5}if(ar){ar[0].rotation.x=ar[1].rotation.x=-0.5}}}
 try{if(room&&room.type==='plaza'&&room.group&&!room.group.userData.bn){room.group.userData.bn=1;benchesBuild(room.group)}}catch(e){}
+/* R100: milestone gift hat 31 for everyone */
+try{if(me&&Array.isArray(me.owned)&&!me.owned.includes(31)){me.owned.push(31);saveMe();setTimeout(()=>{try{toast('🎉 الجولة 100! هدية: 👑 تاج المئة (من "شكلي")',4200);burst(player.root.position,0xffd43b,24);sfx('star')}catch(e){}},2500)}}catch(e){}
