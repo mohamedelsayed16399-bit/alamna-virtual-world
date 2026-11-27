@@ -38,7 +38,7 @@ function drtStart(){
    stuck.forEach(s=>{x.strokeStyle='#868e96';x.lineWidth=2;x.beginPath();x.moveTo(s.x,s.y);x.lineTo(s.x+6,s.y-10);x.stroke();x.fillStyle='#ffd43b';x.beginPath();x.arc(s.x,s.y,2.5,0,6.3);x.fill()});
    if(!over){const r=ret();x.strokeStyle='rgba(255,255,255,.95)';x.lineWidth=2.5;x.beginPath();x.arc(r.x,r.y,9,0,6.3);x.stroke();x.strokeStyle='#228be6';x.lineWidth=1.5;x.beginPath();x.arc(r.x,r.y,9,0,6.3);x.stroke();x.beginPath();x.moveTo(r.x-14,r.y);x.lineTo(r.x+14,r.y);x.moveTo(r.x,r.y-14);x.lineTo(r.x,r.y+14);x.stroke()}
    if(msgT>0){x.fillStyle=msgC;x.strokeStyle='#212529';x.lineWidth=4;x.font='bold 22px sans-serif';x.textAlign='center';x.strokeText(msg,W/2,26);x.fillText(msg,W/2,26)}};
-  const fin=()=>{over=true;dw();sfx('win');setTimeout(()=>{if(!open())return;const d=today();if(!me.drtd||me.drtd.d!==d)me.drtd={d,c:0};let pay=Math.min(5,Math.floor(sc/60));pay=Math.max(0,Math.min(pay,12-me.drtd.c));me.drtd.c+=pay;me.coins+=pay;updCoins();const nb=sc>(me.drtBest||0);if(nb)me.drtBest=sc;me.drtGames=(me.drtGames||0)+1;saveMe();
+  const fin=()=>{over=true;dw();sfx('win');setTimeout(()=>{if(!open())return;const d=today();if(!me.drtd||me.drtd.d!==d)me.drtd={d,c:0};let pay=Math.min(5,Math.floor(sc/80));pay=Math.max(0,Math.min(pay,12-me.drtd.c));me.drtd.c+=pay;me.coins+=pay;updCoins();const nb=sc>(me.drtBest||0);if(nb)me.drtBest=sc;me.drtGames=(me.drtGames||0)+1;saveMe();
    c.innerHTML='<h2>'+(sc>=250?'🎯 قناص!':'🎯 خلصت السهام')+'</h2><div style="text-align:center;font-size:16px">مجموع النقاط: <b>'+sc+'</b>'+(nb&&sc?'<br>🏆 رقم قياسي!':'<br>أحسن نتيجة: '+(me.drtBest||0))+'<br>'+(pay?'+'+pay+'🪙':sc>=60?'(وصلت حد النهاردة)':'اوصل 60 نقطة عشان تكسب عملات')+'</div><div class="row"><button class="btn g" id="drR">🔁 تاني</button><button class="btn d" id="drX">إغلاق</button></div>';$('drR').onclick=()=>{$('modal').style.display='none';drtStart()};$('drX').onclick=()=>{$('modal').style.display='none'}},700)};
   thr=()=>{if(over||cool>0||!open())return;const r=ret(),j=R*0.04,px=r.x+(Math.random()-.5)*2*j,py=r.y+(Math.random()-.5)*2*j,v=val(px,py);thrown++;sc+=v.p;stuck.push({x:px,y:py});cool=0.35;sfx(v.p>=40?'win':'place');say(v.p>=40?v.l+' 🔥':v.l,v.p?'#ffd43b':'#ff6b6b');hud();if(thrown>=TOT)fin()};
   const tick=now=>{if(!open())return;const dt=Math.min(0.04,(now-(last||now))/1000);last=now;if(msgT>0)msgT-=dt;if(cool>0)cool-=dt;if(!over)t+=dt;hud();dw();if(!over)requestAnimationFrame(tick)};
@@ -653,7 +653,7 @@ function buildNng(){
  const s=NNGP[0][1];for(let i=0;i<5;i++)for(let j=0;j<5;j++)g.add(mesh(G.box(0.7,0.12,0.7),s[i*5+j]==='1'?0xe64980:0xdee2e6,-1.7+j*0.85,0.2,-5.7+i*0.85));
  g.add(mesh(G.cyl(0.4,0.4,1,10),0xe64980,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0xe64980,5,0.5,0));
  nngh={it:{x:0,z:0.2,label:'🧩 العب الصور المخفية',fn:nngStart}};interacts.push(nngh.it);
- g.add(portalMesh('ارجع لتلوين الفيضان',5.8,5.8,0x1098ad,'cflroom'));
+ g.add(portalMesh('ارجع لتلوين الفيضان',5.8,5.8,0x1098ad,'cflroom'),portalMesh('🦘 قفز الأبراج',-5.8,5.8,0x37b24d,'dljroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🧩 الأرقام بتقولك كام مربع ملون ورا بعض في كل صف وعمود. اكتشف الصورة!',3400)
 }
@@ -686,3 +686,47 @@ function nngStart(){
   cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),X=(e.clientX-r.left)*S/r.width-m,Y=(e.clientY-r.top)*S/r.height-m;const cx=Math.floor(X/cs),cy=Math.floor(Y/cs);if(X<0||Y<0||cx>4||cy>4)return;tap(cy*5+cx)};
   $('ngM').onclick=()=>{mark=!mark;$('ngM').textContent=mark?'· علّم فاضي':'⬛ تلوين'};
   $('ngR').onclick=()=>{init();hud();dw()};$('ngX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
+let dljh=null;
+function buildDlj(){
+ const g=indoor(0x37b24d,0xebfbee,0x8ce99a);
+ sign(g,'🦘 غرفة قفز الأبراج',0,4.6,-7.6,'rgba(55,178,77,.92)');
+ [[-1.6,0.5],[0.9,1.1],[-0.8,1.8],[1.5,2.5],[-0.3,3.2]].forEach(([x,y],i)=>g.add(mesh(G.box(1.3,0.14,0.8),i%2?0x74c0fc:0x69db7c,x,y,-4.5)));
+ g.add(mesh(G.cyl(0.35,0.35,0.5,12),0xffd43b,-0.3,3.55,-4.5));
+ g.add(mesh(G.cyl(0.4,0.4,1,10),0x37b24d,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x37b24d,5,0.5,0));
+ dljh={it:{x:0,z:0.2,label:'🦘 العب قفز الأبراج',fn:dljStart}};interacts.push(dljh.it);
+ g.add(portalMesh('ارجع للصور المخفية',5.8,5.8,0xe64980,'nngroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🦘 اسحب صباعك يمين وشمال وانط من لوح للوح لأعلى ارتفاع!',3400)
+}
+function dljStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),CW=H?Math.min(W,220):Math.min(W,300),CH=H?Math.max(130,innerHeight-160):Math.min(Math.max(280,innerHeight-330),440);
+ let px=CW/2,py=CH-60,vy=0,tx=CW/2,cam=0,best=0,plats=[],over=false,paid=0,dir=0,last=0,t=0;
+ const G0=1100,VJ=560,PW=54;
+ const gen=()=>{let top=plats.length?Math.min(...plats.map(p=>p.y)):CH;while(top>cam-80){const sc=Math.max(0,-cam)/10,gap=48+Math.random()*(52+Math.min(30,sc/25));top-=gap;const mv=sc>60&&Math.random()<Math.min(0.4,sc/700),sp=sc>30&&Math.random()<0.07;plats.push({x:10+Math.random()*(CW-PW-20),y:top,mv,dx:mv?(Math.random()<0.5?-1:1)*(40+Math.random()*30):0,sp})}};
+ const init=()=>{plats=[{x:CW/2-PW/2,y:CH-30,mv:false,dx:0,sp:false}];for(let i=1;i<6;i++)plats.push({x:10+Math.random()*(CW-PW-20),y:CH-30-i*70,mv:false,dx:0,sp:false});px=CW/2;py=CH-60;vy=-VJ;cam=0;best=0;over=false;tx=px;gen()};
+ init();
+ let step=()=>{};
+ window.dljq=()=>({score:Math.floor(best),over,px,py,vy,cam,plats:plats.map(p=>({...p})),CW,CH,sx:v=>{tx=v},step:d=>step(d),paid});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🦘 قفز الأبراج</h2>')+'<div id="djH" style="text-align:center;font-size:14px;margin:2px">ارتفاع 0</div><canvas id="djC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row" style="display:flex;gap:6px;justify-content:center;direction:ltr"><button class="btn" id="djL" style="width:auto!important;display:inline-block!important;min-width:60px">◀</button><button class="btn d" id="djX" style="width:auto!important;display:inline-block!important">إغلاق</button><button class="btn" id="djR" style="width:auto!important;display:inline-block!important;min-width:60px">▶</button></div>';
+  const cv=$('djC');cv.width=CW;cv.height=CH;const x=cv.getContext('2d');
+  const open=()=>$('djC')&&$('modal').style.display!=='none';
+  const dw=()=>{x.fillStyle='#d3f9d8';x.fillRect(0,0,CW,CH);x.fillStyle='rgba(255,255,255,.7)';for(let i=0;i<4;i++){const cy=((i*130-cam*0.3)%(CH+40)+CH+40)%(CH+40)-20;x.beginPath();x.arc((i*97)%CW,cy,14,0,7);x.fill()}
+   plats.forEach(p=>{const y=p.y-cam;if(y<-20||y>CH+20)return;x.fillStyle=p.sp?'#fa5252':p.mv?'#339af0':'#40c057';x.beginPath();x.roundRect?x.roundRect(p.x,y,PW,10,5):x.rect(p.x,y,PW,10);x.fill();if(p.sp){x.fillStyle='#ffd43b';x.fillRect(p.x+PW/2-6,y-6,12,6)}});
+   x.font='30px sans-serif';x.textAlign='center';x.textBaseline='bottom';x.fillText('🦘',px,py-cam+4);
+   x.fillStyle='#2b8a3e';x.font='bold 14px sans-serif';x.textAlign='left';x.textBaseline='top';x.fillText('⬆ '+Math.floor(best),8,6)};
+  const fin=()=>{over=true;sfx('err');const sc=Math.floor(best),d=today();if(!me.dljD||me.dljD.d!==d)me.dljD={d,c:0};let pay=Math.max(0,Math.min(5,Math.floor(sc/80),12-me.dljD.c));me.dljD.c+=pay;me.coins+=pay;paid=pay;updCoins();me.dljGames=(me.dljGames||0)+1;const nb=sc>(me.dljBest||0);if(nb)me.dljBest=sc;saveMe();
+   c.innerHTML='<h2>🦘 وقعت!</h2><div style="text-align:center;font-size:16px">وصلت ارتفاع <b>'+sc+'</b><br>'+(nb&&sc?'🏆 رقم قياسي!':'أحسن ارتفاع: '+(me.dljBest||0))+'<br>'+(pay?'+'+pay+'🪙':'(80 ارتفاع = 1🪙)')+'</div><div class="row"><button class="btn" id="djR2">🔁 تاني</button><button class="btn d" id="djX2">إغلاق</button></div>';
+   $('djR2').onclick=dljStart;$('djX2').onclick=()=>{$('modal').style.display='none'}};
+  step=dt=>{if(over)return;dt=Math.min(dt,0.05);t+=dt;
+   const mvx=Math.max(-1,Math.min(1,(tx-px)/8))*340*dt;px+=dir?dir*300*dt:mvx;if(px<0)px+=CW;if(px>CW)px-=CW;if(dir)tx=px;
+   const oy=py;vy+=G0*dt;py+=vy*dt;
+   plats.forEach(p=>{if(p.mv){p.x+=p.dx*dt;if(p.x<4||p.x>CW-PW-4)p.dx*=-1}});
+   if(vy>0)for(const p of plats){if(oy<=p.y+2&&py>=p.y&&px>p.x-8&&px<p.x+PW+8){py=p.y;vy=-(p.sp?VJ*1.55:VJ);sfx(p.sp?'star':'tick');break}}
+   if(py-CH*0.4<cam)cam=py-CH*0.4;best=Math.max(best,-cam/10);gen();plats=plats.filter(p=>p.y-cam<CH+60);
+   if(py-cam>CH+20){dw();fin();return}dw();const h=$('djH');if(h)h.textContent='ارتفاع '+Math.floor(best)};
+  const loop=ts=>{if(!open())return;if(!over){const dt=last?(ts-last)/1000:0.016;last=ts;step(dt);requestAnimationFrame(loop)}};
+  const hold=(id,d)=>{const b=$(id);b.onpointerdown=e=>{e.preventDefault();dir=d};b.onpointerup=b.onpointerleave=b.onpointercancel=()=>{if(dir===d)dir=0}};hold('djL',-1);hold('djR',1);
+  const mvp=e=>{const r=cv.getBoundingClientRect();tx=(e.clientX-r.left)*CW/r.width};cv.onpointerdown=e=>{e.preventDefault();mvp(e)};cv.onpointermove=e=>{if(e.buttons||e.pointerType==='touch')mvp(e)};
+  document.addEventListener('keydown',function kd(e){if(!open()){document.removeEventListener('keydown',kd);return}if(e.key==='ArrowLeft')dir=-1;if(e.key==='ArrowRight')dir=1});document.addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight')dir=0});
+  $('djX').onclick=()=>{$('modal').style.display='none'};dw();requestAnimationFrame(loop)})}
