@@ -132,7 +132,7 @@ function buildCrl(){
  [[-2.3,-5],[2.3,-5]].forEach(([x,z])=>g.add(mesh(G.box(0.2,0.5,13),0x1c7ed6,x,0.25,-1.2)));
  g.add(mesh(G.box(0.1,1.4,0.1),0x8d6e63,-4.4,0.7,-1),mesh(G.box(0.6,0.15,0.3),0xe03131,-4.4,0.1,-1));
  crh={it:{x:0,z:0.2,label:'🥌 العب كيرلنج ضد 🤖',fn:crlStart}};interacts.push(crh.it);
- g.add(portalMesh('ارجع لاستوديو المسابقات',5.8,5.8,0x862e9c,'quiz'));
+ g.add(portalMesh('ارجع لاستوديو المسابقات',5.8,5.8,0x862e9c,'quiz'),portalMesh('⛄ ساحة كرات الثلج',-5.8,5.8,0x339af0,'snowfight'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🥌 اسحب الحجر لورا وسيب عشان تزلقه ناحية الهدف',3200)
 }
@@ -185,3 +185,68 @@ function crlStart(){
   cv.onpointermove=e=>{if(drag)drag=pos(e)};
   cv.onpointerup=e=>{if(!drag)return;const q=pos(e),dx=lx-q.x,dy=ly-q.y,L=Math.hypot(dx,dy);drag=null;if(L<14)return;launch(dx,dy,Math.min(1,L/PM))};
   $('crX').onclick=()=>{$('modal').style.display='none'};hud();dw();requestAnimationFrame(tick)})}
+
+/* R269: snowball fight */
+let snh=null;
+function buildSnw(){
+ const g=indoor(0x74c0fc,0xf1f8ff,0xa5d8ff);
+ sign(g,'⛄ ساحة كرات الثلج',0,4.6,-7.6,'rgba(51,154,240,.92)');
+ [[-4,-5],[0,-5.6],[4,-5]].forEach(([x,z])=>{g.add(mesh(G.box(2.4,1,0.8),0x91a7ff,x,0.5,z+0.8));g.add(mesh(G.sph(0.7,10),0xffffff,x,1.5,z),mesh(G.sph(0.5,10),0xffffff,x,2.3,z),mesh(G.sph(0.08,6),0xff922b,x,2.3,z+0.5),mesh(G.sph(0.06,6),0x212529,x-0.15,2.45,z+0.42),mesh(G.sph(0.06,6),0x212529,x+0.15,2.45,z+0.42))});
+ for(let i=0;i<7;i++)g.add(mesh(G.sph(0.25+Math.random()*0.15,8),0xffffff,-3+i,0.25,2+Math.random()*2));
+ snh={it:{x:0,z:0.2,label:'⛄ ابدأ معركة الثلج',fn:snwStart}};interacts.push(snh.it);
+ g.add(portalMesh('ارجع لصالة الكيرلنج',5.8,5.8,0x1098ad,'curl'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('⛄ دوس على رجل الثلج 🤖 قبل ما يرمي عليك',3200)
+}
+function snwStart(){
+ const H=innerHeight<420,CH=H?Math.max(130,innerHeight-165):Math.max(260,Math.min(innerHeight-330,380)),W=Math.min(innerWidth-50,360);
+ const u=Math.min(W/360,CH/300),TL=45,fy=CH*(H?0.74:0.68);
+ const bots=[0.2,0.5,0.8].map(f=>({x:W*f,st:'hid',p:0,tm:0,kind:0}));
+ let sc=0,hearts=3,t=TL,over=false,last=0,nx=0.8,cmb=0,flash=0,fx=[],msg='',msgT=0,hitN=0;
+ const bw=44*u,bh=64*u;
+ const rect=b=>({x:b.x-bw/2,y:fy-bh*b.p-6*u,w:bw,h:bh*b.p+6*u});
+ const hitB=i=>{const b=bots[i];if(over||!(b.st==='up'||b.st==='rise'))return false;
+  if(b.kind===2){sc=Math.max(0,sc-15);cmb=0;say('🐧 ده صاحبك! -15');sfx('lose')}
+  else{cmb++;hitN++;const g2=b.kind===1?30:10+Math.min(10,(cmb-1)*2);sc+=g2;say('+'+g2+(cmb>2?' 🔥':''));sfx('win')}
+  b.st='down';b.tm=0;fx.push({x:b.x,y:fy-bh*0.7,t:0});return true};
+ const tapAt=(px,py)=>{for(let i=0;i<3;i++){const r=rect(bots[i]);if(bots[i].st!=='hid'&&bots[i].st!=='down'&&px>=r.x-6&&px<=r.x+r.w+6&&py>=r.y-8&&py<=r.y+r.h+8)return hitB(i)}cmb=0;return false};
+ window.snwq=()=>({sc,hearts,over,t,hitN,bots:bots.map((b,i)=>({st:b.st,kind:b.kind,cx:b.x,cy:fy-bh*b.p*0.5,hit:()=>hitB(i)})),tap:tapAt});
+ const say=m=>{msg=m;msgT=0.8};
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">⛄ ساحة كرات الثلج</h2>')+'<div id="snH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="snC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row"><button class="btn d" id="snX">إغلاق</button></div>';
+  const cv=$('snC');cv.width=W;cv.height=CH;const x=cv.getContext('2d');
+  const open=()=>$('snC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('snH'))$('snH').textContent='⭐ '+sc+' · '+'❤️'.repeat(hearts)+'🖤'.repeat(3-hearts)+' · ⏱️ '+Math.max(0,Math.ceil(t))+(cmb>1?' · 🔥 x'+cmb:'')};
+  const fin=()=>{over=true;dw();sfx('win');setTimeout(()=>{if(!open())return;const d=today();if(!me.snwd||me.snwd.d!==d)me.snwd={d,c:0};let pay=Math.min(5,Math.floor(sc/150));pay=Math.max(0,Math.min(pay,12-me.snwd.c));me.snwd.c+=pay;me.coins+=pay;updCoins();const nb=sc>(me.snwBest||0);if(nb)me.snwBest=sc;me.snwGames=(me.snwGames||0)+1;saveMe();
+   c.innerHTML='<h2>'+(hearts>0?'⛄ كسبت المعركة!':'⛄ اتغطيت بالتلج!')+'</h2><div style="text-align:center;font-size:16px">النقاط: <b>'+sc+'</b> · رجال ثلج ضربتهم: '+hitN+(nb&&sc?'<br>🏆 رقم قياسي!':'<br>أحسن نتيجة: '+(me.snwBest||0))+'<br>'+(pay?'+'+pay+'🪙':sc>=150?'(وصلت حد النهاردة)':'اوصل 150 نقطة عشان تكسب عملات')+'</div><div class="row"><button class="btn" id="snR">🔁 تاني</button><button class="btn d" id="snX2">إغلاق</button></div>';
+   $('snR').onclick=snwStart;$('snX2').onclick=()=>{$('modal').style.display='none'}},800)};
+  const snowman=(b)=>{const r=rect(b),cx=b.x,top=r.y,s=u;x.save();x.beginPath();x.rect(r.x-8,top-10*s,r.w+16,fy-top+2);x.clip();
+   const by=fy-bh*b.p*0.5+10*s;
+   if(b.kind===2){x.fillStyle='#212529';x.beginPath();x.ellipse(cx,by,15*s,22*s,0,0,6.3);x.fill();x.fillStyle='#fff';x.beginPath();x.ellipse(cx,by+5*s,9*s,14*s,0,0,6.3);x.fill();x.fillStyle='#ff922b';x.beginPath();x.moveTo(cx-4*s,by-8*s);x.lineTo(cx+4*s,by-8*s);x.lineTo(cx,by-3*s);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(cx-5*s,by-14*s,3*s,0,6.3);x.arc(cx+5*s,by-14*s,3*s,0,6.3);x.fill();x.fillStyle='#000';x.beginPath();x.arc(cx-5*s,by-14*s,1.4*s,0,6.3);x.arc(cx+5*s,by-14*s,1.4*s,0,6.3);x.fill()}
+   else{x.fillStyle=b.kind===1?'#ffe066':'#fff';x.strokeStyle='#adb5bd';x.lineWidth=1.5;x.beginPath();x.arc(cx,by+8*s,19*s,0,6.3);x.fill();x.stroke();x.beginPath();x.arc(cx,by-14*s,13*s,0,6.3);x.fill();x.stroke();
+    x.fillStyle='#212529';x.beginPath();x.arc(cx-4.5*s,by-17*s,2*s,0,6.3);x.arc(cx+4.5*s,by-17*s,2*s,0,6.3);x.fill();x.fillStyle='#ff922b';x.beginPath();x.moveTo(cx,by-14*s);x.lineTo(cx+9*s,by-12*s);x.lineTo(cx,by-10*s);x.fill();x.fillStyle='#e03131';x.fillRect(cx-12*s,by-3*s,24*s,5*s);
+    x.fillStyle='#343a40';x.fillRect(cx-9*s,by-30*s,18*s,5*s);x.fillRect(cx-6*s,by-38*s,12*s,9*s);
+    x.strokeStyle='#868e96';x.lineWidth=1.5;x.beginPath();x.moveTo(cx+10*s,by-26*s);x.lineTo(cx+14*s,by-36*s);x.stroke();x.fillStyle=Math.floor(t*4)%2?'#fa5252':'#ffa8a8';x.beginPath();x.arc(cx+14*s,by-37*s,2.5*s,0,6.3);x.fill()}
+   x.restore()};
+  const dw=()=>{const gr=x.createLinearGradient(0,0,0,fy);gr.addColorStop(0,'#74c0fc');gr.addColorStop(1,'#e7f5ff');x.fillStyle=gr;x.fillRect(0,0,W,CH);
+   x.fillStyle='#dbe4ff';x.beginPath();x.moveTo(0,fy);x.lineTo(W*0.18,fy-CH*0.22);x.lineTo(W*0.36,fy);x.lineTo(W*0.6,fy-CH*0.28);x.lineTo(W*0.85,fy);x.closePath();x.fill();
+   x.fillStyle='#fff';x.fillRect(0,fy,W,CH-fy);
+   bots.forEach(b=>{if(b.st!=='hid')snowman(b);x.fillStyle='#91a7ff';x.strokeStyle='#5c7cfa';x.lineWidth=2;const w=bw*1.35;x.beginPath();x.roundRect?x.roundRect(b.x-w/2,fy-4*u,w,26*u,8):x.rect(b.x-w/2,fy-4*u,w,26*u);x.fill();x.stroke();
+    if(b.st==='up'&&b.kind!==2){const f=Math.min(1,b.tm/b.dur);x.fillStyle='#212529';x.fillRect(b.x-bw/2,fy+24*u,bw,4*u);x.fillStyle=f>0.7?'#fa5252':'#fcc419';x.fillRect(b.x-bw/2,fy+24*u,bw*(1-f),4*u)}});
+   fx.forEach(f=>{x.fillStyle='rgba(255,255,255,'+(1-f.t/0.4)+')';x.strokeStyle='#74c0fc';for(let i=0;i<8;i++){const a=i*0.785,d=f.t*140*u;x.beginPath();x.arc(f.x+Math.cos(a)*d,f.y+Math.sin(a)*d,4*u,0,6.3);x.fill();x.stroke()}});
+   if(flash>0){x.fillStyle='rgba(224,49,49,'+flash*0.5+')';x.fillRect(0,0,W,CH)}
+   x.fillStyle='#364fc7';x.font='bold '+(H?10:12)+'px sans-serif';x.textAlign='center';x.fillText('⛄ 🤖 رجال الثلج الآليين',W/2,H?12:18);
+   if(msgT>0){x.fillStyle='#212529';x.strokeStyle='#fff';x.lineWidth=4;x.font='bold 20px sans-serif';x.strokeText(msg,W/2,CH-(H?10:24));x.fillText(msg,W/2,CH-(H?10:24))}};
+  const lvl=()=>1-t/TL;
+  const tick=now=>{if(!open())return;const dt=Math.min(0.05,(now-(last||now))/1000);last=now;
+   if(!over){t-=dt;if(msgT>0)msgT-=dt;if(flash>0)flash-=dt*2;fx.forEach(f=>f.t+=dt);fx=fx.filter(f=>f.t<0.4);nx-=dt;
+    if(nx<=0){const hid=bots.filter(b=>b.st==='hid');if(hid.length){const b=hid[Math.floor(Math.random()*hid.length)],r=Math.random();b.kind=r<0.12?2:r<0.2?1:0;b.st='rise';b.tm=0;b.dur=Math.max(0.75,1.6-lvl()*0.85)*(b.kind===1?0.8:1)}nx=Math.max(0.35,0.95-lvl()*0.6)*(0.7+Math.random()*0.6)}
+    bots.forEach(b=>{if(b.st==='hid')return;b.tm+=dt;
+     if(b.st==='rise'){b.p=Math.min(1,b.tm/0.22);if(b.tm>=0.22){b.st='up';b.tm=0;b.p=1}}
+     else if(b.st==='up'){if(b.tm>=b.dur){if(b.kind!==2){hearts--;flash=1;cmb=0;sfx('lose');say('اتضربت! ❄️');b.st='down';b.tm=0}else{b.st='down';b.tm=0}}}
+     else if(b.st==='down'){b.p=Math.max(0,1-b.tm/0.2);if(b.tm>=0.2){b.st='hid';b.p=0}}});
+    if(hearts<=0||t<=0)fin()}
+   hud();dw();if(!over)requestAnimationFrame(tick)};
+  const pos=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*CH/r.height}};
+  cv.onpointerdown=e=>{e.preventDefault();const q=pos(e);tapAt(q.x,q.y)};
+  $('snX').onclick=()=>{$('modal').style.display='none'};hud();dw();requestAnimationFrame(tick)})}
