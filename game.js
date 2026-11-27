@@ -565,7 +565,7 @@ function modNorm(t){return String(t).toLowerCase().replace(/[\u064b-\u065f\u0670
 function modBad(t){const n=modNorm(t);return BADN.some(w=>n.includes(w))}
 const URLRX=/(https?:\/\/\S+|www\.\S+|\b\S+\.(com|net|org|io|me|ly|xyz|app|gg|tk)\b\S*)/gi;
 const PIIRX=/(\+?\d[\d\s\-.]{7,}\d|[\w.+-]+@[\w-]+\.[\w.]+)/g;
-const str=(s,n)=>{let r=String(s==null?'':s).replace(/[\u0000-\u001f<>]/g,'').slice(0,n).replace(BADRX,m=>'*'.repeat(Math.min(m.length,4))).replace(URLRX,'[رابط]').replace(/[\u0660-\u0669]/g,c=>String(c.charCodeAt(0)-1632)).replace(PIIRX,'[محجوب]');return modBad(r)?'***':r};
+const str=(s,n)=>{let r=String(s==null?'':s).replace(/[\u0000-\u001f<>\u200b-\u200f\u202a-\u202e\u2060\ufeff\u0640]/g,'').replace(/(.)\1{4,}/gu,'$1$1$1$1').slice(0,n).replace(BADRX,m=>'*'.repeat(Math.min(m.length,4))).replace(URLRX,'[رابط]').replace(/[\u0660-\u0669]/g,c=>String(c.charCodeAt(0)-1632)).replace(PIIRX,'[محجوب]');return modBad(r)?'***':r};
 const num=(v,a,b,d=0)=>{v=+v;return isFinite(v)?clamp(v,a,b):d};
 function getRemote(m){
 let r=remotes.get(m.i);
