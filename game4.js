@@ -459,7 +459,7 @@ function buildXox(){
  [[-1.4,-5.4,0],[0,-4,1],[1.4,-2.6,0],[1.4,-5.4,1],[-1.4,-2.6,1]].forEach(([x,z,k])=>{if(k)g.add(mesh(G.cyl(0.45,0.45,0.12,16),0xfa5252,x,0.2,z),mesh(G.cyl(0.25,0.25,0.14,16),0xf1f3f5,x,0.2,z));else{const a=mesh(G.box(1,0.12,0.2),0x228be6,x,0.2,z),b2=mesh(G.box(1,0.12,0.2),0x228be6,x,0.2,z);a.rotation.y=0.78;b2.rotation.y=-0.78;g.add(a,b2)}});
  g.add(mesh(G.cyl(0.4,0.4,1,10),0x2b8a3e,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x2b8a3e,5,0.5,0));
  xoh={it:{x:0,z:0.2,label:'❌ العب بطولة إكس أو',fn:xoxStart}};interacts.push(xoh.it);
- g.add(portalMesh('ارجع للصندوق الموسيقي',5.8,5.8,0x7048e8,'musicbox'));
+ g.add(portalMesh('ارجع للصندوق الموسيقي',5.8,5.8,0x7048e8,'musicbox'),portalMesh('🗼 أبراج هانوي',-5.8,5.8,0x1c7ed6,'hanroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('❌ اهزم 3 روبوتات 🤖 واحد ورا التاني',3000)
 }
@@ -487,3 +487,45 @@ function xoxStart(){
   play=i=>{if(over||pend||turn!==1||b[i])return false;b[i]=1;sfx('place');if(!after()){turn=2;hud();dw();setTimeout(bot,500)}else dw();return true};
   cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),cx=Math.floor((e.clientX-r.left)*S/r.width/cs),cy=Math.floor((e.clientY-r.top)*S/r.height/cs);if(cx<0||cx>2||cy<0||cy>2)return;play(cy*3+cx)};
   $('xoX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
+let hanh=null;
+function buildHan(){
+ const g=indoor(0x1c7ed6,0xe7f5ff,0x74c0fc);
+ sign(g,'🗼 غرفة أبراج هانوي',0,4.6,-7.6,'rgba(28,126,214,.92)');
+ g.add(mesh(G.box(7,0.25,2),0x8d5524,0,0.15,-4));
+ const cols=[0xfa5252,0xfd7e14,0xfab005,0x40c057,0x228be6];
+ [-2.2,0,2.2].forEach((px,i)=>{g.add(mesh(G.cyl(0.12,0.12,2.8,10),0xdee2e6,px,1.6,-4));
+  if(i===0)for(let k=0;k<5;k++)g.add(mesh(G.cyl(1.0-k*0.16,1.0-k*0.16,0.28,18),cols[k],px,0.42+(4-k)*0.3,-4))});
+ g.add(mesh(G.cyl(0.4,0.4,1,10),0x1c7ed6,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x1c7ed6,5,0.5,0));
+ hanh={it:{x:0,z:0.2,label:'🗼 العب أبراج هانوي',fn:hanStart}};interacts.push(hanh.it);
+ g.add(portalMesh('ارجع لساحة إكس أو',5.8,5.8,0x2b8a3e,'xoxroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🗼 انقل الأقراص من البرج الأول للأخير: قرص صغير فوق الكبير بس',3200)
+}
+function hanStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),CH=H?Math.max(110,innerHeight-170):Math.round(W*0.66);
+ const COL=['#fa5252','#fd7e14','#fab005','#40c057','#228be6'];
+ let st=0,n=3,pegs=[],sel=-1,moves=0,cleared=0,eff=0,over=false,pend=false,msg='';
+ const opt=()=>Math.pow(2,n)-1;
+ const init=()=>{n=3+st;pegs=[[],[],[]];for(let k=n;k>=1;k--)pegs[0].push(k);sel=-1;moves=0;pend=false;msg=''};
+ init();
+ let mv=()=>false;
+ window.hanq=()=>({n,st,moves,over,cleared,eff,pegs:pegs.map(p=>p.slice()),mv:(a,b)=>mv(a,b)});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🗼 أبراج هانوي</h2>')+'<div id="hnH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="hnC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="hnR" style="width:auto!important;display:inline-block!important">🔁 من الأول</button><button class="btn d" id="hnX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('hnC');cv.width=W;cv.height=CH;const x=cv.getContext('2d'),pw=W/3;
+  const open=()=>$('hnC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('hnH'))$('hnH').textContent='مرحلة '+(st+1)+'/3 · '+n+' أقراص · حركات '+moves+' (الأمثل '+opt()+')'+(msg?' · '+msg:'')};
+  const dw=()=>{x.fillStyle='#e7f5ff';x.fillRect(0,0,W,CH);x.fillStyle='#8d5524';x.fillRect(8,CH-14,W-16,10);
+   const dh=Math.min(24,(CH-50)/(n+1));
+   for(let i=0;i<3;i++){const px=(i+0.5)*pw;x.fillStyle=sel===i?'#ffd43b':'#adb5bd';x.fillRect(px-4,22,8,CH-36);
+    const lift=sel===i?1:0;
+    pegs[i].forEach((d,j)=>{const w=pw*(0.3+0.62*d/n),top=j===pegs[i].length-1&&lift;const y=top?8:CH-14-(j+1)*dh;x.fillStyle=COL[d-1];x.beginPath();x.roundRect?x.roundRect(px-w/2,y,w,dh-2,6):x.rect(px-w/2,y,w,dh-2);x.fill();if(top){x.strokeStyle='#212529';x.lineWidth=2;x.stroke()}})}};
+  const fin=()=>{over=true;sfx('win');const d=today();if(!me.hanD||me.hanD.d!==d)me.hanD={d,c:0};const sc=cleared+eff;let pay=Math.max(0,Math.min(5,sc,12-me.hanD.c));me.hanD.c+=pay;me.coins+=pay;updCoins();me.hanGames=(me.hanGames||0)+1;const nb=sc>(me.hanBest||0);if(nb)me.hanBest=sc;if(typeof saveMe==='function')saveMe();
+   c.innerHTML='<h2>'+(cleared>=3?'🗼 أتقنت هانوي! 🏆':'🗼 خلصت')+'</h2><div style="text-align:center;font-size:16px">حليت <b>'+cleared+'/3</b> مراحل<br>بحركات قريبة من الأمثل في <b>'+eff+'</b><br>'+(nb&&sc?'🏆 رقم قياسي! ':'أحسن نتيجة: '+(me.hanBest||0)+' ')+'<br>'+(pay?'+'+pay+'🪙':'(مفيش جايزة)')+'</div><div class="row"><button class="btn" id="hnR2">🔁 تاني</button><button class="btn d" id="hnX2">إغلاق</button></div>';
+   $('hnR2').onclick=hanStart;$('hnX2').onclick=()=>{$('modal').style.display='none'}};
+  mv=(a,b)=>{if(over||pend||a===b||!pegs[a]||!pegs[b]||!pegs[a].length)return false;const t=pegs[a][pegs[a].length-1];const u=pegs[b][pegs[b].length-1];if(u&&u<t)return false;pegs[a].pop();pegs[b].push(t);moves++;sel=-1;sfx('place');
+   if(pegs[2].length===n){pend=true;cleared++;const ok=moves<=Math.floor(opt()*1.5);if(ok)eff++;msg=ok?'ممتاز! 🌟':'تمام ✅';hud();dw();setTimeout(()=>{if(!open())return;if(st>=2)fin();else{st++;init();hud();dw()}},1100)}else{msg='';hud();dw()}return true};
+  cv.onpointerdown=e=>{e.preventDefault();if(over||pend)return;const r=cv.getBoundingClientRect(),i=Math.floor((e.clientX-r.left)*W/r.width/pw);if(i<0||i>2)return;
+   if(sel<0){if(pegs[i].length){sel=i;sfx('tick')}}else if(sel===i){sel=-1}else if(!mv(sel,i)){sel=-1;msg='مينفعش قرص كبير فوق صغير';sfx('err')}
+   hud();dw()};
+  $('hnR').onclick=()=>{init();hud();dw()};$('hnX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
