@@ -186,9 +186,9 @@ if(a.q===21)pg.add(...[0,1,2,3,4].map(k=>mesh(G.sph(0.035,6),0xf783ac,Math.cos(k
 if(a.q===22)pg.add(mesh(G.sph(0.11,8),0x5c940d,0,0.74,0.14,0x2b4a06),mesh(G.cyl(0.115,0.115,0.02,10),0x3b5a0a,0,0.69,0.14,0x1e3004))
 if(a.q===23)pg.add(mesh(G.box(0.09,0.22,0.04),0xffd43b,0.03,0.88,0.18,0xaa8800).rotateZ(0.5),mesh(G.box(0.09,0.2,0.04),0xffd43b,-0.03,0.73,0.18,0xaa8800).rotateZ(-0.5))
 if(a.q===24)pg.add(...[0,1,2,3].map(k=>mesh(G.sph(0.045,6),0x2f9e44,Math.cos(k*1.5708)*0.05-0.09,0.76+Math.sin(k*1.5708)*0.05,0.17,0x145a22)),mesh(G.cyl(0.008,0.008,0.08,4),0x145a22,-0.09,0.68,0.17))
-if(a.q===25)pg.add(mesh(G.sph(0.13,8),0xe03131,0,0.76,0.14,0x6a0000),mesh(G.cyl(0.05,0.06,0.1,6),0xf8f9fa,0,0.69,0.14,0x888888),mesh(G.sph(0.03,5),0xf8f9fa,-0.06,0.82,0.22,0x888888),mesh(G.sph(0.03,5),0xf8f9fa,0.06,0.79,0.2,0x888888),mesh(G.sph(0.025,5),0xf8f9fa,0,0.86,0.15,0x888888))
+if(a.q===25)pg.add(mesh(G.sph(0.15,9),0xe03131,0,0.78,0.14,0x6a0000),mesh(G.cyl(0.05,0.06,0.1,6),0xf8f9fa,0,0.69,0.14,0x888888),mesh(G.sph(0.05,6),0xffffff,-0.08,0.85,0.24,0xcccccc),mesh(G.sph(0.05,6),0xffffff,0.09,0.82,0.22,0xcccccc),mesh(G.sph(0.045,6),0xffffff,0.0,0.92,0.18,0xcccccc),mesh(G.sph(0.04,6),0xffffff,0.12,0.9,0.1,0xcccccc))
 if(a.q===26)pg.add(mesh(G.sph(0.09,7),0xf8f9fa,0,0.9,0.14,0xaabbcc),mesh(G.sph(0.08,7),0xf8f9fa,-0.09,0.87,0.14,0xaabbcc),mesh(G.sph(0.08,7),0xf8f9fa,0.09,0.87,0.14,0xaabbcc),mesh(G.sph(0.07,7),0xf8f9fa,0,0.95,0.14,0xaabbcc))
-if(a.q===27)pg.add(mesh(G.sph(0.07,7),0xe03131,0,0.62,0.26,0x8a0000))
+if(a.q===27)pg.add(mesh(G.sph(0.11,8),0xff2b2b,0,0.6,0.3,0xaa0000))
 if(a.q===7)pg.add(mesh(G.cyl(0.01,0.01,0.5,4),0xdee2e6,0.18,0.85,0.1),mesh(G.sph(0.14,8),0xe03131,0.18,1.15,0.1,0x880000));
 if(a.q===8)pg.add(mesh(G.cyl(0.19,0.19,0.05,12),0xe03131,0,0.5,0.1,0x880000),mesh(G.sph(0.09,8),0xffd43b,0,0.42,0.3,0xaa7a00));
 if(a.q===9)pg.add(mesh(G.sph(0.12,5),0xffd43b,0,1.0,0.1,0xffaa00),mesh(G.cone(0.09,0.26,4),0xffd43b,0,1.2,0.1,0xffaa00),mesh(G.cone(0.09,0.26,4),0xffd43b,0,0.8,0.1,0xffaa00).rotateZ(3.14),mesh(G.cone(0.09,0.26,4),0xffd43b,-0.2,1.0,0.1,0xffaa00).rotateZ(1.57),mesh(G.cone(0.09,0.26,4),0xffd43b,0.2,1.0,0.1,0xffaa00).rotateZ(-1.57));
