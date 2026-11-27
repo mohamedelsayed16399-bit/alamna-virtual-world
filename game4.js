@@ -780,7 +780,7 @@ function buildTws(){
  [[3,0x4dabf7],[2.4,0x339af0],[1.8,0x1c7ed6],[1.2,0x1971c2],[0.7,0xffd43b]].forEach(([w,c],i)=>g.add(mesh(G.box(w,0.5,w),c,0,0.25+i*0.5,-4.5)));
  g.add(mesh(G.cyl(0.4,0.4,1,10),0x1c7ed6,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x1c7ed6,5,0.5,0));
  twsh={it:{x:0,z:0.2,label:'🏗️ العب برج التكديس',fn:twsStart}};interacts.push(twsh.it);
- g.add(portalMesh('ارجع لركض الحارات',5.8,5.8,0xf76707,'lnrroom'));
+ g.add(portalMesh('ارجع لركض الحارات',5.8,5.8,0xf76707,'lnrroom'),portalMesh('🔎 البحث عن الكلمات',-5.8,5.8,0x9c36b5,'wdsroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🏗️ اضغط في اللحظة المظبوطة عشان تنزل الطابق فوق اللي تحته. اللي بيطلع بره بيتقصّ!',3600)
 }
@@ -816,3 +816,49 @@ function twsStart(){
   cv.onpointerdown=e=>{e.preventDefault();drop()};
   document.addEventListener('keydown',function kd(e){if(!open()){document.removeEventListener('keydown',kd);return}if(e.key===' '||e.key==='ArrowDown'){e.preventDefault();drop()}});
   $('twX').onclick=()=>{$('modal').style.display='none'};dw();hud();requestAnimationFrame(loop)})}
+
+let wdsh=null;
+function buildWds(){
+ const g=indoor(0x9c36b5,0xf8f0fc,0xe599f7);
+ sign(g,'🔎 غرفة البحث عن الكلمات',0,4.6,-7.6,'rgba(156,54,181,.92)');
+ [[-1.5,-4.8],[0,-4.8],[1.5,-4.8],[-0.75,-3.4],[0.75,-3.4]].forEach(([x,z],i)=>g.add(mesh(G.box(1.2,0.3,1.2),[0xe599f7,0xda77f2,0xcc5de8,0xbe4bdb,0x9c36b5][i],x,0.15,z)));
+ g.add(mesh(G.cyl(0.4,0.4,1,10),0x9c36b5,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x9c36b5,5,0.5,0));
+ wdsh={it:{x:0,z:0.2,label:'🔎 العب البحث عن الكلمات',fn:wdsStart}};interacts.push(wdsh.it);
+ g.add(portalMesh('ارجع لبرج التكديس',5.8,5.8,0x1c7ed6,'twsroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🔎 دوّر على 5 كلمات مخفية. اضغط أول حرف وبعدين آخر حرف (أفقي أو رأسي)!',3600)
+}
+function wdsStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),N=7,CW=H?Math.min(W,Math.max(150,innerHeight-175)):Math.min(W,320),cs=CW/N;
+ const POOL=['قمر','نجم','بحر','شمس','جبل','نهر','وردة','قطة','كتاب','بيت','سمك','نخلة','ماء','ريح','سحاب','زهرة','طير','باب'];
+ const FIL='ابتجحدرسشعفقكلمنهوي';
+ let words=POOL.slice().sort(()=>Math.random()-0.5).slice(0,5),grid,place=[],found=[],sel=null,over=false,t0=Date.now(),bad=0,paid=0,fl=null;
+ const build=()=>{for(let tries=0;tries<200;tries++){grid=Array.from({length:N},()=>Array(N).fill(''));place=[];let ok=true;
+   for(const w of words){const L=[...w];let done=false;for(let k=0;k<80&&!done;k++){const v=Math.random()<0.5,rev=Math.random()<0.5,r=Math.floor(Math.random()*(v?N-L.length+1:N)),c=Math.floor(Math.random()*(v?N:N-L.length+1));const cells=L.map((ch,i)=>[v?r+i:r,v?c:c+i]);const seq=rev?L.slice().reverse():L;if(cells.every(([a,b],i)=>!grid[a][b]||grid[a][b]===seq[i])){cells.forEach(([a,b],i)=>grid[a][b]=seq[i]);place.push({w,cells});done=true}}
+    if(!done){ok=false;break}}
+   if(ok){for(let a=0;a<N;a++)for(let b=0;b<N;b++)if(!grid[a][b])grid[a][b]=FIL[Math.floor(Math.random()*FIL.length)];return}}};
+ build();
+ let tap=()=>{};
+ window.wdsq=()=>({over,found:found.length,words:words.slice(),place:place.map(p=>({w:p.w,cells:p.cells})),N,paid,tap:(r,c)=>tap(r,c),bad});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🔎 البحث عن الكلمات</h2>')+'<div id="wdH" style="text-align:center;font-size:14px;margin:2px;line-height:1.5"></div><canvas id="wdC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn d" id="wdX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('wdC');cv.width=CW;cv.height=CW;const x=cv.getContext('2d');
+  const open=()=>$('wdC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('wdH'))$('wdH').innerHTML=words.map(w=>found.includes(w)?'<s style="opacity:.5">'+w+'</s>':'<b>'+w+'</b>').join(' · ')};
+  const fc=new Set();found.forEach(()=>0);
+  const dw=()=>{x.fillStyle='#f8f0fc';x.fillRect(0,0,CW,CW);const fset=new Set();place.filter(p=>found.includes(p.w)).forEach(p=>p.cells.forEach(([a,b])=>fset.add(a+','+b)));
+   for(let a=0;a<N;a++)for(let b=0;b<N;b++){const k=a+','+b;x.fillStyle=fset.has(k)?'#8ce99a':(sel&&sel[0]===a&&sel[1]===b)?'#ffd43b':(fl&&fl[0]===a&&fl[1]===b)?'#ff8787':'#fff';x.fillRect(b*cs+1,a*cs+1,cs-2,cs-2);x.fillStyle='#212529';x.font='700 '+Math.round(cs*0.6)+'px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(grid[a][b],b*cs+cs/2,a*cs+cs/2+1)}};
+  const fin=()=>{over=true;sfx('win');const secs=Math.round((Date.now()-t0)/1000),sc=Math.max(0,180-secs-bad*5),d=today();if(!me.wdsD||me.wdsD.d!==d)me.wdsD={d,c:0};let pay=Math.max(0,Math.min(5,Math.floor(sc/50),12-me.wdsD.c));me.wdsD.c+=pay;me.coins+=pay;paid=pay;updCoins();me.wdsGames=(me.wdsGames||0)+1;const nb=sc>(me.wdsBest||0);if(nb)me.wdsBest=sc;saveMe();
+   c.innerHTML='<h2>🔎 لقيت كل الكلمات!</h2><div style="text-align:center;font-size:16px">الوقت <b>'+secs+'</b> ث · غلطات '+bad+'<br>النتيجة <b>'+sc+'</b><br>'+(nb&&sc?'🏆 رقم قياسي!':'أحسن نتيجة: '+(me.wdsBest||0))+'<br>'+(pay?'+'+pay+'🪙':'(النتيجة 50 = 1🪙)')+'</div><div class="row"><button class="btn" id="wdR2">🔁 تاني</button><button class="btn d" id="wdX2">إغلاق</button></div>';
+   $('wdR2').onclick=wdsStart;$('wdX2').onclick=()=>{$('modal').style.display='none'}};
+  tap=(r,c2)=>{if(over)return;
+   if(!sel){sel=[r,c2];sfx('tick');dw();return}
+   const [a,b]=sel;if(a===r&&b===c2){sel=null;dw();return}
+   if(a!==r&&b!==c2){sel=[r,c2];sfx('tick');dw();return}
+   const cells=[];if(a===r){const s=b<c2?1:-1;for(let j=b;j!==c2+s;j+=s)cells.push([r,j])}else{const s=a<r?1:-1;for(let i=a;i!==r+s;i+=s)cells.push([i,b])}
+   const str=cells.map(([i,j])=>grid[i][j]).join(''),rs=[...str].reverse().join('');
+   const w=words.find(w=>!found.includes(w)&&(w===str||w===rs));sel=null;
+   if(w){found.push(w);sfx('star');hud();dw();if(found.length===words.length)setTimeout(fin,500)}
+   else{bad++;sfx('err');fl=[r,c2];dw();setTimeout(()=>{fl=null;if(open())dw()},300)}};
+  cv.onpointerdown=e=>{e.preventDefault();const rc=cv.getBoundingClientRect(),px=(e.clientX-rc.left)/rc.width*CW,py=(e.clientY-rc.top)/rc.height*CW;tap(Math.min(N-1,Math.max(0,Math.floor(py/cs))),Math.min(N-1,Math.max(0,Math.floor(px/cs))))};
+  $('wdX').onclick=()=>{$('modal').style.display='none'};dw();hud()})}
