@@ -497,7 +497,7 @@ function buildHan(){
   if(i===0)for(let k=0;k<5;k++)g.add(mesh(G.cyl(1.0-k*0.16,1.0-k*0.16,0.28,18),cols[k],px,0.42+(4-k)*0.3,-4))});
  g.add(mesh(G.cyl(0.4,0.4,1,10),0x1c7ed6,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x1c7ed6,5,0.5,0));
  hanh={it:{x:0,z:0.2,label:'🗼 العب أبراج هانوي',fn:hanStart}};interacts.push(hanh.it);
- g.add(portalMesh('ارجع لساحة إكس أو',5.8,5.8,0x2b8a3e,'xoxroom'));
+ g.add(portalMesh('ارجع لساحة إكس أو',5.8,5.8,0x2b8a3e,'xoxroom'),portalMesh('💡 طفي الأنوار',-5.8,5.8,0xf59f00,'lgoroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🗼 انقل الأقراص من البرج الأول للأخير: قرص صغير فوق الكبير بس',3200)
 }
@@ -529,3 +529,37 @@ function hanStart(){
    if(sel<0){if(pegs[i].length){sel=i;sfx('tick')}}else if(sel===i){sel=-1}else if(!mv(sel,i)){sel=-1;msg='مينفعش قرص كبير فوق صغير';sfx('err')}
    hud();dw()};
   $('hnR').onclick=()=>{init();hud();dw()};$('hnX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
+let lgoh=null;
+function buildLgo(){
+ const g=indoor(0xf59f00,0xfff9db,0xffe066);
+ sign(g,'💡 غرفة طفي الأنوار',0,4.6,-7.6,'rgba(245,159,0,.92)');
+ g.add(mesh(G.box(4.4,0.12,4.4),0x343a40,0,0.08,-4));
+ for(let i=0;i<5;i++)for(let j=0;j<5;j++){const on=(i*3+j*2)%3===0;g.add(mesh(G.box(0.72,0.1,0.72),on?0xffd43b:0x495057,-1.7+i*0.85,0.2,-5.7+j*0.85,on?0xffd43b:undefined))}
+ g.add(mesh(G.cyl(0.4,0.4,1,10),0xf59f00,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0xf59f00,5,0.5,0));
+ lgoh={it:{x:0,z:0.2,label:'💡 العب طفي الأنوار',fn:lgoStart}};interacts.push(lgoh.it);
+ g.add(portalMesh('ارجع لأبراج هانوي',5.8,5.8,0x1c7ed6,'hanroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('💡 الضغطة بتقلب القرص وجيرانه الأربعة. طفّي كل الأنوار!',3200)
+}
+function lgoStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),S=H?Math.max(120,Math.min(W,innerHeight-190)):Math.min(W,Math.max(240,Math.min(innerHeight-340,340)));
+ const K=[4,7,10];let st=0,g=[],pr=[],moves=0,cleared=0,eff=0,over=false,pend=false,msg='';
+ const init=()=>{g=Array(25).fill(0);pr=[];const idx=[...Array(25).keys()].sort(()=>Math.random()-0.5).slice(0,K[st]);idx.forEach(i=>{tg(i);pr.push(i)});if(g.every(v=>!v)){tg(12);pr.push(12)}moves=0;pend=false;msg=''};
+ const tg=i=>{const r=Math.floor(i/5),c=i%5;[[0,0],[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{const rr=r+a,cc=c+b;if(rr>=0&&rr<5&&cc>=0&&cc<5)g[rr*5+cc]^=1})};
+ init();
+ let press=()=>false;
+ window.lgoq=()=>({st,moves,over,cleared,eff,g:g.slice(),sol:pr.slice(),press:i=>press(i)});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">💡 طفّي الأنوار</h2>')+'<div id="lgH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="lgC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="lgR" style="width:auto!important;display:inline-block!important">🔁 لوحة جديدة</button><button class="btn d" id="lgX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('lgC');cv.width=S;cv.height=S;const x=cv.getContext('2d'),cs=S/5;
+  const open=()=>$('lgC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('lgH'))$('lgH').textContent='مرحلة '+(st+1)+'/3 · مضيء '+g.filter(v=>v).length+' · ضغطات '+moves+(msg?' · '+msg:'')};
+  const dw=()=>{x.fillStyle='#212529';x.fillRect(0,0,S,S);for(let i=0;i<25;i++){const cx=(i%5)*cs+3,cy=Math.floor(i/5)*cs+3,w=cs-6;if(g[i]){x.shadowColor='#ffd43b';x.shadowBlur=12;x.fillStyle='#ffd43b'}else{x.shadowBlur=0;x.fillStyle='#495057'}
+   x.beginPath();x.roundRect?x.roundRect(cx,cy,w,w,8):x.rect(cx,cy,w,w);x.fill()}x.shadowBlur=0};
+  const fin=()=>{over=true;sfx('win');const d=today();if(!me.lgoD||me.lgoD.d!==d)me.lgoD={d,c:0};const sc=cleared+eff;let pay=Math.max(0,Math.min(5,sc,12-me.lgoD.c));me.lgoD.c+=pay;me.coins+=pay;updCoins();me.lgoGames=(me.lgoGames||0)+1;const nb=sc>(me.lgoBest||0);if(nb)me.lgoBest=sc;saveMe();
+   c.innerHTML='<h2>'+(cleared>=3?'💡 نوّرت وطفّيت! 🏆':'💡 خلصت')+'</h2><div style="text-align:center;font-size:16px">حليت <b>'+cleared+'/3</b> مراحل<br>بضغطات قليلة في <b>'+eff+'</b><br>'+(nb&&sc?'🏆 رقم قياسي! ':'أحسن نتيجة: '+(me.lgoBest||0)+' ')+'<br>'+(pay?'+'+pay+'🪙':'(مفيش جايزة)')+'</div><div class="row"><button class="btn" id="lgR2">🔁 تاني</button><button class="btn d" id="lgX2">إغلاق</button></div>';
+   $('lgR2').onclick=lgoStart;$('lgX2').onclick=()=>{$('modal').style.display='none'}};
+  press=i=>{if(over||pend||i<0||i>24)return false;tg(i);moves++;sfx('tick');msg='';
+   if(g.every(v=>!v)){pend=true;cleared++;const ok=moves<=K[st]+2;if(ok)eff++;msg=ok?'ممتاز! 🌟':'تمام ✅';hud();dw();setTimeout(()=>{if(!open())return;if(st>=2)fin();else{st++;init();hud();dw()}},1100)}else{hud();dw()}return true};
+  cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),cx=Math.floor((e.clientX-r.left)*S/r.width/cs),cy=Math.floor((e.clientY-r.top)*S/r.height/cs);if(cx<0||cx>4||cy<0||cy>4)return;press(cy*5+cx)};
+  $('lgR').onclick=()=>{init();hud();dw()};$('lgX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
