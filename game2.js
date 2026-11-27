@@ -383,7 +383,7 @@ const GBG=[['golf','⛳ جولف',1],['hoops','🏀 سلة',0],['bowl','🎳 ب�
 function myBests(){return{golf:me.golfBest||0,hoops:me.hoopBest||0,bowl:me.bowlBest||0,gal:me.galBest||0,tag:me.tagBest||0,pen:me.penBest||0,seek:me.seekBest||0,kite:me.kiteBest||0,bump:me.bumpBest||0,bake:me.bakeBest||0,star:me.simonBest||0,ice:me.iceBest||0,bal:me.balBest||0,mol:me.molBest||0}}
 function pubBests(){try{const o=JSON.stringify({n:me.name,g:myBests()});if(o===chLast||!netOK)return;chLast=o;client.publish(NS+'/ch/'+me.id,o,{retain:true})}catch(e){}}
 const _sv0=saveMe;saveMe=function(){_sv0.apply(this,arguments);pubBests()};
-const WKEYS=['ice','simon','mem','tag','seek','kite','bump','bake','pen','hoop','gal','bowl','bal','dash','mol','mth','clr'];
+const WKEYS=['ice','simon','mem','tag','seek','kite','bump','bake','pen','hoop','gal','bowl','bal','dash','mol','mth','clr','wrd'];
 function wkId(){const d=new Date(),j=new Date(d.getFullYear(),0,1);return d.getFullYear()+'w'+Math.floor(((d-j)/864e5+j.getDay())/7)}
 function wkCounts(){const o={};for(const k of WKEYS)o[k]=me[k+'Games']||0;return o}
 function wkInit(){if(!me.wk||me.wk.w!==wkId()){me.wk={w:wkId(),base:wkCounts(),cl:[]};saveMe()}return me.wk}
@@ -394,7 +394,7 @@ function openWeekly(){const w=wkInit();modal(c=>{const p=wkProg();let h='<h2>�
  c.innerHTML=h+'<div class="row"><button class="btn d" id="wkx">إغلاق</button></div>';$('wkx').onclick=()=>{$('modal').style.display='none'};
  c.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const i=+b.dataset.q,q=WCH[i];if(w.cl.indexOf(i)>=0||q[1](wkProg())<q[2])return;w.cl.push(i);me.coins+=q[3];updCoins();saveMe();sfx('win');toast('🎁 +'+q[3]+'🪙 تحدي الأسبوع',1600);openWeekly()})})}
 function lvUnlock(){const L=plLevel().lv;for(const k in LVH){if(L>=LVH[k]&&!me.owned.includes(+k)){me.owned.push(+k);setTimeout(()=>toast('🎖️ مستوى '+L+'! اتفتحت: '+HATS[k],2600),400)}}saveMe()}
-function plLevel(){let n=0;for(const k of['tag','seek','kite','bump','bake','pen','hoop','gal','bowl','mem','simon','ice','bal','dash','mol','mth','clr'])n+=me[k+'Games']||0;const lv=Math.floor(Math.sqrt(n/2))+1,nx=2*lv*lv,cur=2*(lv-1)*(lv-1);return{n,lv,pct:Math.round((n-cur)/(nx-cur)*100),nx}}
+function plLevel(){let n=0;for(const k of['tag','seek','kite','bump','bake','pen','hoop','gal','bowl','mem','simon','ice','bal','dash','mol','mth','clr','wrd'])n+=me[k+'Games']||0;const lv=Math.floor(Math.sqrt(n/2))+1,nx=2*lv*lv,cur=2*(lv-1)*(lv-1);return{n,lv,pct:Math.round((n-cur)/(nx-cur)*100),nx}}
 function lvBar(){const L=plLevel();return '<div style="background:rgba(255,255,255,.08);border-radius:12px;padding:8px 10px;margin:6px 0;text-align:center"><b>🎖️ مستوى اللاعب '+L.lv+'</b> · '+L.n+' جولة<div style="height:8px;background:rgba(255,255,255,.15);border-radius:6px;margin:6px 0"><div style="height:8px;width:'+L.pct+'%;background:#ffd43b;border-radius:6px"></div></div><span style="font-size:11px;opacity:.7">الجولة اللي بعدها لحد '+L.nx+' للمستوى '+(L.lv+1)+'</span></div>'}
 function openChamps(){const e={};modal(c=>{let cur=1;c.innerHTML='<h2>🏆 لوحة الأبطال</h2>'+lvBar()+'<div class="row" id="cg" style="flex-wrap:wrap"></div><div id="cl"></div><div class="row"><button class="btn d" id="cx">إغلاق</button></div>';
 const render=()=>{const l=$('cl');if(!l)return;l.innerHTML='';const G0=GBG[cur];const a=Object.entries(e).map(([id,v])=>({id,n:v.n,v:v.g[G0[0]]})).filter(x=>x.v>0).sort((x,y)=>G0[2]?x.v-y.v:y.v-x.v).slice(0,10);if(!a.length)l.textContent='لسه مفيش أرقام، العب وسجل رقمك!';a.forEach((v,i)=>{const d=document.createElement('div');d.className='qrow';d.textContent=(i+1)+'. '+v.n+' · '+v.v+(v.id===me.id?' (إنت)':'');l.appendChild(d)})};
@@ -640,6 +640,8 @@ function buildPlan(){
  sign(g,'🔭 القبة النجمية · تتبّع النجوم',0,5.5,-6.8,'rgba(92,124,250,.92)');
  sign(g,'⚡ تحدي الحساب',-4,3,1.2,'rgba(230,119,0,.92)');
  sign(g,'🎨 تحدي الألوان',4,3,1.2,'rgba(156,54,181,.92)');
+ sign(g,'🔤 رتّب الكلمة',-5.5,3,-2,'rgba(12,133,153,.92)');
+ interacts.push({x:-5.5,z:-2,label:'🔤 ابدأ رتّب الكلمة'+(me.wrdBest?' (أحسن '+me.wrdBest+')':''),fn:openWord});
  interacts.push({x:4,z:1.2,label:'🎨 ابدأ تحدي الألوان'+(me.clrBest?' (أحسن '+me.clrBest+')':''),fn:openColor});
  interacts.push({x:-4,z:1.2,label:'⚡ ابدأ تحدي الحساب'+(me.mthBest?' (أحسن '+me.mthBest+')':''),fn:openMath});
  interacts.push({x:0,z:1.2,label:'🌌 ابدأ تتبّع النجوم'+(me.simonBest?' (أحسن '+me.simonBest+')':''),fn:openStarSeq});
@@ -670,6 +672,18 @@ function openColor(){modal(c=>{const lw=innerHeight<420;const CL=[['أحمر','#
   c.innerHTML='<h2>🎨 خلص الوقت</h2><div style="text-align:center;font-size:16px">إجابات صح: <b>'+sc+'</b> من '+tot+(nb?'<br>🏆 رقم قياسي!':'<br>أحسن: '+me.clrBest)+'<br>'+(pay?'+'+pay+'🪙':'(وصلت حد النهاردة)')+'</div><div class="row"><button class="btn g" id="cr">🔁 تاني</button><button class="btn d" id="cx2">إغلاق</button></div>';$('cr').onclick=openColor;$('cx2').onclick=closeModal};
  const iv=setInterval(()=>{if(!alive||!$('cq')){clearInterval(iv);return}t--;hd();if(t<=0){clearInterval(iv);end()}},1000);
  window.__clr={get ans(){return ans},pick,get sc(){return sc}};hd();q()})}
+function openWord(){modal(c=>{const lw=innerHeight<420;const W=['قطة','بحر','شمس','قمر','نجمة','ورده','كتاب','مدرسة','سمكة','طيارة','حديقة','عصفور','برتقال','تفاحة','صحراء','جمل','فيل','أسد','نمر','بطه','عنب','موز','بيت','باب','شباك','كرسي','طاوله','قلم','ساعة','سحابة','مطر','جبل','نهر','شجرة','زهرة','فراشة','دجاجة','حصان','قرد','سلحفاة'];let t=30,sc=0,tot=0,alive=true,word='',built=[],tiles=[];const td=today();if(!me.wdd||me.wdd.d!==td)me.wdd={d:td,paid:0};
+ c.innerHTML='<h2>🔤 رتّب الكلمة</h2><div id="whd" style="text-align:center;margin:4px;font-size:15px"></div><div id="wb" style="text-align:center;font-size:'+(lw?28:38)+'px;min-height:'+(lw?36:52)+'px;margin:'+(lw?2:8)+'px;letter-spacing:2px"></div><div id="wo" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center"></div><div class="row"><button class="btn" id="wc">↩️ امسح</button><button class="btn" id="ws">⏭️ تخطّي (-3ث)</button><button class="btn d" id="wx">إغلاق</button></div>';
+ $('wx').onclick=()=>{alive=false;clearInterval(iv);closeModal()};
+ const hd=()=>{const e=$('whd');if(e)e.textContent='⏱ '+t+' ث · ✅ '+sc};
+ const draw=()=>{$('wb').textContent=built.map(i=>tiles[i]).join('')||'؟';[...$('wo').children].forEach((b,i)=>{b.style.opacity=built.includes(i)?'.25':'1'})};
+ const q=()=>{let w;do{w=W[Math.floor(Math.random()*W.length)]}while(w===word);word=w;const ch=[...w];let s;let n=0;do{s=ch.slice().sort(()=>Math.random()-0.5);n++}while(s.join('')===w&&n<20);tiles=s;built=[];const box=$('wo');box.innerHTML='';s.forEach((l,i)=>{const b=document.createElement('button');b.className='btn';b.style.cssText='width:'+(lw?42:54)+'px;height:'+(lw?42:54)+'px;font-size:24px;padding:0';b.textContent=l;b.onclick=()=>tap(i);box.appendChild(b)});draw()};
+ const tap=i=>{if(!alive||built.includes(i))return;built.push(i);sfx('chat');draw();if(built.length===tiles.length){tot++;if(built.map(k=>tiles[k]).join('')===word){sc++;sfx('win');hd();q()}else{sfx('err');t=Math.max(0,t-2);hd();built=[];draw()}}};
+ $('wc').onclick=()=>{built=[];draw()};$('ws').onclick=()=>{if(!alive)return;t=Math.max(0,t-3);hd();q()};
+ const end=()=>{alive=false;me.wrdGames=(me.wrdGames||0)+1;const nb=sc>(me.wrdBest||0);if(nb)me.wrdBest=sc;let pay=Math.min(sc*2,10-me.wdd.paid);if(pay<0)pay=0;me.wdd.paid+=pay;me.coins+=pay;updCoins();lvUnlock();saveMe();sfx(sc>=3?'win':'err');
+  c.innerHTML='<h2>🔤 خلص الوقت</h2><div style="text-align:center;font-size:16px">كلمات صح: <b>'+sc+'</b>'+(nb?'<br>🏆 رقم قياسي!':'<br>أحسن: '+me.wrdBest)+'<br>'+(pay?'+'+pay+'🪙':'(وصلت حد النهاردة)')+'</div><div class="row"><button class="btn g" id="wr">🔁 تاني</button><button class="btn d" id="wx2">إغلاق</button></div>';$('wr').onclick=openWord;$('wx2').onclick=closeModal};
+ const iv=setInterval(()=>{if(!alive||!$('wb')){clearInterval(iv);return}t--;hd();if(t<=0){clearInterval(iv);end()}},1000);
+ window.__wrd={get word(){return word},get tiles(){return tiles},tap,get sc(){return sc}};hd();q()})}
 function openStarSeq(){modal(c=>{const COL=['#fa5252','#fab005','#40c057','#339af0'],EM=['🔴','🟡','🟢','🔵'],FR=[262,330,392,523];let seq=[],pi=0,busy=true,alive=true;
  const tone=i=>{try{if(me&&me.mute)return;if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),gn=AC.createGain();o.frequency.value=FR[i];o.type='triangle';gn.gain.value=0.12;o.connect(gn);gn.connect(AC.destination);o.start();gn.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.3);o.stop(AC.currentTime+0.32)}catch(e){}};
  c.innerHTML='<h2>🌌 تتبّع النجوم</h2><div id="sm" style="text-align:center;margin:6px;min-height:22px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div><div class="row"><button class="btn d" id="smx">إغلاق</button></div>';
