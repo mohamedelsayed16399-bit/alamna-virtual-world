@@ -1490,7 +1490,7 @@ function buildRtt(){
  g.add(mesh(G.box(0.5,3,0.5),0x343a40,0,1.5,-5.5),mesh(G.box(1.2,2.6,0.6),0x212529,0,3,-5.5),mesh(G.sph(0.35,10),0xe03131,0,3.7,-5.15),mesh(G.sph(0.35,10),0xfcc419,0,3,-5.15),mesh(G.sph(0.35,10),0x2f9e44,0,2.3,-5.15));
  g.add(mesh(G.box(0.3,2,0.3),0xc92a2a,-5,1,-2),mesh(G.box(0.3,2,0.3),0xc92a2a,5,1,-2));
  rtth={it:{x:0,z:0.2,label:'🚦 جرّب ردّ فعلك',fn:rttStart}};interacts.push(rtth.it);
- g.add(portalMesh('ارجع لتحدّي الحساب',5.8,5.8,0x0b7285,'mdlroom'));
+ g.add(portalMesh('ارجع لتحدّي الحساب',5.8,5.8,0x0b7285,'mdlroom'),portalMesh('تحدّي البالونات',-5.8,5.8,0xd6336c,'bpproom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🚦 اضغط أول ما يبقى أخضر. بدري = غلطة',3000)
 }
