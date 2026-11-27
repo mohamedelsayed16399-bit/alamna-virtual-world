@@ -318,7 +318,7 @@ function buildDgt(){
  g.add(mesh(G.box(0.9,0.6,0.6),0x8d5524,2.2,0.3,-1.6),mesh(G.box(0.92,0.18,0.62),0xffd43b,2.2,0.65,-1.6,0xffd43b));
  g.add(mesh(G.box(0.1,1.4,0.1),0x8d6e63,-2.4,0.7,-1.4),mesh(G.box(0.5,0.5,0.1),0x868e96,-2.4,0.1,-1.3));
  dgh={it:{x:0,z:0.2,label:'⛏️ ابدأ التنقيب',fn:dgtStart}};interacts.push(dgh.it);
- g.add(portalMesh('ارجع لساحة شد الحبل',5.8,5.8,0xe67700,'tug'));
+ g.add(portalMesh('ارجع لساحة شد الحبل',5.8,5.8,0xe67700,'tug'),portalMesh('🎨 المرسم',-5.8,5.8,0xd6336c,'artroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('⛏️ احفر، والرقم بيقولك الكنز بعيد قد إيه',3200)
 }
@@ -358,3 +358,43 @@ function dgtStart(){
    dw();if(!over)requestAnimationFrame(tick)};
   cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width-gx,py=(e.clientY-r.top)*CH/r.height-gy;dig(Math.floor(px/cs),Math.floor(py/cs))};
   $('dgX').onclick=()=>{$('modal').style.display='none'};hud();dw();requestAnimationFrame(tick)})}
+
+/* R272: art studio with drawing pad */
+let arth=null,artCv=null,artTex=null;
+function artLoad(){try{const d=localStorage.getItem('ealam_drw');const x=artCv.getContext('2d');x.fillStyle='#fff9db';x.fillRect(0,0,256,192);if(d){const im=new Image();im.onload=()=>{x.drawImage(im,0,0,256,192);if(artTex)artTex.needsUpdate=true};im.src=d}else{x.fillStyle='#868e96';x.font='bold 22px sans-serif';x.textAlign='center';x.fillText('لوحتك هنا',128,100)}if(artTex)artTex.needsUpdate=true}catch(e){}}
+function buildArt(){
+ const g=indoor(0xd6336c,0xfff0f6,0xff8787);
+ sign(g,'🎨 مرسم عالمنا',0,4.6,-7.6,'rgba(214,51,108,.92)');
+ [[-4.5,-5,0xe03131],[-3.5,-5.4,0xfcc419],[3.5,-5.4,0x40c057],[4.5,-5,0x228be6]].forEach(([x,z,c])=>g.add(mesh(G.cyl(0.3,0.3,0.6,10),0xf1f3f5,x,0.3,z),mesh(G.cyl(0.24,0.24,0.1,10),c,x,0.64,z,c)));
+ g.add(mesh(G.box(0.12,2.6,0.12),0x8d6e63,-1.7,1.3,-6.4),mesh(G.box(0.12,2.6,0.12),0x8d6e63,1.7,1.3,-6.4),mesh(G.box(3.8,0.14,0.2),0x8d6e63,0,0.3,-6.3),mesh(G.box(3.5,2.7,0.1),0x5c3d2e,0,2.1,-6.45));
+ arth={it:{x:0,z:0.2,label:'🎨 ارسم لوحة',fn:artStart}};interacts.push(arth.it);
+ g.add(portalMesh('ارجع لموقع التنقيب',5.8,5.8,0xa9792f,'digsite'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ if(!artCv){artCv=document.createElement('canvas');artCv.width=256;artCv.height=192}
+ artTex=new THREE.CanvasTexture(artCv);artLoad();
+ const pl=new THREE.Mesh(new THREE.PlaneGeometry(3.2,2.4),new THREE.MeshBasicMaterial({map:artTex}));pl.position.set(0,2.1,-6.38);g.add(pl);
+ toast('🎨 لوحتك المحفوظة بتتعلق على الحامل',3000)
+}
+function artStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),avail=H?Math.max(96,innerHeight-190):Math.max(200,Math.min(innerHeight-400,320)),cw=Math.floor(Math.min(W,avail*4/3)),ch=Math.floor(cw*3/4);
+ const COLS=['#212529','#e03131','#f76707','#fcc419','#40c057','#228be6','#7048e8','#f06595','#8d5524','#ffffff'];
+ let col=COLS[0],sz=4,er=false,undo=[],drawing=false,lp=null,strokes=0,saved=false;
+ window.drwq=()=>({strokes,saved,col,sz});
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:'+(H?'26':'34')+'px!important;padding:'+(H?'1px 6px':'3px 8px')+';font-size:'+(H?'12':'14')+'px;margin:2px';
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🎨 المرسم</h2>')+'<canvas id="drC" style="display:block;margin:2px auto;border-radius:8px;touch-action:none;background:#fff;width:'+cw+'px;height:'+ch+'px"></canvas><div id="drP" style="text-align:center;margin:2px"></div><div style="text-align:center"><button class="btn" id="drS1" style="'+bs+'">● صغير</button><button class="btn" id="drS2" style="'+bs+'">⬤ وسط</button><button class="btn" id="drS3" style="'+bs+'">⬤ كبير</button><button class="btn" id="drE" style="'+bs+'">🧽 ممحاة</button><button class="btn" id="drU" style="'+bs+'">↩️ تراجع</button><button class="btn" id="drK" style="'+bs+'">🗑️ مسح</button></div><div class="row"><button class="btn" id="drSv" style="'+bs+'">💾 احفظ على الحامل</button><button class="btn d" id="drX" style="'+bs+'">إغلاق</button></div>';
+  const cv=$('drC');cv.width=320;cv.height=240;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,320,240);x.lineCap='round';x.lineJoin='round';
+  try{const d=localStorage.getItem('ealam_drw');if(d){const im=new Image();im.onload=()=>x.drawImage(im,0,0,320,240);im.src=d}}catch(e){}
+  const pal=$('drP');COLS.forEach(cc=>{const b=document.createElement('button');b.style.cssText='width:'+(H?22:28)+'px;height:'+(H?22:28)+'px;border-radius:50%;margin:2px;border:3px solid '+(cc===col?'#ffd43b':'#495057')+';background:'+cc;b.dataset.c=cc;b.onclick=()=>{col=cc;er=false;[...pal.children].forEach(k=>k.style.borderColor=k.dataset.c===col?'#ffd43b':'#495057')};pal.appendChild(b)});
+  const sizes=[3,7,14];[1,2,3].forEach(i=>$('drS'+i).onclick=()=>{sz=sizes[i-1];er=false});
+  $('drE').onclick=()=>{er=true};
+  const snap=()=>{undo.push(x.getImageData(0,0,320,240));if(undo.length>12)undo.shift()};
+  $('drU').onclick=()=>{if(undo.length)x.putImageData(undo.pop(),0,0)};
+  $('drK').onclick=()=>{snap();x.fillStyle='#fff';x.fillRect(0,0,320,240)};
+  const pos=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*320/r.width,y:(e.clientY-r.top)*240/r.height}};
+  const line=(a,b)=>{x.strokeStyle=er?'#fff':col;x.lineWidth=er?sz*2.2:sz;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()};
+  cv.onpointerdown=e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}snap();drawing=true;lp=pos(e);line(lp,{x:lp.x+0.01,y:lp.y})};
+  cv.onpointermove=e=>{if(!drawing)return;const p=pos(e);line(lp,p);lp=p};
+  const up=()=>{if(drawing){drawing=false;strokes++}};cv.onpointerup=up;cv.onpointercancel=up;
+  $('drSv').onclick=()=>{try{const t=document.createElement('canvas');t.width=256;t.height=192;t.getContext('2d').drawImage(cv,0,0,256,192);localStorage.setItem('ealam_drw',t.toDataURL('image/jpeg',0.72));me.drwGames=(me.drwGames||0)+1;saveMe();saved=true;sfx('win');toast('✅ اتحفظت على الحامل، اطلع بره وارجع تشوفها',3200)}catch(e){toast('مقدرتش أحفظ اللوحة',2500)}};
+  $('drX').onclick=()=>{$('modal').style.display='none'}})}
