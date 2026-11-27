@@ -686,7 +686,7 @@ if(topic.startsWith(NS+'/fr/')){frMsg(m);return}
 if(topic.startsWith(NS+'/pl/')){const pp=topic.split('/');if(plCb&&pp[2]&&typeof m.l==='number')plCb(pp[2],{n:str(m.n,14),l:num(m.l,0,30)|0,p:num(m.p,0,30)|0});return}
 if(topic.startsWith(NS+'/sg/')){const pp=topic.split('/');if(slCb&&pp[2]&&typeof m.s==='number')slCb(pp[2],{n:str(m.n,14),s:num(m.s,0,80)});return}
 if(topic.startsWith(NS+'/bl/')){const pp=topic.split('/');if(blCb&&pp[2]&&typeof m.s==='number')blCb(pp[2],{n:str(m.n,14),s:num(m.s,0,60)});return}
-if(topic.startsWith(NS+'/ch/')){const pp=topic.split('/');if(chCb&&pp[2]&&m.g&&typeof m.g==='object'){const q={};for(const k of['golf','hoops','bowl','gal','tag','pen','seek','kite','bump','bake','star','ice','bal','mol','mth','clr','wrd','seq','odd','cmp','tfq','cnt','adx','snk','tzf'])q[k]=num(m.g[k],0,9999);chCb(pp[2],{n:str(m.n,14),g:q})}return}
+if(topic.startsWith(NS+'/ch/')){const pp=topic.split('/');if(chCb&&pp[2]&&m.g&&typeof m.g==='object'){const q={};for(const k of['golf','hoops','bowl','gal','tag','pen','seek','kite','bump','bake','star','ice','bal','mol','mth','clr','wrd','seq','odd','cmp','tfq','cnt','adx','snk','tzf','mns'])q[k]=num(m.g[k],0,9999);chCb(pp[2],{n:str(m.n,14),g:q})}return}
 if(topic.startsWith(NS+'/lb/')){const pp=topic.split('/');if(lbCb&&pp[2]&&typeof m.t==='number')lbCb(pp[2],{n:str(m.n,14),t:num(m.t,0,9999)});return}
 if(topic.startsWith(NS+'/gb/')){const pp=topic.split('/');if(gbCb&&pp[2]===room.owner&&pp[3])gbCb(pp[3],{n:str(m.n,14),m:str(m.m,60),t:num(m.t,0,9e15)});return}
 if(topic.startsWith(NS+'/h/')){if(homeCb&&topic===NS+'/h/'+homeCb.code)homeCb.fn(m);return}
