@@ -645,12 +645,12 @@ function buildPlan(){
  mergeStatic(g);scene.add(g);room.group=g;room.bounds=7;room.pickables=[];
  toast('🔭 اتفرج على النجوم وكرّر الترتيب',2600)
 }
-function openMath(){modal(c=>{let t=30,sc=0,tot=0,alive=true,ans=0;const td=today();if(!me.mtd||me.mtd.d!==td)me.mtd={d:td,paid:0};
- c.innerHTML='<h2>⚡ تحدي الحساب</h2><div id="mhd" style="text-align:center;margin:4px;font-size:15px"></div><div id="mq" style="text-align:center;font-size:34px;margin:10px;direction:ltr"></div><div id="mo" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div><div class="row"><button class="btn d" id="mx">إغلاق</button></div>';
+function openMath(){modal(c=>{const lw=innerHeight<420;let t=30,sc=0,tot=0,alive=true,ans=0;const td=today();if(!me.mtd||me.mtd.d!==td)me.mtd={d:td,paid:0};
+ c.innerHTML='<h2>⚡ تحدي الحساب</h2><div id="mhd" style="text-align:center;margin:4px;font-size:15px"></div><div id="mq" style="text-align:center;font-size:'+(lw?24:34)+'px;margin:'+(lw?4:10)+'px;direction:ltr"></div><div id="mo" style="display:grid;grid-template-columns:'+(lw?'repeat(4,1fr)':'1fr 1fr')+';gap:10px"></div><div class="row"><button class="btn d" id="mx">إغلاق</button></div>';
  $('mx').onclick=()=>{alive=false;clearInterval(iv);closeModal()};
  const q=()=>{const op=Math.random()<0.5?'+':(Math.random()<0.5?'-':'×');let a,b;if(op==='×'){a=2+Math.floor(Math.random()*9);b=2+Math.floor(Math.random()*9);ans=a*b}else{a=5+Math.floor(Math.random()*(20+sc*2));b=2+Math.floor(Math.random()*(15+sc));if(op==='-'&&b>a){const x=a;a=b;b=x}ans=op==='+'?a+b:a-b}
   $('mq').textContent=a+' '+op+' '+b+' = ?';const o=new Set([ans]);while(o.size<4){const d=Math.floor(Math.random()*9)-4;if(d)o.add(Math.max(0,ans+d))}
-  const arr=[...o].sort(()=>Math.random()-0.5);const box=$('mo');box.innerHTML='';arr.forEach(v=>{const bt=document.createElement('button');bt.className='btn';bt.style.cssText='height:60px;font-size:24px';bt.textContent=v;bt.onclick=()=>pick(v);box.appendChild(bt)})};
+  const arr=[...o].sort(()=>Math.random()-0.5);const box=$('mo');box.innerHTML='';arr.forEach(v=>{const bt=document.createElement('button');bt.className='btn';bt.style.cssText='height:'+(lw?44:60)+'px;font-size:22px';bt.textContent=v;bt.onclick=()=>pick(v);box.appendChild(bt)})};
  const hd=()=>{const e=$('mhd');if(e)e.textContent='⏱ '+t+' ث · ✅ '+sc};
  const pick=v=>{if(!alive)return;tot++;if(v===ans){sc++;sfx('chat')}else{sfx('err');t=Math.max(0,t-2)}hd();q()};
  const end=()=>{alive=false;me.mthGames=(me.mthGames||0)+1;const nb=sc>(me.mthBest||0);if(nb)me.mthBest=sc;let pay=Math.min(Math.floor(sc/3),10-me.mtd.paid);if(pay<0)pay=0;me.mtd.paid+=pay;me.coins+=pay;updCoins();lvUnlock();saveMe();sfx(sc>=8?'win':'err');
