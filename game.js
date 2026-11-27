@@ -686,7 +686,7 @@ if(topic.startsWith(NS+'/fr/')){frMsg(m);return}
 if(topic.startsWith(NS+'/pl/')){const pp=topic.split('/');if(plCb&&pp[2]&&typeof m.l==='number')plCb(pp[2],{n:str(m.n,14),l:num(m.l,0,30)|0,p:num(m.p,0,30)|0});return}
 if(topic.startsWith(NS+'/sg/')){const pp=topic.split('/');if(slCb&&pp[2]&&typeof m.s==='number')slCb(pp[2],{n:str(m.n,14),s:num(m.s,0,80)});return}
 if(topic.startsWith(NS+'/bl/')){const pp=topic.split('/');if(blCb&&pp[2]&&typeof m.s==='number')blCb(pp[2],{n:str(m.n,14),s:num(m.s,0,60)});return}
-if(topic.startsWith(NS+'/ch/')){const pp=topic.split('/');if(chCb&&pp[2]&&m.g&&typeof m.g==='object'){const q={};for(const k of['golf','hoops','bowl','gal','tag','pen','seek','kite','bump','bake','star','ice','bal','mol','mth','clr','wrd','seq','odd','cmp','tfq','cnt','adx','snk','tzf','mns','pzz','dnc','isl','ast','frt','rhy','rkt'])q[k]=num(m.g[k],0,9999);chCb(pp[2],{n:str(m.n,14),g:q})}return}
+if(topic.startsWith(NS+'/ch/')){const pp=topic.split('/');if(chCb&&pp[2]&&m.g&&typeof m.g==='object'){const q={};for(const k of['golf','hoops','bowl','gal','tag','pen','seek','kite','bump','bake','star','ice','bal','mol','mth','clr','wrd','seq','odd','cmp','tfq','cnt','adx','snk','tzf','mns','pzz','dnc','isl','ast','frt','rhy','rkt','pgn'])q[k]=num(m.g[k],0,9999);chCb(pp[2],{n:str(m.n,14),g:q})}return}
 if(topic.startsWith(NS+'/lb/')){const pp=topic.split('/');if(lbCb&&pp[2]&&typeof m.t==='number')lbCb(pp[2],{n:str(m.n,14),t:num(m.t,0,9999)});return}
 if(topic.startsWith(NS+'/gb/')){const pp=topic.split('/');if(gbCb&&pp[2]===room.owner&&pp[3])gbCb(pp[3],{n:str(m.n,14),m:str(m.m,60),t:num(m.t,0,9e15)});return}
 if(topic.startsWith(NS+'/h/')){if(homeCb&&topic===NS+'/h/'+homeCb.code)homeCb.fn(m);return}
@@ -745,7 +745,7 @@ for(const b of bots)dot(b.root.position.x,b.root.position.z,'#999',3);
 for(const [,r] of remotes)dot(r.root.position.x,r.root.position.z,'#4dabf7',5);
 dot(player.root.position.x,player.root.position.z,'#fff',6);x.restore()}
 /* ===================== friends presence ===================== */
-const friendPres={};const RN={mole:'اضرب الخلد',dash:'سباق النقاط',bal:'فرقعة البالونات',flw:'حديقة الورود',tank:'الأكواريوم',ice:'حلبة التزلج',plan:'القبة النجمية',zoo:'حديقة الحيوان',lib:'المكتبة',bake:'المخبز',isle:'جزيرة الكنز',obs:'المرصد',fruit:'سوق الفاكهة',drum:'استوديو الإيقاع',rocket:'قاعدة الإطلاق',pizza:'مطعم البيتزا',dance:'حلبة الرقص',bump:'التصادم',kite:'الطيارة الورق',plaza:'الساحة',arcade:'الأركيد',cafe:'الكافيه',home:'بيت',garden:'الحديقة',beach:'الشاطئ',cave:'الكهف',disco:'الديسكو',haunt:'البيت المسكون',space:'محطة الفضاء',maze:'المتاهة',fun:'الملاهي',show:'عرض الأزياء',farm:'المزرعة',studio:'الاستوديو',seek:'الاستغماية',pen:'ركلات الجزاء',photo:'استوديو الصور',jump:'الترامبولين',tag:'الطاردة',gallery:'ميدان الرماية',wheel:'عجلة الحظ',bowl:'البولينج',hoops:'تحدي السلة',golf:'الميني جولف',fish:'ميناء الصيد'};
+const friendPres={};const RN={mole:'اضرب الخلد',dash:'سباق النقاط',bal:'فرقعة البالونات',flw:'حديقة الورود',tank:'الأكواريوم',ice:'حلبة التزلج',plan:'القبة النجمية',zoo:'حديقة الحيوان',lib:'المكتبة',bake:'المخبز',isle:'جزيرة الكنز',obs:'المرصد',fruit:'سوق الفاكهة',drum:'استوديو الإيقاع',rocket:'قاعدة الإطلاق',pong:'صالة البنج بونج',pizza:'مطعم البيتزا',dance:'حلبة الرقص',bump:'التصادم',kite:'الطيارة الورق',plaza:'الساحة',arcade:'الأركيد',cafe:'الكافيه',home:'بيت',garden:'الحديقة',beach:'الشاطئ',cave:'الكهف',disco:'الديسكو',haunt:'البيت المسكون',space:'محطة الفضاء',maze:'المتاهة',fun:'الملاهي',show:'عرض الأزياء',farm:'المزرعة',studio:'الاستوديو',seek:'الاستغماية',pen:'ركلات الجزاء',photo:'استوديو الصور',jump:'الترامبولين',tag:'الطاردة',gallery:'ميدان الرماية',wheel:'عجلة الحظ',bowl:'البولينج',hoops:'تحدي السلة',golf:'الميني جولف',fish:'ميناء الصيد'};
 function presTopic(c){return NS+'/u/'+c}
 function subFriends(){if(!netOK||!client)return;try{client.subscribe(NS+'/fr/'+me.id)}catch(e){}me.friends.forEach(f=>{try{client.subscribe(presTopic(f.code))}catch(e){}})}
 function pubPres(){if(!netOK||!client)return;try{client.publish(presTopic(me.id),JSON.stringify({n:me.name,r:room.type,h:room.type==='home'?room.owner:null}))}catch(e){}}
@@ -818,6 +818,7 @@ else if(type==='obs'){room.id='obs';buildObs();$('roomName').textContent='🔭 �
 else if(type==='fruit'){room.id='fruit';buildFruit();$('roomName').textContent='🍉 سوق الفاكهة';starObjs=[]}
 else if(type==='drum'){room.id='drum';buildDrum();$('roomName').textContent='🥁 استوديو الإيقاع';starObjs=[]}
 else if(type==='rocket'){room.id='rocket';buildRocket();$('roomName').textContent='🚀 قاعدة الإطلاق';starObjs=[]}
+else if(type==='pong'){room.id='pong';buildPong();$('roomName').textContent='🏓 صالة البنج بونج';starObjs=[]}
 else if(type==='beach'){room.id='beach';buildBeach();$('roomName').textContent='🏖️ الشاطئ';starObjs=[]}
 else if(type==='cave'){room.id='cave';buildCave();$('roomName').textContent='💎 الكهف';starObjs=[]}
 else if(type==='disco'){room.id='disco';buildDisco();$('roomName').textContent='🪩 الديسكو';starObjs=[]}
@@ -1231,7 +1232,7 @@ function buildDrum(){
  for(const x of[-7,7]){for(let k=0;k<3;k++)g.add(mesh(G.box(1.1,1.0,0.9),0x212529,x,0.5+k*1.0,-6.8,0x111111),mesh(G.cyl(0.3,0.3,0.05,12),0x495057,x,0.5+k*1.0,-6.33))}
  for(const[x,c]of[[-5,0xff6b6b],[0,0xffd43b],[5,0x4dabf7]])g.add(mesh(G.sph(0.25,8),c,x,4,-4,c));
  dm={it:{x:0,z:-2.4,label:'🥁 ابدأ الإيقاع',fn:rhyStart}};interacts.push(dm.it);
- g.add(portalMesh('ارجع للشاطئ',5.8,5.8,0xff8787,'beach'));
+ g.add(portalMesh('ارجع للشاطئ',5.8,5.8,0xff8787,'beach'),portalMesh('🏓 بنج بونج',-5.8,5.8,0x94d82d,'pong'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🥁 دوس على العمود لما النوتة توصل الخط',3000)
 }
