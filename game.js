@@ -125,7 +125,7 @@ if(h===24){g.add(mesh(G.cyl(0.46,0.5,0.2,14),0xffd43b,0,1.88,0,0x886600),mesh(G.
 if(h===15){const b=mesh(G.cyl(0.42,0.42,0.06,14),0x212529,0,1.92,0);g.add(b);for(const sx of[-1,1])g.add(mesh(G.cyl(0.14,0.14,0.2,10),0x339af0,sx*0.44,1.55,0,0x0b3a66))}
 if(h===12){for(const sx of[-1,1]){const e=mesh(G.cone(0.14,0.3,4),0x343a40,sx*0.22,1.88,0);e.rotation.z=sx*-0.25;g.add(e);g.add(mesh(G.cone(0.07,0.18,4),0xf783ac,sx*0.22,1.86,0.04))}}
 if(h===4){g.add(mesh(G.cyl(0.02,0.02,0.4,6),0x868e96,0,2.0,0),mesh(G.sph(0.08,8),0xff6b6b,0,2.25,0,0x661111))}
-if(a.p){const pg=new THREE.Group(),pc=[0,0xf08c00,0x8d5524,0xffd43b,0xf8f9fa,0xe8590c,0xf8f9fa,0x51cf66,0xf1f3f5][a.p]||0xf08c00;pg.position.set(0.95,0,0.35);
+if(a.p){const pg=new THREE.Group(),pc=[0,0xf08c00,0x8d5524,0xffd43b,0xf8f9fa,0xe8590c,0xf8f9fa,0x51cf66,0xf1f3f5,0x2f9e44,0x212529,0x8d5524][a.p]||0xf08c00;pg.position.set(0.95,0,0.35);
 pg.add(mesh(G.sph(0.25,8),pc,0,0.28,0),mesh(G.sph(0.17,8),pc,0.0,0.52,0.2));pg.children[0].scale.set(1,0.8,1.3);
 pg.add(mesh(G.sph(0.03,5),0x111111,-0.07,0.56,0.35),mesh(G.sph(0.03,5),0x111111,0.07,0.56,0.35));
 if(a.p===1){pg.add(mesh(G.cone(0.06,0.14,4),pc,-0.1,0.72,0.2),mesh(G.cone(0.06,0.14,4),pc,0.1,0.72,0.2),mesh(G.box(0.04,0.04,0.3),pc,0,0.35,-0.35))}
@@ -135,6 +135,9 @@ if(a.p===5){pg.add(mesh(G.cone(0.07,0.18,4),pc,-0.1,0.74,0.2),mesh(G.cone(0.07,0
 if(a.p===6){pg.add(mesh(G.sph(0.08,6),0x212529,-0.14,0.7,0.14),mesh(G.sph(0.08,6),0x212529,0.14,0.7,0.14),mesh(G.sph(0.06,6),0x212529,-0.08,0.58,0.34),mesh(G.sph(0.06,6),0x212529,0.08,0.58,0.34),mesh(G.sph(0.05,6),0x212529,0,0.5,0.38),mesh(G.sph(0.09,6),0x212529,-0.2,0.1,0.15),mesh(G.sph(0.09,6),0x212529,0.2,0.1,0.15))}
 if(a.p===7){pg.add(mesh(G.sph(0.08,6),0xf8f9fa,-0.09,0.66,0.26),mesh(G.sph(0.08,6),0xf8f9fa,0.09,0.66,0.26),mesh(G.sph(0.04,5),0x111111,-0.09,0.67,0.33),mesh(G.sph(0.04,5),0x111111,0.09,0.67,0.33),mesh(G.box(0.2,0.02,0.04),0xe03131,0,0.47,0.36))}
 if(a.p===8){pg.add(mesh(G.cone(0.04,0.28,5),0xffd43b,0,0.82,0.22,0xaa8800),mesh(G.box(0.05,0.3,0.1),0xf783ac,0,0.68,0.05,0x883355),mesh(G.sph(0.09,6),0xb197fc,0,0.34,-0.34,0x442288),mesh(G.sph(0.07,6),0xf783ac,0,0.28,-0.44,0x883355),mesh(G.sph(0.03,5),0x6741d9,-0.07,0.57,0.34),mesh(G.sph(0.03,5),0x6741d9,0.07,0.57,0.34))}
+if(a.p===9)pg.add(mesh(G.sph(0.22,8),0x8d6e3b,0,0.5,-0.02,0x3a2a10),mesh(G.sph(0.07,6),0x94d82d,0,0.34,0.32),mesh(G.sph(0.04,5),0x111111,-0.04,0.36,0.37),mesh(G.sph(0.04,5),0x111111,0.04,0.36,0.37));
+if(a.p===10)pg.add(mesh(G.sph(0.17,8),0xf8f9fa,0,0.4,0.06),mesh(G.cone(0.04,0.08,4),0xff922b,0,0.62,0.3),mesh(G.sph(0.03,5),0xf8f9fa,-0.05,0.68,0.24),mesh(G.sph(0.03,5),0xf8f9fa,0.05,0.68,0.24),mesh(G.box(0.12,0.05,0.1),0xff922b,-0.08,0.1,0.08),mesh(G.box(0.12,0.05,0.1),0xff922b,0.08,0.1,0.08));
+if(a.p===11)pg.add(mesh(G.cone(0.05,0.1,4),0x5c3a1e,-0.1,0.8,0.18),mesh(G.cone(0.05,0.1,4),0x5c3a1e,0.1,0.8,0.18),mesh(G.sph(0.07,6),0xfff3bf,-0.07,0.65,0.34),mesh(G.sph(0.07,6),0xfff3bf,0.07,0.65,0.34),mesh(G.sph(0.03,5),0x111111,-0.07,0.65,0.4),mesh(G.sph(0.03,5),0x111111,0.07,0.65,0.4),mesh(G.cone(0.03,0.06,4),0xffa94d,0,0.58,0.4));
 if(a.p===3){pg.add(mesh(G.box(0.14,0.05,0.12),0xff922b,0,0.5,0.38))}
 const L=Math.min(a.l|0,6);if(L>0)pg.scale.setScalar(1+0.12*L);if(L>=3){const bw=mesh(G.cyl(0.14,0.14,0.04,8),0xe03131,0,0.82,-0.05,0x440000);pg.add(bw)}if(L>=5){pg.add(mesh(G.cone(0.09,0.18,5),0xffd43b,0,1.0,0.1,0x886600))}
 if(a.q===1)pg.add(mesh(G.cone(0.1,0.2,4),0xe64980,-0.12,0.38,0.32),mesh(G.cone(0.1,0.2,4),0xe64980,0.12,0.38,0.32),mesh(G.sph(0.06,6),0xc2255c,0,0.38,0.34));
@@ -501,7 +504,7 @@ const str=(s,n)=>{let r=String(s==null?'':s).replace(/[\u0000-\u001f<>]/g,'').sl
 const num=(v,a,b,d=0)=>{v=+v;return isFinite(v)?clamp(v,a,b):d};
 function getRemote(m){
 let r=remotes.get(m.i);
-const app={b:num(m.b,0,20,0)|0,h:num(m.h,0,20,0)|0,a:num(m.a,0,40,0)|0,p:num(m.p,0,8,0)|0,l:num(m.l,0,50,0)|0,q:num(m.q,0,9,0)|0,pn:str(m.pn,10)};
+const app={b:num(m.b,0,20,0)|0,h:num(m.h,0,20,0)|0,a:num(m.a,0,40,0)|0,p:num(m.p,0,11,0)|0,l:num(m.l,0,50,0)|0,q:num(m.q,0,9,0)|0,pn:str(m.pn,10)};
 if(!r){r=new Actor(app,str(m.n,16)||'لاعب');r.tx=0;r.tz=0;r.root.position.set(num(m.x,-50,50),0,num(m.z,-50,50));scene.add(r.root);remotes.set(m.i,r);setOnline();{const tn=Date.now();joinLog[m.i]=joinLog[m.i]||0;if(tn-joinLog[m.i]>20000){joinLog[m.i]=tn;addLog('','🔔 '+r.name+' دخل الغرفة')}};if(room&&room.type==='home'&&room.owner===me.id){toast('🏡 '+r.name+' زار بيتك!',3000);sfx('star');qAdd('visit')}}
 else{if(r.app.b!==app.b||r.app.h!==app.h||r.app.a!==app.a||r.app.p!==app.p||r.app.l!==app.l||r.app.q!==app.q||(r.app.pn||'')!==app.pn)r.setApp(app);r.setName(str(m.n,16)||'لاعب')}
 r.seen=performance.now();return r;
@@ -511,7 +514,7 @@ let m;try{m=JSON.parse(payload.toString())}catch(e){return}
 if(!m||typeof m!=='object')return;
 if(topic.startsWith(NS+'/u/')){const c=topic.slice(NS.length+3);if(typeof m.r==='string')friendPres[c]={n:str(m.n,14),r:str(m.r,8),h:m.h?str(m.h,8):null,seen:Date.now()};return}
 if(topic.startsWith(NS+'/fr/')){frMsg(m);return}
-if(topic.startsWith(NS+'/pl/')){const pp=topic.split('/');if(plCb&&pp[2]&&typeof m.l==='number')plCb(pp[2],{n:str(m.n,14),l:num(m.l,0,30)|0,p:num(m.p,0,8)|0});return}
+if(topic.startsWith(NS+'/pl/')){const pp=topic.split('/');if(plCb&&pp[2]&&typeof m.l==='number')plCb(pp[2],{n:str(m.n,14),l:num(m.l,0,30)|0,p:num(m.p,0,11)|0});return}
 if(topic.startsWith(NS+'/sg/')){const pp=topic.split('/');if(slCb&&pp[2]&&typeof m.s==='number')slCb(pp[2],{n:str(m.n,14),s:num(m.s,0,80)});return}
 if(topic.startsWith(NS+'/bl/')){const pp=topic.split('/');if(blCb&&pp[2]&&typeof m.s==='number')blCb(pp[2],{n:str(m.n,14),s:num(m.s,0,60)});return}
 if(topic.startsWith(NS+'/ch/')){const pp=topic.split('/');if(chCb&&pp[2]&&m.g&&typeof m.g==='object'){const q={};for(const k of['golf','hoops','bowl','gal','tag','pen','seek','kite','bump','bake','star','ice','bal','mol'])q[k]=num(m.g[k],0,9999);chCb(pp[2],{n:str(m.n,14),g:q})}return}
@@ -840,7 +843,7 @@ $('bMe').onclick=()=>modal(c=>{
 c.innerHTML='<h2>🎨 شكلك واسمك</h2><label>الاسم</label><input type="text" id="nm" maxlength="14"><label>لون الجسم</label><div class="sw" id="s1"></div><label>لون البشرة</label><div class="sw" id="s2"></div><label>القبعة</label><div class="sw" id="s3"></div><label>الحيوان الأليف</label><div class="sw" id="s4"></div><label>إكسسوار الحيوان</label><div class="sw" id="s5"></div><label>كودك (ابعته لصحابك عشان يزوروا بيتك)</label><div style="font-size:26px;letter-spacing:4px;font-weight:800;color:#ffd35c" id="code"></div><div class="row"><button class="btn g" id="ok">تم</button></div>';
 $('nm').value=me.name;$('code').textContent=me.id;
 const sw=(id,arr,key,isCol)=>{if(key==='hat'&&typeof lvUnlock==='function')lvUnlock();const el=$(id);arr.forEach((v,i)=>{const b=document.createElement(isCol?'b':'u');const cl=key==='body'&&CLV[i]&&plLevel().lv<CLV[i];if(cl){b.style.opacity='.4';b.textContent='🔒';b.style.fontSize='11px';b.style.textAlign='center'}const lock=key==='hat'&&HPRICE[i]&&!me.owned.includes(i);if(isCol)b.style.background=v;else b.textContent=v+(lock?(i===24?' 🔒 جواز السفر':i>=25?' 🔒 مستوى '+LVH[i]:' 🔒'+HPRICE[i]):'');if(me[key]===i)b.classList.add('on');b.onclick=()=>{if(cl){toast('🎖️ اللون ده بيتفتح عند مستوى '+CLV[i]);sfx('err');return}if(lock&&!b.dataset.u){if(HPRICE[i]>=99999){toast(i===24?'🛂 بتتفتح من جواز السفر':'🎖️ بتتفتح عند مستوى '+LVH[i]);sfx('err');return}if(me.coins<HPRICE[i]){toast('محتاج '+HPRICE[i]+' 🪙');sfx('err');return}me.coins-=HPRICE[i];me.owned.push(i);b.dataset.u=1;b.textContent=v;sfx('win');burst(player.root.position,0xffd43b,30)}me[key]=i;[...el.children].forEach(x=>x.classList.remove('on'));b.classList.add('on');player.setApp(myApp());saveMe();sendPos(true)};el.appendChild(b)})};
-sw('s4',['بدون','🐱 قطة','🐶 كلب','🦆 بطة','🐰 أرنب','🦊 ثعلب','🐼 باندا','🐸 ضفدع','🦄 يونيكورن'],'pet',false);sw('s5',['بدون','🎀 فيونكة','😎 نضارة','🧣 وشاح','🎩 قبعة','👑 تاج','🪽 أجنحة','🎈 بالون','🔔 جرس','⭐ نجمة'],'pacc',false);sw('s1',BODY,'body',true);sw('s2',HEAD,'head',true);sw('s3',HATS,'hat',false);
+sw('s4',['بدون','🐱 قطة','🐶 كلب','🦆 بطة','🐰 أرنب','🦊 ثعلب','🐼 باندا','🐸 ضفدع','🦄 يونيكورن','🐢 سلحفاة','🐧 بطريق','🦉 بومة'],'pet',false);sw('s5',['بدون','🎀 فيونكة','😎 نضارة','🧣 وشاح','🎩 قبعة','👑 تاج','🪽 أجنحة','🎈 بالون','🔔 جرس','⭐ نجمة'],'pacc',false);sw('s1',BODY,'body',true);sw('s2',HEAD,'head',true);sw('s3',HATS,'hat',false);
 $('ok').onclick=()=>{const n=str($('nm').value,14).trim();if(n){me.name=n;player.setName(n)}saveMe();publishHome();sendPos(true);closeModal()};
 });
 $('bVisit').onclick=()=>modal(c=>{
