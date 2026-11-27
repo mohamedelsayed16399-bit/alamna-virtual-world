@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -340,6 +340,7 @@ function buildStp(){
  g.add(mesh(G.box(0.3,2,0.3),0xae3ec9,-5,1,-2),mesh(G.box(0.3,2,0.3),0xae3ec9,5,1,-2));
  stph={it:{x:0,z:0.2,label:'🎨 العب تحدّي الألوان',fn:stpStart}};interacts.push(stph.it);
  g.add(portalMesh('ارجع للغز',5.8,5.8,0x37b24d,'slproom'));
+ g.add(portalMesh('سباق الحارات',-5.8,5.8,0x495057,'ldgroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🎨 دوس على لون الحبر مش على معنى الكلمة. 20 ثانية',3400)
 }
@@ -363,3 +364,48 @@ function stpStart(){
   $('stpG').onclick=()=>{score=0;miss=0;left=20;over=false;run=true;msg='';nxt();clearInterval(tmr);tmr=setInterval(()=>{if(!open()){clearInterval(tmr);return}left-=.25;if(left<=0){left=0;finish()}paint()},250);paint()};
   $('stpX').onclick=()=>{clearInterval(tmr);$('modal').style.display='none'};
   paint()})}
+function buildLdg(){
+ const g=indoor(0x495057,0xf1f3f5,0xced4da);
+ sign(g,'🏎️ سباق الحارات',0,4.6,-7.6,'rgba(73,80,87,.92)');
+ g.add(mesh(G.box(3.6,0.1,5),0x343a40,0,0.08,-4.5),mesh(G.box(0.1,0.12,4.6),0xffd43b,-0.6,0.12,-4.5),mesh(G.box(0.1,0.12,4.6),0xffd43b,0.6,0.12,-4.5),mesh(G.box(0.7,0.35,1.2),0xe03131,0,0.35,-3.4));
+ g.add(mesh(G.box(0.3,2,0.3),0x495057,-5,1,-2),mesh(G.box(0.3,2,0.3),0x495057,5,1,-2));
+ ldgh={it:{x:0,z:0.2,label:'🏎️ العب سباق الحارات',fn:ldgStart}};interacts.push(ldgh.it);
+ g.add(portalMesh('ارجع للألوان',5.8,5.8,0xae3ec9,'stproom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🏎️ دوس يمين أو شمال عشان تغيّر الحارة وتتفادى العربيات',3400)
+}
+function ldgStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,300),CH=H?150:260,LW=W/3,CW=LW*.5,CHt=H?26:36,PY=CH-CHt-6;
+ let lane=1,ob=[],n=0,over=false,msg='',acc=0,go=false,tsc=1;
+ const spd=()=>Math.min(260,110+n*3);
+ window.ldgq=()=>({lane,ob:ob.map(o=>({lane:o.l,y:o.y})),n,over,go,PY,CHt,CH,coins:me.coins,setLane:l=>{lane=l},setN:v=>{n=v;},fast:k=>{tsc=k},start:()=>$('ldG')&&$('ldG').click()});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🏎️ سباق الحارات</h2>')+'<div id="ldS" style="text-align:center;font-size:14px;margin:2px;min-height:1.4em"></div><div style="text-align:center"><canvas id="ldC" width="'+W+'" height="'+CH+'" style="border-radius:10px;max-width:100%;touch-action:none"></canvas></div><div id="ldM" style="text-align:center;font-size:13px;margin:5px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="ldG" style="width:auto!important;display:inline-block!important">▶ ابدأ</button><button class="btn d" id="ldX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('ldC'),x=cv.getContext('2d');
+  const open=()=>$('ldC')&&$('modal').style.display!=='none';
+  const info=()=>{if($('ldS'))$('ldS').textContent='العربيات اللي عدّيت '+n+' · أحسن '+(me.ldgBest||0);if($('ldM'))$('ldM').textContent=msg};
+  const finish=()=>{over=true;go=false;me.ldgGames=(me.ldgGames||0)+1;me.ldgBest=Math.max(me.ldgBest||0,n);const d=today();if(me.ldgDD!==d){me.ldgDD=d;me.ldgDC=0}
+   let c=n>=50?3:n>=30?2:n>=15?1:0;c=Math.min(c,Math.max(0,6-(me.ldgDC||0)));
+   if(c){me.coins+=c;me.ldgDC=(me.ldgDC||0)+c;updCoins();sfx('win')}else sfx('err');
+   msg='💥 خبطت بعد '+n+' عربية'+(c?' · +'+c+'🪙':' · عدّي 15 للجايزة');saveMe();info()};
+  const spawn=()=>{const a=Math.floor(Math.random()*3);ob.push({l:a,y:-CHt});if(Math.random()<.4){let b=(a+1+Math.floor(Math.random()*2))%3;ob.push({l:b,y:-CHt})}};
+  const step=dt=>{const v=spd();acc+=dt;if(acc>=Math.max(.55,1.1-n*.012)){acc=0;spawn()}
+   for(const o of ob){o.y+=v*dt;if(!o.p&&o.y>CH){o.p=1;}}
+   for(const o of ob){if(o.l===lane&&o.y+CHt>PY+4&&o.y<PY+CHt-4){finish();return}}
+   const k=ob.length;ob=ob.filter(o=>o.y<=CH);
+   // count a row passed once all its cars left
+   };
+  let seen=new Set();
+  let tm=performance.now();
+  const loop=ts=>{if(!open())return;let dt=Math.min(.05,(ts-tm)/1000)*tsc;tm=ts;
+   if(go&&!over){while(dt>0&&!over){const s=Math.min(dt,.01);const before=ob.filter(o=>o.y+CHt<PY).length;step(s);dt-=s;}
+    ob.forEach(o=>{if(!o.c&&o.y>PY+CHt){o.c=1;n++;info()}})}
+   x.fillStyle='#495057';x.fillRect(0,0,W,CH);x.strokeStyle='#ffd43b';x.lineWidth=2;x.setLineDash([10,10]);x.lineDashOffset=-(performance.now()/20)%20;
+   for(let i=1;i<3;i++){x.beginPath();x.moveTo(i*LW,0);x.lineTo(i*LW,CH);x.stroke()}x.setLineDash([]);
+   ob.forEach(o=>{x.fillStyle='#1c7ed6';x.fillRect(o.l*LW+(LW-CW)/2,o.y,CW,CHt)});
+   x.fillStyle='#e03131';x.fillRect(lane*LW+(LW-CW)/2,PY,CW,CHt);x.fillStyle='#ffa8a8';x.fillRect(lane*LW+(LW-CW)/2+3,PY+4,CW-6,8);
+   info();requestAnimationFrame(loop)};
+  cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),px=(e.clientX-r.left)/r.width;if(!go)return;lane=px<.5?Math.max(0,lane-1):Math.min(2,lane+1);sfx('tick')};
+  $('ldG').onclick=()=>{ob=[];n=0;lane=1;over=false;acc=0;go=true;msg='';info()};
+  $('ldX').onclick=()=>{$('modal').style.display='none'};
+  info();requestAnimationFrame(loop)})}
