@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -304,6 +304,7 @@ function buildSlp(){
  g.add(mesh(G.box(0.3,2,0.3),0x37b24d,-5,1,-2),mesh(G.box(0.3,2,0.3),0x37b24d,5,1,-2));
  slph={it:{x:0,z:0.2,label:'🧩 العب لغز الأرقام',fn:slpStart}};interacts.push(slph.it);
  g.add(portalMesh('ارجع للطوب',5.8,5.8,0x1098ad,'bxrroom'));
+ g.add(portalMesh('تحدّي الألوان',-5.8,5.8,0xae3ec9,'stproom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🧩 رتّب الأرقام من 1 لـ8 بأقل حركات',3400)
 }
@@ -332,3 +333,33 @@ function slpStart(){
   $('slN').onclick=()=>{shuffle();moves=0;over=false;msg='';info()};
   $('slX').onclick=()=>{$('modal').style.display='none'};
   info();requestAnimationFrame(loop)})}
+function buildStp(){
+ const g=indoor(0xae3ec9,0xf8f0fc,0xe599f7);
+ sign(g,'🎨 تحدّي الألوان',0,4.6,-7.6,'rgba(174,62,201,.92)');
+ [0xe03131,0x1c7ed6,0x2f9e44,0xf59f00].forEach((c,i)=>g.add(mesh(G.cyl(0.5,0.5,0.3,12),c,-2.1+i*1.4,0.3,-5)));
+ g.add(mesh(G.box(0.3,2,0.3),0xae3ec9,-5,1,-2),mesh(G.box(0.3,2,0.3),0xae3ec9,5,1,-2));
+ stph={it:{x:0,z:0.2,label:'🎨 العب تحدّي الألوان',fn:stpStart}};interacts.push(stph.it);
+ g.add(portalMesh('ارجع للغز',5.8,5.8,0x37b24d,'slproom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🎨 دوس على لون الحبر مش على معنى الكلمة. 20 ثانية',3400)
+}
+function stpStart(){
+ const H=innerHeight<420,N=['أحمر','أزرق','أخضر','أصفر'],CL=['#e03131','#1c7ed6','#2f9e44','#f59f00'];
+ let ti=0,ink=0,score=0,miss=0,left=20,run=false,over=false,msg='',tmr=null;
+ const nxt=()=>{ti=Math.floor(Math.random()*4);ink=(ti+1+Math.floor(Math.random()*3))%4;if(Math.random()<.25)ink=ti};
+ nxt();
+ let pick=()=>{};
+ window.stpq=()=>({ti,ink,score,miss,left,over,run,coins:me.coins,pick:i=>pick(i),start:()=>$('stpG')&&$('stpG').click(),tick:()=>{left=0;}});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🎨 تحدّي الألوان</h2>')+'<div id="stpS" style="text-align:center;font-size:14px;margin:2px;min-height:1.4em"></div><div id="stpW" style="text-align:center;font-size:'+(H?34:52)+'px;font-weight:bold;margin:'+(H?2:14)+'px 0;min-height:1.3em;direction:rtl"></div><div id="stpB" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;direction:ltr">'+CL.map((k,i)=>'<button class="btn" data-i="'+i+'" style="background:'+k+';min-height:'+(H?38:52)+'px;width:auto!important;font-size:13px">'+N[i]+'</button>').join('')+'</div><div id="stpM" style="text-align:center;font-size:13px;margin:5px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="stpG" style="width:auto!important;display:inline-block!important">▶ ابدأ</button><button class="btn d" id="stpX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const open=()=>$('stpS')&&$('modal').style.display!=='none';
+  const paint=()=>{if(!$('stpS'))return;$('stpS').textContent='النقاط '+score+' · أخطاء '+miss+' · الوقت '+Math.ceil(left)+' · أحسن '+(me.stpBest||0);const w=$('stpW');w.textContent=run?N[ti]:'';w.style.color=CL[ink];$('stpM').textContent=msg};
+  const finish=()=>{run=false;over=true;clearInterval(tmr);me.stpGames=(me.stpGames||0)+1;me.stpBest=Math.max(me.stpBest||0,score);const d=today();if(me.stpDD!==d){me.stpDD=d;me.stpDC=0}
+   let c=score>=18?3:score>=12?2:score>=7?1:0;c=Math.min(c,Math.max(0,6-(me.stpDC||0)));
+   if(c){me.coins+=c;me.stpDC=(me.stpDC||0)+c;updCoins();sfx('win')}else sfx('err');
+   msg='🏁 '+score+' صح و'+miss+' غلط'+(c?' · +'+c+'🪙':' · 7 صح للجايزة');saveMe();paint()};
+  pick=i=>{if(!run)return;if(i===ink){score++;sfx('tick')}else{miss++;score=Math.max(0,score-1);sfx('err')}nxt();paint()};
+  $('stpB').onclick=e=>{const b=e.target.closest('button');if(b)pick(+b.dataset.i)};
+  $('stpG').onclick=()=>{score=0;miss=0;left=20;over=false;run=true;msg='';nxt();clearInterval(tmr);tmr=setInterval(()=>{if(!open()){clearInterval(tmr);return}left-=.25;if(left<=0){left=0;finish()}paint()},250);paint()};
+  $('stpX').onclick=()=>{clearInterval(tmr);$('modal').style.display='none'};
+  paint()})}
