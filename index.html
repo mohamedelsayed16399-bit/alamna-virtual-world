@@ -60,6 +60,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#101830;font-family:sy
 #chatbox input{flex:1;padding:12px;border-radius:12px;border:1px solid #556;background:#0f1530;color:#fff;font:inherit;font-size:16px;min-width:0}
 #emo{position:fixed;left:8px;right:8px;bottom:calc(70px + env(safe-area-inset-bottom));z-index:12;display:none;justify-content:center;gap:6px;flex-wrap:wrap}
 #emo b{font-size:28px;background:rgba(16,24,48,.85);border-radius:14px;padding:6px 10px;cursor:pointer}
+@media(max-height:420px){#emo{bottom:calc(48px + env(safe-area-inset-bottom));flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start}#emo b{font-size:22px;padding:4px 8px;flex:0 0 auto}}
 #loading{position:fixed;inset:0;background:#101830;z-index:40;display:flex;align-items:center;justify-content:center;font-size:22px;flex-direction:column;gap:10px}
 </style>
 </head>
@@ -91,7 +92,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#101830;font-family:sy
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js"></script>
-<script src="game.js?v=177"></script>
-<script src="game2.js?v=177"></script>
+<script src="game.js?v=178"></script>
+<script src="game2.js?v=178"></script>
 </body>
 </html>
