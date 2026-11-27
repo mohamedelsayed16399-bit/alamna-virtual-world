@@ -24,7 +24,7 @@ const DEFAULT_ITEMS=[['rug',5,6,0],['sofa',3,3,0],['plant',1,1,0]];
 let me;
 try{me=JSON.parse(localStorage.getItem('ealam_me')||'null')}catch(e){me=null}
 if(!me||!me.id){me={id:rnd(6),name:'زائر'+Math.floor(Math.random()*900+100),body:Math.floor(Math.random()*12),head:0,hat:0,coins:150,floor:0,wall:0,items:DEFAULT_ITEMS.map(a=>a.slice()),friends:[],best:0}}
-if(!Array.isArray(me.items))me.items=DEFAULT_ITEMS.map(a=>a.slice());me.friends=me.friends||[];me.best=me.best||0;me.owned=me.owned||[];me.daily=me.daily||{d:'',streak:0};
+if(!Array.isArray(me.items))me.items=DEFAULT_ITEMS.map(a=>a.slice());if(!Array.isArray(me.friends))me.friends=[];me.best=me.best||0;if(!Array.isArray(me.owned))me.owned=[];if(!me.daily||typeof me.daily!=='object')me.daily={d:'',streak:0};me.coins=Math.max(0,+me.coins||0);
 function saveMe(){try{localStorage.setItem('ealam_me',JSON.stringify(me))}catch(e){}updCoins()}
 function updCoins(){$('coins').textContent='🪙 '+me.coins}
 /* ===================== three setup ===================== */
@@ -544,7 +544,7 @@ const render=()=>{const l=$('rl');if(!l)return;l.innerHTML='';const a=Object.val
 lbCb=(id,m)=>{e[id]=m;render()};if(netOK)client.subscribe(NS+'/lb/+');if(me.raceBest)e[me.id]={n:me.name,t:me.raceBest};
 $('rx').onclick=()=>{try{client.unsubscribe(NS+'/lb/+')}catch(x){}lbCb=null;closeModal()};render()})}
 function buildHome(data){
-const g=new THREE.Group();home.group=g;home.items=data.items.map(a=>a.slice());home.floor=data.floor|0;home.wall=data.wall|0;home.name=data.n||'';home.sel=null;
+const g=new THREE.Group();home.group=g;home.items=(Array.isArray(data.items)?data.items:[]).filter(a=>Array.isArray(a)&&CAT[a[0]]).map(a=>a.slice());home.floor=data.floor|0;home.wall=data.wall|0;home.name=data.n||'';home.sel=null;
 home.floorMesh=mesh(G.box(14,0.3,14),0xffffff,0,-0.15,0);g.add(home.floorMesh);
 g.add(mesh(G.box(15,0.1,15),0x2b2f4a,0,-0.35,0));
 home.wallMeshes=[];
