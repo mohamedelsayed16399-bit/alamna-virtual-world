@@ -571,7 +571,7 @@ function buildPbl(){
  g.add(mesh(G.sph(0.16,8),0xdee2e6,0.3,1.4,-3.3));
  [[-5,-1],[5,-1]].forEach(([x,z],i)=>g.add(mesh(G.cyl(0.4,0.4,1.4,10),0x7048e8,x,0.7,z),mesh(G.sph(0.4,8),[0xfa5252,0x51cf66][i],x,1.6,z,[0xfa5252,0x51cf66][i])));
  pbh={it:{x:0,z:0.2,label:'🎰 العب بينبول',fn:pblStart}};interacts.push(pbh.it);
- g.add(portalMesh('ارجع لميدان المدفع',5.8,5.8,0x2f9e44,'cannon'));
+ g.add(portalMesh('ارجع لميدان المدفع',5.8,5.8,0x2f9e44,'cannon'),portalMesh('🏒 صالة الهوكي',-5.8,5.8,0x1c7ed6,'hockey'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🎰 دوس يمين وشمال عشان تشغّل الدفاعات',3000)
 }
@@ -620,3 +620,59 @@ function pblStart(){
   cv.onpointerdown=e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}setP(e,true)};
   cv.onpointerup=e=>setP(e,false);cv.onpointercancel=e=>setP(e,false);
   $('pbX').onclick=()=>{$('modal').style.display='none'};hud();dw();requestAnimationFrame(tick)})}
+let ahh=null;
+function buildAhk(){
+ const g=indoor(0x1971c2,0xd0ebff,0x339af0);
+ sign(g,'🏒 صالة الهوكي',0,4.6,-7.6,'rgba(25,113,194,.92)');
+ g.add(mesh(G.box(3.4,0.8,5.4),0x1c7ed6,0,0.4,-4),mesh(G.box(3,0.1,5),0xf1f3f5,0,0.85,-4),mesh(G.box(3.4,0.25,0.2),0x212529,0,0.95,-6.6),mesh(G.box(3.4,0.25,0.2),0x212529,0,0.95,-1.4),mesh(G.box(0.2,0.25,5.4),0x212529,-1.6,0.95,-4),mesh(G.box(0.2,0.25,5.4),0x212529,1.6,0.95,-4));
+ g.add(mesh(G.cyl(0.18,0.18,0.08,12),0x212529,0.3,0.93,-4.2),mesh(G.cyl(0.3,0.3,0.12,12),0xfa5252,-0.5,0.95,-2.4,0x660000),mesh(G.cyl(0.3,0.3,0.12,12),0x51cf66,0.6,0.95,-5.8,0x006600));
+ [[-5,0],[5,0]].forEach(([x,z],i)=>g.add(mesh(G.cyl(0.35,0.35,1,10),0x1971c2,x,0.5,z),mesh(G.sph(0.35,8),[0xfcc419,0xfa5252][i],x,1.2,z,[0xfcc419,0xfa5252][i])));
+ ahh={it:{x:0,z:0.2,label:'🏒 العب هوكي ضد 🤖',fn:ahkStart}};interacts.push(ahh.it);
+ g.add(portalMesh('ارجع لصالة البينبول',5.8,5.8,0x7048e8,'pinball'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🏒 حرّك صباعك عشان تتحكم في المضرب. الخصم روبوت 🤖',3200)
+}
+function ahkStart(){
+ const H=innerHeight<420,CH=H?Math.max(130,innerHeight-165):Math.max(280,Math.min(innerHeight-300,460)),W=Math.min(innerWidth-50,360),MR=H?9:17,PR=H?6:10,GW=W*0.46,LIM=4;
+ const Ls=window.__ahkLv=(window.__ahkLv||0);
+ let pu={x:W/2,y:CH/2,vx:0,vy:0},pl={x:W/2,y:CH*0.85,px:W/2,py:CH*0.85,tx:W/2,ty:CH*0.85},bt={x:W/2,y:CH*0.15,px:W/2,py:CH*0.15},sp=0,sb=0,over=false,last=0,msg='',msgT=0,msgC='#fff',pause=0.8,tleft=75,hitT=0;
+ const botSp=()=>115+Math.min(5,window.__ahkLv)*40;
+ let move=()=>{};
+ window.ahq=()=>({sp,sb,over,W,CH,puck:{x:pu.x,y:pu.y,vx:pu.vx,vy:pu.vy},pl:{x:pl.x,y:pl.y},move:(x,y)=>move(x,y),tleft});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🏒 صالة الهوكي</h2>')+'<div id="ahH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="ahC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row"><button class="btn d" id="ahX">إغلاق</button></div>';
+  const cv=$('ahC');cv.width=W;cv.height=CH;const x=cv.getContext('2d');
+  const open=()=>$('ahC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('ahH'))$('ahH').textContent='أنت '+sp+' - '+sb+' 🤖 · الوقت '+Math.max(0,Math.ceil(tleft))+'ث · أول لـ '+LIM};
+  const say=(m,cc)=>{msg=m;msgC=cc;msgT=1};
+  const dw=()=>{x.fillStyle='#e7f5ff';x.fillRect(0,0,W,CH);x.strokeStyle='#74c0fc';x.lineWidth=3;x.strokeRect(1.5,1.5,W-3,CH-3);x.beginPath();x.moveTo(0,CH/2);x.lineTo(W,CH/2);x.stroke();x.beginPath();x.arc(W/2,CH/2,W*0.14,0,6.3);x.stroke();
+   x.fillStyle='#fa5252';x.fillRect((W-GW)/2,0,GW,5);x.fillRect((W-GW)/2,CH-5,GW,5);
+   x.fillStyle='#e03131';x.beginPath();x.arc(bt.x,bt.y,MR,0,6.3);x.fill();x.fillStyle='#ffa8a8';x.beginPath();x.arc(bt.x,bt.y,MR*0.5,0,6.3);x.fill();
+   x.fillStyle='#1971c2';x.beginPath();x.arc(pl.x,pl.y,MR,0,6.3);x.fill();x.fillStyle='#a5d8ff';x.beginPath();x.arc(pl.x,pl.y,MR*0.5,0,6.3);x.fill();
+   x.fillStyle='#212529';x.beginPath();x.arc(pu.x,pu.y,PR,0,6.3);x.fill();
+   x.fillStyle='rgba(0,0,0,.5)';x.font='bold 13px sans-serif';x.textAlign='left';x.fillText('🤖 روبوت',8,18);
+   if(msgT>0){x.fillStyle=msgC;x.strokeStyle='#212529';x.lineWidth=4;x.font='bold 24px sans-serif';x.textAlign='center';x.strokeText(msg,W/2,CH/2-20);x.fillText(msg,W/2,CH/2-20)}};
+  const reset=dir=>{pu={x:W/2+(Math.random()-.5)*W*0.2,y:CH/2+dir*MR*0.3,vx:0,vy:0};pause=0.8};
+  const fin=()=>{over=true;dw();const win=sp>sb;if(win){window.__ahkLv++;sfx('win')}else sfx('err');setTimeout(()=>{if(!open())return;const d=today();if(!me.ahkd||me.ahkd.d!==d)me.ahkd={d,c:0};let pay=win?Math.min(3,2+(sp-sb>=3?1:0)):0;pay=Math.max(0,Math.min(pay,12-me.ahkd.c));me.ahkd.c+=pay;me.coins+=pay;updCoins();const mg=win?sp-sb:0;const nb=mg>(me.ahkBest||0);if(nb)me.ahkBest=mg;me.ahkGames=(me.ahkGames||0)+1;saveMe();
+   c.innerHTML='<h2>'+(win?'🏆 كسبت الروبوت!':sp===sb?'🤝 تعادل':'🤖 الروبوت كسب')+'</h2><div style="text-align:center;font-size:16px">أنت <b>'+sp+'</b> - <b>'+sb+'</b> 🤖'+(nb?'<br>🏆 أكبر فارق: '+mg:'<br>أكبر فارق: '+(me.ahkBest||0))+'<br>'+(pay?'+'+pay+'🪙':win?'(وصلت حد النهاردة)':'اكسب عشان تاخد عملات')+'</div><div class="row"><button class="btn g" id="ahR">🔁 تاني</button><button class="btn d" id="ahX">إغلاق</button></div>';$('ahR').onclick=()=>{$('modal').style.display='none';ahkStart()};$('ahX').onclick=()=>{$('modal').style.display='none'}},700)};
+  const goal=who=>{if(who==='me'){sp++;say('جول! ⚽','#69db7c');sfx('win')}else{sb++;say('جول للروبوت 🤖','#ff6b6b');sfx('err')}hud();if(sp>=LIM||sb>=LIM){fin();return}reset(who==='me'?-1:1)};
+  const mal=(m,vx,vy)=>{const dx=pu.x-m.x,dy=pu.y-m.y,d=Math.hypot(dx,dy),mn=MR+PR;if(d<mn&&d>0){const nx=dx/d,ny=dy/d;pu.x=m.x+nx*mn;pu.y=m.y+ny*mn;const rv=(pu.vx-vx)*nx+(pu.vy-vy)*ny;if(rv<0){pu.vx-=(1+0.9)*rv*nx;pu.vy-=(1+0.9)*rv*ny}const s=Math.hypot(pu.vx,pu.vy);if(s>720){pu.vx*=720/s;pu.vy*=720/s}if(s<90&&d>0){pu.vx+=nx*120;pu.vy+=ny*120}if(hitT<=0){sfx('place');hitT=0.12}}};
+  move=(px,py)=>{pl.tx=Math.max(MR,Math.min(W-MR,px));pl.ty=Math.max(CH/2+MR,Math.min(CH-MR,py))};
+  const tick=now=>{if(!open())return;const dt=Math.min(0.04,(now-(last||now))/1000);last=now;if(msgT>0)msgT-=dt;if(hitT>0)hitT-=dt;
+   if(!over){tleft-=dt;
+    const n=3,d=dt/n;for(let k=0;k<n;k++){
+     pl.px=pl.x;pl.py=pl.y;pl.x+=(pl.tx-pl.x)*Math.min(1,d*30);pl.y+=(pl.ty-pl.y)*Math.min(1,d*30);const pvx=(pl.x-pl.px)/d,pvy=(pl.y-pl.py)/d;
+     bt.px=bt.x;bt.py=bt.y;let tx,ty;if(pu.y<CH/2||pu.vy<-30){tx=pu.x+(pu.vx>=0?1:-1)*MR*0.8;ty=pu.y<CH*0.3?Math.max(MR,pu.y-MR*1.6):CH*0.12}else{tx=W/2+(pu.x-W/2)*0.3;ty=CH*0.13}
+     if(pause>0){tx=W/2;ty=CH*0.15}
+     const bs=botSp()*d,bx=tx-bt.x,by=ty-bt.y,bd=Math.hypot(bx,by);if(bd>0){const m=Math.min(bd,bs);bt.x+=bx/bd*m;bt.y+=by/bd*m}bt.x=Math.max(MR,Math.min(W-MR,bt.x));bt.y=Math.max(MR,Math.min(CH/2-MR,bt.y));const bvx=(bt.x-bt.px)/d,bvy=(bt.y-bt.py)/d;
+     if(pause>0){pause-=d}else{pu.x+=pu.vx*d;pu.y+=pu.vy*d;const f=Math.pow(0.7,d);pu.vx*=f;pu.vy*=f;
+      if(pu.x<PR){pu.x=PR;pu.vx=Math.abs(pu.vx)*0.9}if(pu.x>W-PR){pu.x=W-PR;pu.vx=-Math.abs(pu.vx)*0.9}
+      const inG=Math.abs(pu.x-W/2)<GW/2;
+      if(pu.y<PR){if(inG){goal('me');break}pu.y=PR;pu.vy=Math.abs(pu.vy)*0.9}
+      if(pu.y>CH-PR){if(inG){goal('bot');break}pu.y=CH-PR;pu.vy=-Math.abs(pu.vy)*0.9}
+      mal(pl,pvx,pvy);mal(bt,bvx,bvy)}}
+    if(tleft<=0&&!over){fin()}}
+   hud();dw();if(!over)requestAnimationFrame(tick)};
+  const pt=e=>{const r=cv.getBoundingClientRect();move((e.clientX-r.left)*W/r.width,(e.clientY-r.top)*CH/r.height)};
+  cv.onpointerdown=e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}pt(e)};cv.onpointermove=e=>{if(e.buttons||e.pointerType==='touch')pt(e)};
+  $('ahX').onclick=()=>{$('modal').style.display='none'};hud();dw();requestAnimationFrame(tick)})}
