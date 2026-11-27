@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -91,6 +91,7 @@ function buildSkb(){
  g.add(mesh(G.box(0.3,2,0.3),0x4263eb,-5,1,-2),mesh(G.box(0.3,2,0.3),0x4263eb,5,1,-2));
  skbh={it:{x:0,z:0.2,label:'🏗️ ابني البرج',fn:skbStart}};interacts.push(skbh.it);
  g.add(portalMesh('ارجع للجولف',5.8,5.8,0x2f9e44,'mg2room'));
+ g.add(portalMesh('لعبة الذاكرة',-5.8,5.8,0x7048e8,'mprroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🏗️ دوس في اللحظة المظبوطة عشان الطبقة تنزل فوق اللي تحتها',3400)
 }
@@ -125,4 +126,47 @@ function skbStart(){
   bx=0;
   cv.onpointerdown=e=>{e.preventDefault();drop()};
   $('skN').onclick=()=>{reset();info()};$('skX').onclick=()=>{$('modal').style.display='none'};
+  info();requestAnimationFrame(loop)})}
+function buildMpr(){
+ const g=indoor(0x7048e8,0xf3f0ff,0xd0bfff);
+ sign(g,'🃏 لعبة الذاكرة',0,4.6,-7.6,'rgba(112,72,232,.92)');
+ [0,1,2,3].forEach(i=>g.add(mesh(G.box(0.9,0.06,1.2),[0x7048e8,0xf03e3e,0xfab005,0x37b24d][i],-1.6+i*1.1,0.5,-4.5)));
+ g.add(mesh(G.box(4.8,0.4,1.6),0x5f3dc4,0,0.2,-4.5));
+ g.add(mesh(G.box(0.3,2,0.3),0x7048e8,-5,1,-2),mesh(G.box(0.3,2,0.3),0x7048e8,5,1,-2));
+ mprh={it:{x:0,z:0.2,label:'🃏 العب الذاكرة',fn:mprStart}};interacts.push(mprh.it);
+ g.add(portalMesh('ارجع للبرج',5.8,5.8,0x4263eb,'skbroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🃏 اقلب كارتين متشابهين. أقل حركات أحسن',3400)
+}
+function mprStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,320),CH=H?150:250,C=4,R=4,cw=W/C,ch=CH/R;
+ const cols=['#e03131','#1c7ed6'],face=[];
+ for(let i=0;i<8;i++)face.push(i,i);
+ for(let i=15;i>0;i--){const j=Math.floor(Math.random()*(i+1));[face[i],face[j]]=[face[j],face[i]]}
+ let up=new Array(16).fill(false),done=new Array(16).fill(false),sel=[],moves=0,lock=false,over=false,msg='';
+ window.mprq=()=>({face:face.slice(),up:up.slice(),done:done.slice(),moves,over,lock,W,CH,coins:me.coins,flip:i=>flip(i)});
+ let flip=()=>{};
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🃏 لعبة الذاكرة</h2>')+'<div id="mpS" style="text-align:center;font-size:14px;margin:2px;min-height:1.4em"></div><div style="text-align:center"><canvas id="mpC" width="'+W+'" height="'+CH+'" style="border-radius:10px;max-width:100%;touch-action:none"></canvas></div><div id="mpM" style="text-align:center;font-size:13px;margin:5px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="mpN" style="width:auto!important;display:inline-block!important">🔁 من الأول</button><button class="btn d" id="mpX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('mpC'),x=cv.getContext('2d');
+  const open=()=>$('mpC')&&$('modal').style.display!=='none';
+  const info=()=>{if($('mpS'))$('mpS').textContent='الحركات '+moves+' · أحسن '+(me.mprBest||'-');if($('mpM'))$('mpM').textContent=msg};
+  const finish=()=>{over=true;me.mprGames=(me.mprGames||0)+1;me.mprBest=me.mprBest?Math.min(me.mprBest,moves):moves;const d=today();if(me.mprDD!==d){me.mprDD=d;me.mprDC=0}
+   let c=moves<=12?3:moves<=16?2:moves<=22?1:0;c=Math.min(c,Math.max(0,6-(me.mprDC||0)));
+   if(c){me.coins+=c;me.mprDC=(me.mprDC||0)+c;updCoins();sfx('win')}
+   msg='🏁 خلصت في '+moves+' حركة'+(c?' · +'+c+'🪙':' · جرّب أقل من 23 للجايزة');saveMe();info()};
+  flip=i=>{if(lock||over||up[i]||done[i])return;up[i]=true;sel.push(i);sfx('tick');
+   if(sel.length===2){moves++;const[a,b]=sel;sel=[];
+    if(face[a]===face[b]){done[a]=done[b]=true;sfx('star');msg='';if(done.every(v=>v))setTimeout(finish,500)}
+    else{lock=true;msg='مش متشابهين';setTimeout(()=>{up[a]=up[b]=false;lock=false;msg='';info()},700)}}
+   info()};
+  const shape=(k,cx,cy,r)=>{x.beginPath();if(k===0)x.arc(cx,cy,r,0,7);else if(k===1)x.rect(cx-r,cy-r,2*r,2*r);else if(k===2){x.moveTo(cx,cy-r);x.lineTo(cx+r,cy+r);x.lineTo(cx-r,cy+r);x.closePath()}else{x.moveTo(cx,cy-r);x.lineTo(cx+r,cy);x.lineTo(cx,cy+r);x.lineTo(cx-r,cy);x.closePath()}x.fill()};
+  const loop=()=>{if(!open())return;x.fillStyle='#e5dbff';x.fillRect(0,0,W,CH);
+   for(let i=0;i<16;i++){const cx=(i%C)*cw,cy=Math.floor(i/C)*ch,vis=up[i]||done[i];
+    x.fillStyle=done[i]?'#b2f2bb':vis?'#fff':'#7048e8';x.fillRect(cx+3,cy+3,cw-6,ch-6);
+    if(vis){const f=face[i];x.fillStyle=cols[f>>2&1];shape(f&3,cx+cw/2,cy+ch/2,Math.min(cw,ch)*0.28)}}
+   info();requestAnimationFrame(loop)};
+  cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width,py=(e.clientY-r.top)*CH/r.height;flip(Math.floor(py/ch)*C+Math.floor(px/cw))};
+  $('mpN').onclick=()=>{if(lock)return;for(let i=15;i>0;i--){const j=Math.floor(Math.random()*(i+1));[face[i],face[j]]=[face[j],face[i]]}up.fill(false);done.fill(false);sel=[];moves=0;over=false;msg='';info()};
+  $('mpX').onclick=()=>{$('modal').style.display='none'};
   info();requestAnimationFrame(loop)})}
