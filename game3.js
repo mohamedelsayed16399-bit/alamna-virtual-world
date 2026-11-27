@@ -628,7 +628,7 @@ function buildAhk(){
  g.add(mesh(G.cyl(0.18,0.18,0.08,12),0x212529,0.3,0.93,-4.2),mesh(G.cyl(0.3,0.3,0.12,12),0xfa5252,-0.5,0.95,-2.4,0x660000),mesh(G.cyl(0.3,0.3,0.12,12),0x51cf66,0.6,0.95,-5.8,0x006600));
  [[-5,0],[5,0]].forEach(([x,z],i)=>g.add(mesh(G.cyl(0.35,0.35,1,10),0x1971c2,x,0.5,z),mesh(G.sph(0.35,8),[0xfcc419,0xfa5252][i],x,1.2,z,[0xfcc419,0xfa5252][i])));
  ahh={it:{x:0,z:0.2,label:'🏒 العب هوكي ضد 🤖',fn:ahkStart}};interacts.push(ahh.it);
- g.add(portalMesh('ارجع لصالة البينبول',5.8,5.8,0x7048e8,'pinball'));
+ g.add(portalMesh('ارجع لصالة البينبول',5.8,5.8,0x7048e8,'pinball'),portalMesh('🎯 صالة السهام',-5.8,5.8,0x5c940d,'darts'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🏒 حرّك صباعك عشان تتحكم في المضرب. الخصم روبوت 🤖',3200)
 }
