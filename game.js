@@ -520,7 +520,7 @@ if(m.t==='bye'){const r=remotes.get(m.i);if(r){scene.remove(r.root);remotes.dele
 if(me.blk&&me.blk.some(e=>e.i===m.i))return;
 const r=getRemote(m);
 if(m.t==='p'){r.tx=num(m.x,-50,50);r.tz=num(m.z,-50,50);r.stars=num(m.s,0,99999)|0}
-else if(m.t==='c'){const t=str(m.m,100);if(t){sfx('chat');r.say(t);addLog(r.name,t)}}
+else if(m.t==='c'){const t=str(m.m,100);const rx=(window.rxChat=window.rxChat||{}),nw=Date.now(),q=rx[m.i]||(rx[m.i]={t:0,l:'',n:0});let flood=nw-q.t<700;if(t===q.l){q.n++;if(q.n>=3)flood=true}else{q.n=0;q.l=t}q.t=nw;if(t&&!flood){sfx('chat');r.say(t);addLog(r.name,t)}}
 else if(m.t==='fs'){showIn(m,r)}
 else if(m.t==='fv'){voteIn(m)}
 else if(m.t==='n'){noteIn(m,r)}else if(m.t==='fw'){fwIn(m,r)}
