@@ -739,7 +739,7 @@ function buildLnr(){
  [[0,-5.8],[1.4,-3]].forEach(([x,z])=>g.add(mesh(G.cyl(0.25,0.25,0.08,14),0xffd43b,x,0.25,z)));
  g.add(mesh(G.cyl(0.4,0.4,1,10),0xf76707,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0xf76707,5,0.5,0));
  lnrh={it:{x:0,z:0.2,label:'🏃 العب ركض الحارات',fn:lnrStart}};interacts.push(lnrh.it);
- g.add(portalMesh('ارجع لقفز الأبراج',5.8,5.8,0x37b24d,'dljroom'));
+ g.add(portalMesh('ارجع لقفز الأبراج',5.8,5.8,0x37b24d,'dljroom'),portalMesh('🏗️ برج التكديس',-5.8,5.8,0x1c7ed6,'twsroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🏃 غيّر الحارة بالضغط يمين أو شمال. اتفادى العوائق وجمّع العملات!',3400)
 }
@@ -772,3 +772,47 @@ function lnrStart(){
   cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect();go((e.clientX-r.left)/r.width<0.5?-1:1)};
   document.addEventListener('keydown',function kd(e){if(!open()){document.removeEventListener('keydown',kd);return}if(e.key==='ArrowLeft')go(-1);if(e.key==='ArrowRight')go(1)});
   $('lnX').onclick=()=>{$('modal').style.display='none'};dw();hud();requestAnimationFrame(loop)})}
+
+let twsh=null;
+function buildTws(){
+ const g=indoor(0x1c7ed6,0xe7f5ff,0x74c0fc);
+ sign(g,'🏗️ غرفة برج التكديس',0,4.6,-7.6,'rgba(28,126,214,.92)');
+ [[3,0x4dabf7],[2.4,0x339af0],[1.8,0x1c7ed6],[1.2,0x1971c2],[0.7,0xffd43b]].forEach(([w,c],i)=>g.add(mesh(G.box(w,0.5,w),c,0,0.25+i*0.5,-4.5)));
+ g.add(mesh(G.cyl(0.4,0.4,1,10),0x1c7ed6,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x1c7ed6,5,0.5,0));
+ twsh={it:{x:0,z:0.2,label:'🏗️ العب برج التكديس',fn:twsStart}};interacts.push(twsh.it);
+ g.add(portalMesh('ارجع لركض الحارات',5.8,5.8,0xf76707,'lnrroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🏗️ اضغط في اللحظة المظبوطة عشان تنزل الطابق فوق اللي تحته. اللي بيطلع بره بيتقصّ!',3600)
+}
+function twsStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),CW=H?Math.min(W,240):Math.min(W,300),CH=H?Math.max(130,innerHeight-160):Math.min(Math.max(280,innerHeight-330),440);
+ const BH=18,TY=Math.round(CH*0.5);
+ let st=[{x:(CW-130)/2,w:130}],cur={x:0,w:130,d:1},n=0,perf=0,over=false,last=0,paid=0,flash=0;
+ const spd=()=>Math.min(90+n*7,280);
+ let step=()=>{};
+ window.twsq=()=>({n,over,perf,cx:cur.x,cw:cur.w,tx:st[st.length-1].x,tw:st[st.length-1].w,CW,drop:()=>drop(),step:d=>step(d),paid});
+ let drop=()=>{};
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🏗️ برج التكديس</h2>')+'<div id="twH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="twC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="twD" style="width:auto!important;display:inline-block!important;min-width:110px">⬇ نزّل</button><button class="btn d" id="twX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('twC');cv.width=CW;cv.height=CH;const x=cv.getContext('2d');
+  const open=()=>$('twC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('twH'))$('twH').textContent='🏗️ '+n+' طابق · ✨ '+perf+' مظبوط'};
+  const col=i=>'hsl('+((i*23+200)%360)+',70%,55%)';
+  const dw=()=>{const g=x.createLinearGradient(0,0,0,CH);g.addColorStop(0,'#a5d8ff');g.addColorStop(1,'#e7f5ff');x.fillStyle=g;x.fillRect(0,0,CW,CH);
+   x.fillStyle='#fff';x.beginPath();x.arc(50,40,16,0,7);x.arc(70,38,20,0,7);x.arc(92,42,14,0,7);x.fill();
+   st.forEach((b,i)=>{const y=TY+(st.length-1-i)*BH;x.fillStyle=col(i);x.fillRect(b.x,y,b.w,BH-1);x.fillStyle='rgba(255,255,255,.3)';x.fillRect(b.x,y,b.w,4)});
+   if(!over){x.fillStyle=col(st.length);x.fillRect(cur.x,TY-BH,cur.w,BH-1);x.fillStyle='rgba(255,255,255,.3)';x.fillRect(cur.x,TY-BH,cur.w,4)}
+   if(flash>0){x.fillStyle='rgba(255,215,0,'+flash+')';x.fillRect(st[st.length-1].x,TY,st[st.length-1].w,BH-1)}};
+  const fin=()=>{over=true;sfx('err');const d=today();if(!me.twsD||me.twsD.d!==d)me.twsD={d,c:0};let pay=Math.max(0,Math.min(5,Math.floor(n/4),12-me.twsD.c));me.twsD.c+=pay;me.coins+=pay;paid=pay;updCoins();me.twsGames=(me.twsGames||0)+1;const nb=n>(me.twsBest||0);if(nb)me.twsBest=n;saveMe();
+   c.innerHTML='<h2>🏗️ البرج وقع!</h2><div style="text-align:center;font-size:16px">ارتفاع البرج <b>'+n+'</b> طابق · ✨ '+perf+' مظبوط<br>'+(nb&&n?'🏆 رقم قياسي!':'أحسن ارتفاع: '+(me.twsBest||0))+'<br>'+(pay?'+'+pay+'🪙':'(4 طوابق = 1🪙)')+'</div><div class="row"><button class="btn" id="twR2">🔁 تاني</button><button class="btn d" id="twX2">إغلاق</button></div>';
+   $('twR2').onclick=twsStart;$('twX2').onclick=()=>{$('modal').style.display='none'}};
+  drop=()=>{if(over)return;const t=st[st.length-1];const l=Math.max(cur.x,t.x),r=Math.min(cur.x+cur.w,t.x+t.w),ov=r-l;
+   if(ov<=0){dw();fin();return}
+   if(Math.abs(cur.x-t.x)<5){st.push({x:t.x,w:cur.w});perf++;flash=0.8;sfx('win')}else{st.push({x:l,w:ov});sfx('place')}
+   n++;cur={x:cur.x,w:st[st.length-1].w,d:cur.d};cur.x=cur.d>0?0:CW-cur.w;hud();dw()};
+  step=dt=>{if(over)return;dt=Math.min(dt,0.05);flash=Math.max(0,flash-dt*2);cur.x+=cur.d*spd()*dt;if(cur.x<=0){cur.x=0;cur.d=1}if(cur.x+cur.w>=CW){cur.x=CW-cur.w;cur.d=-1}dw()};
+  const loop=ts=>{if(!open())return;if(!over){const dt=last?(ts-last)/1000:0.016;last=ts;step(dt);requestAnimationFrame(loop)}};
+  $('twD').onpointerdown=e=>{e.preventDefault();drop()};
+  cv.onpointerdown=e=>{e.preventDefault();drop()};
+  document.addEventListener('keydown',function kd(e){if(!open()){document.removeEventListener('keydown',kd);return}if(e.key===' '||e.key==='ArrowDown'){e.preventDefault();drop()}});
+  $('twX').onclick=()=>{$('modal').style.display='none'};dw();hud();requestAnimationFrame(loop)})}
