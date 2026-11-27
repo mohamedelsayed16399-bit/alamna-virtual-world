@@ -916,7 +916,7 @@ function buildMzt(){
  [[-2,-4.8,3,0.5],[0.5,-4.8,0.5,2.5],[2,-3.5,2,0.5],[-1,-3.2,0.5,1.8],[1,-5.8,2.5,0.5]].forEach(([x,z,w,d])=>g.add(mesh(G.box(w,1.2,d),0x2f9e44,x,0.6,z)));
  g.add(mesh(G.cyl(0.4,0.4,1,10),0x2b8a3e,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x2b8a3e,5,0.5,0));
  mzth={it:{x:0,z:0.2,label:'🌀 العب المتاهة بالوقت',fn:mztStart}};interacts.push(mzth.it);
- g.add(portalMesh('ارجع لحيواني الأليف',5.8,5.8,0xf08c00,'ptfroom'));
+ g.add(portalMesh('ارجع لحيواني الأليف',5.8,5.8,0xf08c00,'ptfroom'),portalMesh('🫧 فقاعات الرماية',-5.8,5.8,0xd6336c,'bstroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🌀 وصّل للمربع الأخضر قبل ما الوقت يخلص. كل متاهة أكبر من اللي قبلها!',3600)
 }
@@ -951,3 +951,63 @@ function mztStart(){
   let sx=0,sy=0;cv.onpointerdown=e=>{e.preventDefault();sx=e.clientX;sy=e.clientY};cv.onpointerup=e=>{const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.max(Math.abs(dx),Math.abs(dy))<12)return;if(Math.abs(dx)>Math.abs(dy))mv(0,dx>0?1:-1);else mv(dy>0?1:-1,0)};
   document.addEventListener('keydown',function kd(e){if(!open()){document.removeEventListener('keydown',kd);return}const m={ArrowLeft:[0,-1],ArrowRight:[0,1],ArrowUp:[-1,0],ArrowDown:[1,0]}[e.key];if(m){e.preventDefault();mv(...m)}});
   $('mzX').onclick=()=>{$('modal').style.display='none'};dw();hud();requestAnimationFrame(loop)})}
+
+let bsth=null;
+function buildBst(){
+ const g=indoor(0xd6336c,0xfff0f6,0xfaa2c1);
+ sign(g,'🫧 غرفة فقاعات الرماية',0,4.6,-7.6,'rgba(214,51,108,.92)');
+ [[-1.6,0xfa5252],[-0.8,0x339af0],[0,0x51cf66],[0.8,0xfcc419],[1.6,0xfa5252]].forEach(([x,c],i)=>g.add(mesh(G.sph(0.4,10),c,x,0.4+(i%2)*0.7,-4.4),mesh(G.sph(0.4,10),[0x339af0,0x51cf66,0xfcc419,0xfa5252,0x339af0][i],x,1.2+(i%2)*0.7,-4.4)));
+ g.add(mesh(G.cyl(0.4,0.4,1,10),0xd6336c,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0xd6336c,5,0.5,0));
+ bsth={it:{x:0,z:0.2,label:'🫧 العب فقاعات الرماية',fn:bstStart}};interacts.push(bsth.it);
+ g.add(portalMesh('ارجع للمتاهة بالوقت',5.8,5.8,0x2b8a3e,'mztroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🫧 وجّه واضغط عشان تضرب. 3 فقاعات من نفس اللون أو أكتر بتفرقع!',3600)
+}
+function bstStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),COLS=8,CW=H?176:Math.min(W,320),cs=CW/COLS,CH=H?Math.max(150,innerHeight-160):Math.min(Math.max(300,innerHeight-300),440),R=Math.floor((CH-34)/cs),rad=cs/2-1;
+ const COL=['#fa5252','#339af0','#51cf66','#fcc419'];
+ let grid=Array.from({length:R},()=>Array(COLS).fill(-1)),popped=0,shots=0,over=false,paid=0,last=0,ang=-Math.PI/2,cur=0,nxt=0,fly=null,pops=[];
+ const rc=()=>Math.floor(Math.random()*4);
+ for(let r=0;r<(H?2:4);r++)for(let c=0;c<COLS;c++)grid[r][c]=rc();
+ cur=rc();nxt=rc();
+ const SX=CW/2,SY=CH-16;
+ let shoot=()=>{},step=()=>{};
+ window.bstq=()=>({popped,shots,over,cur,grid:grid.map(r=>r.slice()),R,COLS,cs,SX,SY,fly:!!fly,shoot:a=>shoot(a),step:d=>step(d),paid});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🫧 فقاعات الرماية</h2>')+'<div id="bsH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="bsC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row"><button class="btn d" id="bsX">إغلاق</button></div>';
+  const cv=$('bsC');cv.width=CW;cv.height=CH;const x=cv.getContext('2d');
+  const open=()=>$('bsC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('bsH'))$('bsH').textContent='🫧 '+popped+' فرقعة · '+shots+' طلقة'};
+  const ball=(px,py,ci,r)=>{x.fillStyle=COL[ci];x.beginPath();x.arc(px,py,r,0,7);x.fill();x.fillStyle='rgba(255,255,255,.45)';x.beginPath();x.arc(px-r*0.3,py-r*0.3,r*0.25,0,7);x.fill()};
+  const dw=()=>{x.fillStyle='#fff0f6';x.fillRect(0,0,CW,CH);x.strokeStyle='#e64980';x.setLineDash([6,6]);x.beginPath();x.moveTo(0,R*cs);x.lineTo(CW,R*cs);x.stroke();x.setLineDash([]);
+   for(let r=0;r<R;r++)for(let c=0;c<COLS;c++)if(grid[r][c]>=0)ball(c*cs+cs/2,r*cs+cs/2,grid[r][c],rad);
+   pops.forEach(p=>{x.fillStyle='rgba(255,255,255,'+p.a+')';x.beginPath();x.arc(p.x,p.y,rad*(1.5-p.a),0,7);x.fill()});
+   if(!over){x.strokeStyle='rgba(0,0,0,.25)';x.lineWidth=2;x.beginPath();x.moveTo(SX,SY);x.lineTo(SX+Math.cos(ang)*60,SY+Math.sin(ang)*60);x.stroke();
+    ball(SX,SY,cur,rad);if(fly)ball(fly.x,fly.y,fly.ci,rad);ball(CW-16,CH-14,nxt,rad*0.6)}};
+  const fin=()=>{over=true;sfx('err');const d=today();if(!me.bstD||me.bstD.d!==d)me.bstD={d,c:0};let pay=Math.max(0,Math.min(5,Math.floor(popped/12),12-me.bstD.c));me.bstD.c+=pay;me.coins+=pay;paid=pay;updCoins();me.bstGames=(me.bstGames||0)+1;const nb=popped>(me.bstBest||0);if(nb)me.bstBest=popped;saveMe();
+   c.innerHTML='<h2>🫧 الفقاعات وصلت!</h2><div style="text-align:center;font-size:16px">فرقعت <b>'+popped+'</b> فقاعة في '+shots+' طلقة<br>'+(nb&&popped?'🏆 رقم قياسي!':'أحسن نتيجة: '+(me.bstBest||0))+'<br>'+(pay?'+'+pay+'🪙':'(12 فقاعة = 1🪙)')+'</div><div class="row"><button class="btn" id="bsR2">🔁 تاني</button><button class="btn d" id="bsX2">إغلاق</button></div>';
+   $('bsR2').onclick=bstStart;$('bsX2').onclick=()=>{$('modal').style.display='none'}};
+  const land=()=>{let c=Math.max(0,Math.min(COLS-1,Math.floor(fly.x/cs))),r=Math.max(0,Math.min(R-1,Math.floor(fly.y/cs)));
+   while(r<R&&grid[r][c]>=0)r++;if(r>=R){fly=null;fin();return}
+   grid[r][c]=fly.ci;fly=null;shots++;
+   const key=(a,b)=>a*COLS+b,seen=new Set([key(r,c)]),st=[[r,c]],ci=grid[r][c];
+   while(st.length){const [a,b]=st.pop();[[1,0],[-1,0],[0,1],[0,-1]].forEach(([da,db])=>{const p=a+da,q=b+db;if(p>=0&&q>=0&&p<R&&q<COLS&&grid[p][q]===ci&&!seen.has(key(p,q))){seen.add(key(p,q));st.push([p,q])}})}
+   if(seen.size>=3){seen.forEach(k=>{const a=Math.floor(k/COLS),b=k%COLS;pops.push({x:b*cs+cs/2,y:a*cs+cs/2,a:1});grid[a][b]=-1});popped+=seen.size;sfx('star');
+    const con=new Set();const s2=[];for(let b=0;b<COLS;b++)if(grid[0][b]>=0){con.add(b);s2.push([0,b])}
+    while(s2.length){const [a,b]=s2.pop();[[1,0],[0,1],[0,-1]].forEach(([da,db])=>{const p=a+da,q=b+db;if(p>=0&&q>=0&&p<R&&q<COLS&&grid[p][q]>=0&&!con.has(key(p,q))){con.add(key(p,q));s2.push([p,q])}})}
+    for(let a=1;a<R;a++)for(let b=0;b<COLS;b++)if(grid[a][b]>=0&&!con.has(key(a,b))){pops.push({x:b*cs+cs/2,y:a*cs+cs/2,a:1});grid[a][b]=-1;popped++}}
+   else sfx('place');
+   if(shots%6===0){if(grid[R-1].some(v=>v>=0)){fin();return}grid.pop();grid.unshift(Array.from({length:COLS},rc))}
+   if(grid[R-1].some(v=>v>=0)){fin();return}
+   if(grid.every(r=>r.every(v=>v<0))){for(let r=0;r<3;r++)for(let b=0;b<COLS;b++)grid[r][b]=rc()}
+   cur=nxt;nxt=rc();hud()};
+  shoot=a=>{if(over||fly)return;ang=Math.min(-0.15,Math.max(-Math.PI+0.15,a));fly={x:SX,y:SY,vx:Math.cos(ang),vy:Math.sin(ang),ci:cur};sfx('tick')};
+  step=dt=>{if(over)return;dt=Math.min(dt,0.05);pops.forEach(p=>p.a-=dt*3);pops=pops.filter(p=>p.a>0);
+   if(fly){let d=640*dt;while(d>0&&fly){const s=Math.min(d,4);fly.x+=fly.vx*s;fly.y+=fly.vy*s;d-=s;if(fly.x<rad){fly.x=rad;fly.vx=Math.abs(fly.vx)}if(fly.x>CW-rad){fly.x=CW-rad;fly.vx=-Math.abs(fly.vx)}
+    let hit=fly.y<=rad;if(!hit)outer:for(let r=0;r<R;r++)for(let b=0;b<COLS;b++)if(grid[r][b]>=0&&Math.hypot(b*cs+cs/2-fly.x,r*cs+cs/2-fly.y)<cs*0.85){hit=true;break outer}
+    if(hit){land();break}}}
+   dw()};
+  const aimTo=e=>{const r=cv.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*CW,py=(e.clientY-r.top)/r.height*CH;ang=Math.atan2(py-SY,px-SX);ang=Math.min(-0.15,Math.max(-Math.PI+0.15,ang))};
+  cv.onpointerdown=e=>{e.preventDefault();aimTo(e)};cv.onpointermove=e=>{if(e.buttons)aimTo(e)};cv.onpointerup=e=>{aimTo(e);shoot(ang)};
+  const loop=ts=>{if(!open())return;if(!over){const dt=last?(ts-last)/1000:0.016;last=ts;step(dt);requestAnimationFrame(loop)}};
+  $('bsX').onclick=()=>{$('modal').style.display='none'};dw();hud();requestAnimationFrame(loop)})}
