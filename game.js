@@ -5,7 +5,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rnd=n=>Array.from({length:n},()=>'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)]).join('');
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function toast(msg,ms=2200){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',ms)}
-const BODY=['#e8590c','#2f9e44','#3b5bdb','#9c36b5','#e03131','#f08c00','#0c8599','#495057','#d6336c','#1098ad','#74b816','#f783ac','#f2c94c','#dee2e6','#38d9a9','#845ef7','#ff8787','#1864ab','#ffd43b','#212529','#ff1fa9','#00b894','#6c5ce7','#fdcb6e'];const CLV={12:4,13:7,14:10,15:13,16:16,17:19,18:22,19:25,20:30,21:33,22:36,23:40};
+const BODY=['#e8590c','#2f9e44','#3b5bdb','#9c36b5','#e03131','#f08c00','#0c8599','#495057','#d6336c','#1098ad','#74b816','#f783ac','#f2c94c','#dee2e6','#38d9a9','#845ef7','#ff8787','#1864ab','#ffd43b','#212529','#ff1fa9','#00b894','#6c5ce7','#fdcb6e','#e84393','#00cec9','#a3cb38','#b53471'];const CLV={12:4,13:7,14:10,15:13,16:16,17:19,18:22,19:25,20:30,21:33,22:36,23:40,24:44,25:48,26:52,27:56};
 const HEAD=['#ffd8a8','#f1b98a','#d9a066','#a9744f','#7a4b2a','#ffe3e3','#8ce99a','#74c0fc','#d0a2f7','#ffd43b'];
 const HATS=['بدون','كاب','تاج','طاقية','هوائي','نظارة','قرون','طربوش','شعر ملون','هالة','أجنحة','تاج ملكي','أذن قطة','قبعة ساحر','كعكة','سماعات','نجمة','تاج ورد','خوذة فضاء','قبعة صياد','قبعة قرصان','خوذة فايكنج','تاج جواهر','قبعة نحلة','تاج المستكشف','قبعة الجنرال','تاج الأسطورة','إكليل النجوم','قبعة الشيف','تاج الجليد','هالة العظماء','تاج المئة','تاج البرق','قوس قزح','تاج اللهب','قبعة التخرج','قبعة بيتزا','تاج الجليد','قبعة الحفلة','تاج الكواكب','تاج الأسطورة','قبعة الطباخ','قبعة الشرطي','تاج الشمس','تاج الصقيع','قبعة المهرج','خوذة فارس'];const LVH={25:3,26:5,27:8,28:10,29:12,30:15,32:18,33:22,34:26,35:28,36:32,37:36,38:40,39:45,40:50,41:52,42:56,43:60,44:64,45:68,46:72};
 const HPRICE={9:60,10:120,11:250,12:40,13:90,14:30,15:70,16:50,17:60,18:110,19:35,20:55,21:65,22:140,23:30,24:99999,25:99999,26:99999,27:99999,28:99999,29:99999,30:99999,32:99999,33:99999,34:99999,35:99999,36:99999,37:99999,38:99999,39:99999,40:99999,41:99999,42:99999,43:99999,44:99999,45:99999,46:99999};
@@ -544,7 +544,7 @@ const str=(s,n)=>{let r=String(s==null?'':s).replace(/[\u0000-\u001f<>]/g,'').sl
 const num=(v,a,b,d=0)=>{v=+v;return isFinite(v)?clamp(v,a,b):d};
 function getRemote(m){
 let r=remotes.get(m.i);
-const app={b:num(m.b,0,23,0)|0,h:num(m.h,0,20,0)|0,a:num(m.a,0,46,0)|0,p:num(m.p,0,16,0)|0,l:num(m.l,0,50,0)|0,q:num(m.q,0,15,0)|0,pn:str(m.pn,10)};
+const app={b:num(m.b,0,27,0)|0,h:num(m.h,0,20,0)|0,a:num(m.a,0,46,0)|0,p:num(m.p,0,16,0)|0,l:num(m.l,0,50,0)|0,q:num(m.q,0,15,0)|0,pn:str(m.pn,10)};
 if(!r){r=new Actor(app,str(m.n,16)||'لاعب');r.tx=0;r.tz=0;r.root.position.set(num(m.x,-50,50),0,num(m.z,-50,50));scene.add(r.root);remotes.set(m.i,r);setOnline();{const tn=Date.now();joinLog[m.i]=joinLog[m.i]||0;if(tn-joinLog[m.i]>20000){joinLog[m.i]=tn;addLog('','🔔 '+r.name+' دخل الغرفة')}};if(room&&room.type==='home'&&room.owner===me.id){toast('🏡 '+r.name+' زار بيتك!',3000);sfx('star');qAdd('visit')}}
 else{if(r.app.b!==app.b||r.app.h!==app.h||r.app.a!==app.a||r.app.p!==app.p||r.app.l!==app.l||r.app.q!==app.q||(r.app.pn||'')!==app.pn)r.setApp(app);r.setName(str(m.n,16)||'لاعب')}
 r.seen=performance.now();return r;
