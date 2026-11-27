@@ -573,7 +573,7 @@ function buildSdk(){
  for(let i=0;i<4;i++)for(let j=0;j<4;j++)g.add(mesh(G.cyl(0.28,0.28,0.12,12),cl[B[i][j]-1],-1.65+j*1.1,0.24,-5.65+i*1.1));
  g.add(mesh(G.cyl(0.4,0.4,1,10),0x7048e8,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x7048e8,5,0.5,0));
  sdh={it:{x:0,z:0.2,label:'🔢 العب سودوكو',fn:sdkStart}};interacts.push(sdh.it);
- g.add(portalMesh('ارجع لطفي الأنوار',5.8,5.8,0xf59f00,'lgoroom'));
+ g.add(portalMesh('ارجع لطفي الأنوار',5.8,5.8,0xf59f00,'lgoroom'),portalMesh('🌊 تلوين الفيضان',-5.8,5.8,0x1098ad,'cflroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🔢 كل رقم من 1 لـ4 مرة واحدة في كل صف وعمود ومربع',3200)
 }
@@ -606,3 +606,41 @@ function sdkStart(){
   cv.onpointerdown=e=>{e.preventDefault();if(over||pend)return;const r=cv.getBoundingClientRect(),cx=Math.floor((e.clientX-r.left)*S/r.width/cs),cy=Math.floor((e.clientY-r.top)*S/r.height/cs);if(cx<0||cx>3||cy<0||cy>3)return;const i=cy*4+cx;sel=fx[i]?-1:i;sfx('tick');dw()};
   c.querySelectorAll('.sdp').forEach(b=>b.onclick=()=>{if(sel>=0)put(sel,+b.dataset.n)});
   $('sdR').onclick=()=>{init();hud();dw()};$('sdX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
+let cfh=null;
+function buildCfl(){
+ const g=indoor(0x1098ad,0xe3fafc,0x66d9e8);
+ sign(g,'🌊 غرفة تلوين الفيضان',0,4.6,-7.6,'rgba(16,152,173,.92)');
+ const cl=[0xfa5252,0xfab005,0x40c057,0x228be6,0xbe4bdb];
+ g.add(mesh(G.box(4.4,0.12,4.4),0x212529,0,0.08,-4));
+ for(let i=0;i<6;i++)for(let j=0;j<6;j++){const c=i+j<3?cl[3]:cl[(i*7+j*3+(i>3?1:0))%5];g.add(mesh(G.box(0.62,0.1,0.62),c,-1.6+i*0.64,0.2,-5.6+j*0.64))}
+ g.add(mesh(G.cyl(0.4,0.4,1,10),0x1098ad,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x1098ad,5,0.5,0));
+ cfh={it:{x:0,z:0.2,label:'🌊 العب تلوين الفيضان',fn:cflStart}};interacts.push(cfh.it);
+ g.add(portalMesh('ارجع لسودوكو',5.8,5.8,0x7048e8,'sdkroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🌊 ابدأ من الركن اللي فوق وغطّي اللوحة بلون واحد قبل ما الحركات تخلص',3200)
+}
+function cflStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),S=H?Math.max(120,Math.min(W,innerHeight-210)):Math.min(W,Math.max(240,Math.min(innerHeight-400,320)));
+ const CO=['#fa5252','#fab005','#40c057','#228be6','#be4bdb'],N=[8,9,10],LM=[16,18,20];
+ let st=0,n=8,g=[],moves=0,lim=14,cleared=0,eff=0,over=false,pend=false,msg='';
+ const init=()=>{n=N[st];lim=LM[st];g=[];for(let i=0;i<n*n;i++)g.push(Math.floor(Math.random()*5));moves=0;pend=false;msg=''};
+ const reg=()=>{const s=new Set([0]),q=[0],c=g[0];while(q.length){const i=q.pop(),r=Math.floor(i/n),cc=i%n;[[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{const rr=r+a,c2=cc+b;if(rr<0||rr>=n||c2<0||c2>=n)return;const k=rr*n+c2;if(!s.has(k)&&g[k]===c){s.add(k);q.push(k)}})}return s};
+ init();
+ let mv=()=>false;
+ window.cflq=()=>({st,n,g:g.slice(),moves,lim,over,cleared,eff,mv:c=>mv(c)});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🌊 تلوين الفيضان</h2>')+'<div id="cfH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="cfC" style="display:block;margin:4px auto;border-radius:10px"></canvas><div class="row" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">'+CO.map((k,i)=>'<button class="btn cfp" data-c="'+i+'" style="width:auto!important;display:inline-block!important;min-width:48px;background:'+k+'">&nbsp;</button>').join('')+'</div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="cfR" style="width:auto!important;display:inline-block!important">🔁 لوحة جديدة</button><button class="btn d" id="cfX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('cfC');cv.width=S;cv.height=S;const x=cv.getContext('2d');
+  const open=()=>$('cfC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('cfH'))$('cfH').textContent='مرحلة '+(st+1)+'/3 · حركات '+moves+'/'+lim+(msg?' · '+msg:'')};
+  const dw=()=>{const cs=S/n,rg=reg();for(let i=0;i<n*n;i++){x.fillStyle=CO[g[i]];x.fillRect((i%n)*cs,Math.floor(i/n)*cs,cs+0.5,cs+0.5)}
+   x.strokeStyle='rgba(255,255,255,.9)';x.lineWidth=2;rg.forEach(i=>{const r=Math.floor(i/n),cc=i%n;[[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{const k=(r+a)*n+cc+b;if(r+a<0||r+a>=n||cc+b<0||cc+b>=n||!rg.has(k)){x.beginPath();const X=cc*cs,Y=r*cs;if(a===1){x.moveTo(X,Y+cs);x.lineTo(X+cs,Y+cs)}else if(a===-1){x.moveTo(X,Y);x.lineTo(X+cs,Y)}else if(b===1){x.moveTo(X+cs,Y);x.lineTo(X+cs,Y+cs)}else{x.moveTo(X,Y);x.lineTo(X,Y+cs)}x.stroke()}})});
+   x.fillStyle='#fff';x.font='bold '+Math.round(cs*0.6)+'px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('★',cs/2,cs/2+2)};
+  const fin=()=>{over=true;sfx('win');const d=today();if(!me.cflD||me.cflD.d!==d)me.cflD={d,c:0};const sc=cleared+eff;let pay=Math.max(0,Math.min(5,sc,12-me.cflD.c));me.cflD.c+=pay;me.coins+=pay;updCoins();me.cflGames=(me.cflGames||0)+1;const nb=sc>(me.cflBest||0);if(nb)me.cflBest=sc;saveMe();
+   c.innerHTML='<h2>'+(cleared>=3?'🌊 ملك الفيضان! 🏆':'🌊 خلصت')+'</h2><div style="text-align:center;font-size:16px">غطيت <b>'+cleared+'/3</b> لوحات<br>بحركات قليلة في <b>'+eff+'</b><br>'+(nb&&sc?'🏆 رقم قياسي! ':'أحسن نتيجة: '+(me.cflBest||0)+' ')+'<br>'+(pay?'+'+pay+'🪙':'(مفيش جايزة)')+'</div><div class="row"><button class="btn" id="cfR2">🔁 تاني</button><button class="btn d" id="cfX2">إغلاق</button></div>';
+   $('cfR2').onclick=cflStart;$('cfX2').onclick=()=>{$('modal').style.display='none'}};
+  mv=k=>{if(over||pend||k<0||k>4||k===g[0])return false;const rg=reg();rg.forEach(i=>g[i]=k);moves++;sfx('place');
+   if(g.every(v=>v===g[0])){pend=true;cleared++;const ok=moves<=lim-3;if(ok)eff++;msg=ok?'ممتاز! 🌟':'تمام ✅';hud();dw();sfx('win');setTimeout(()=>{if(!open())return;if(st>=2)fin();else{st++;init();hud();dw()}},1100)}
+   else if(moves>=lim){pend=true;msg='الحركات خلصت ❌';hud();dw();sfx('err');setTimeout(()=>{if(open())fin()},1300)}else{hud();dw()}return true};
+  c.querySelectorAll('.cfp').forEach(b=>b.onclick=()=>mv(+b.dataset.c));
+  $('cfR').onclick=()=>{init();hud();dw()};$('cfX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
