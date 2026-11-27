@@ -194,7 +194,7 @@ function buildSnw(){
  [[-4,-5],[0,-5.6],[4,-5]].forEach(([x,z])=>{g.add(mesh(G.box(2.4,1,0.8),0x91a7ff,x,0.5,z+0.8));g.add(mesh(G.sph(0.7,10),0xffffff,x,1.5,z),mesh(G.sph(0.5,10),0xffffff,x,2.3,z),mesh(G.sph(0.08,6),0xff922b,x,2.3,z+0.5),mesh(G.sph(0.06,6),0x212529,x-0.15,2.45,z+0.42),mesh(G.sph(0.06,6),0x212529,x+0.15,2.45,z+0.42))});
  for(let i=0;i<7;i++)g.add(mesh(G.sph(0.25+Math.random()*0.15,8),0xffffff,-3+i,0.25,2+Math.random()*2));
  snh={it:{x:0,z:0.2,label:'⛄ ابدأ معركة الثلج',fn:snwStart}};interacts.push(snh.it);
- g.add(portalMesh('ارجع لصالة الكيرلنج',5.8,5.8,0x1098ad,'curl'));
+ g.add(portalMesh('ارجع لصالة الكيرلنج',5.8,5.8,0x1098ad,'curl'),portalMesh('🪢 ساحة شد الحبل',-5.8,5.8,0xe67700,'tug'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('⛄ دوس على رجل الثلج 🤖 قبل ما يرمي عليك',3200)
 }
@@ -250,3 +250,60 @@ function snwStart(){
   const pos=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*CH/r.height}};
   cv.onpointerdown=e=>{e.preventDefault();const q=pos(e);tapAt(q.x,q.y)};
   $('snX').onclick=()=>{$('modal').style.display='none'};hud();dw();requestAnimationFrame(tick)})}
+
+/* R270: tug of war */
+let tgh=null;
+function buildTgw(){
+ const g=indoor(0xe67700,0xfff4e6,0xffa94d);
+ sign(g,'🪢 ساحة شد الحبل',0,4.6,-7.6,'rgba(230,119,0,.92)');
+ g.add(mesh(G.box(9,0.05,3),0x8d6e63,0,0.04,-3));
+ g.add(mesh(G.box(8.4,0.08,0.12),0xd9a066,0,0.55,-3));
+ g.add(mesh(G.box(0.12,0.9,0.12),0xe03131,0,0.9,-3),mesh(G.box(0.7,0.4,0.05),0xe03131,0.35,1.2,-3));
+ [[-3.6,0x4dabf7],[-3,0x4dabf7],[3,0xfcc419],[3.6,0xfcc419]].forEach(([x,c])=>g.add(mesh(G.cyl(0.28,0.3,0.8,10),c,x,0.4,-3),mesh(G.sph(0.28,8),0xffd8a8,x,1,-3)));
+ g.add(mesh(G.box(0.1,1.2,0.1),0x4dabf7,-4.4,0.6,-3),mesh(G.box(0.1,1.2,0.1),0xfcc419,4.4,0.6,-3));
+ tgh={it:{x:0,z:0.2,label:'🪢 شد الحبل ضد 🤖',fn:tgwStart}};interacts.push(tgh.it);
+ g.add(portalMesh('ارجع لساحة الثلج',5.8,5.8,0x339af0,'snowfight'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🪢 دوس بسرعة، والدوسة الأقوى لما الدايرة تكبر',3200)
+}
+function tgwStart(){
+ const H=innerHeight<420,CH=H?Math.max(130,innerHeight-165):Math.max(260,Math.min(innerHeight-330,340)),W=Math.min(innerWidth-50,360);
+ const BEST=3,RT=20;
+ let pos=0,rd=0,pw=0,bw=0,t=0,over=false,last=0,taps=[],ring=0,ph=Math.random()*6,msg='',msgT=0,state='play',st=0,fl=0,pf=0;
+ const lv=()=>rd;
+ const say=m=>{msg=m;msgT=0.8};
+ const cyc=0.9;
+ const perfect=()=>{const f=(t%cyc)/cyc;return f>0.72};
+ const tap=()=>{if(over||state!=='play')return;const now=t;taps=taps.filter(x=>now-x<1);const fat=taps.length>7?0.6:1;taps.push(now);const pf2=perfect();pos+=(pf2?0.085:0.04)*fat;if(pf2){say('ممتاز! 💪');sfx('win');pf=0.2}else sfx('place')};
+ window.tgwq=()=>({pos,rd,pw,bw,over,state,perfect:perfect(),tap,t});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🪢 ساحة شد الحبل</h2>')+'<div id="tgH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="tgC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row"><button class="btn d" id="tgX">إغلاق</button></div>';
+  const cv=$('tgC');cv.width=W;cv.height=CH;const x=cv.getContext('2d');
+  const open=()=>$('tgC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('tgH'))$('tgH').textContent='أنت 🔵 '+pw+' · 🤖🟡 '+bw+' · جولة '+Math.min(rd+1,BEST)+' · ⏱️ '+Math.max(0,Math.ceil(RT-st))};
+  const fin=()=>{over=true;state='done';dw();sfx('win');setTimeout(()=>{if(!open())return;const d=today();if(!me.tgwd||me.tgwd.d!==d)me.tgwd={d,c:0};const won=pw>bw;let pay=won?(pw===2&&bw===0?4:3):0;pay=Math.max(0,Math.min(5,pay,12-me.tgwd.c));me.tgwd.c+=pay;me.coins+=pay;updCoins();const sc=pw*10-bw*5+Math.round(pos*0);const nb=won&&pw>(me.tgwBest||0);if(nb)me.tgwBest=pw;if(won)me.tgwBest=Math.max(me.tgwBest||0,pw);me.tgwGames=(me.tgwGames||0)+1;if(won)me.tgwWins=(me.tgwWins||0)+1;saveMe();
+   c.innerHTML='<h2>'+(won?'🪢 كسبت! 🏆':'🪢 🤖 كسب المرة دي')+'</h2><div style="text-align:center;font-size:16px">أنت 🔵 <b>'+pw+'</b> · 🤖🟡 <b>'+bw+'</b><br>'+(pay?'+'+pay+'🪙':'(مفيش جايزة)')+'<br>انتصاراتك: '+(me.tgwWins||0)+'</div><div class="row"><button class="btn" id="tgR">🔁 تاني</button><button class="btn d" id="tgX2">إغلاق</button></div>';
+   $('tgR').onclick=tgwStart;$('tgX2').onclick=()=>{$('modal').style.display='none'}},900)};
+  const endRd=w=>{if(w>0)pw++;else bw++;state='between';fl=1.4;say(w>0?'كسبت الجولة! 🎉':'🤖 كسب الجولة');hud()};
+  const person=(px,py,col,face)=>{x.fillStyle=col;x.fillRect(px-7,py-18,14,22);x.fillStyle='#ffd8a8';x.beginPath();x.arc(px,py-24,7,0,6.3);x.fill();x.fillStyle='#212529';x.beginPath();x.arc(px-2.5,py-25,1.2,0,6.3);x.arc(px+2.5,py-25,1.2,0,6.3);x.fill();x.fillRect(px-6,py+4,5,8);x.fillRect(px+1,py+4,5,8)};
+  const dw=()=>{const cy=H?CH*0.5:CH*0.46,sc=Math.min(1,W/360);x.fillStyle='#ffe8cc';x.fillRect(0,0,W,CH);
+   x.fillStyle='#74b816';x.fillRect(0,cy+26,W,CH-cy-26);
+   const L=W*0.12,R=W*0.88;x.fillStyle='rgba(77,171,247,.25)';x.fillRect(0,cy-30,W/2,70);x.fillStyle='rgba(252,196,25,.25)';x.fillRect(W/2,cy-30,W/2,70);
+   x.strokeStyle='#e03131';x.lineWidth=3;x.setLineDash([5,4]);x.beginPath();x.moveTo(W/2,cy-40);x.lineTo(W/2,cy+34);x.stroke();x.setLineDash([]);
+   const flagX=W/2-pos*(W*0.36);
+   [[-1,'#4dabf7',0.06],[1,'#fcc419',0.94]].forEach(([d,c,f])=>{x.fillStyle=c;x.fillRect(W*f-3,cy-40,6,60)});
+   x.strokeStyle='#8d6e63';x.lineWidth=5;x.beginPath();x.moveTo(W*0.1,cy);x.lineTo(W*0.9,cy);x.stroke();
+   x.fillStyle='#e03131';x.fillRect(flagX-3,cy-18,6,36);x.beginPath();x.moveTo(flagX+3,cy-18);x.lineTo(flagX+18,cy-12);x.lineTo(flagX+3,cy-6);x.fill();
+   const sh=Math.sin(t*14)*1.2;
+   for(let i=0;i<2;i++){person(flagX-34-i*20+sh,cy+14,'#1c7ed6');person(flagX+34+i*20-sh,cy+14,'#f08c00')}
+   x.fillStyle='#364fc7';x.font='bold 11px sans-serif';x.textAlign='center';x.fillText('أنت',flagX-44,cy+34);x.fillText('🤖',flagX+44,cy+34);
+   if(state==='play'){const f=(t%cyc)/cyc,rr=(f>0.72?1:0.35+f*0.7)*34*sc+8,cx=W/2,ry=CH-(H?38:62);x.strokeStyle='#868e96';x.lineWidth=2;x.beginPath();x.arc(cx,ry,34*sc+8,0,6.3);x.stroke();x.fillStyle=f>0.72?'rgba(81,207,102,.85)':'rgba(77,171,247,.55)';x.beginPath();x.arc(cx,ry,rr,0,6.3);x.fill();x.fillStyle='#fff';x.font='bold 14px sans-serif';x.fillText(f>0.72?'دوس!':'اضغط',cx,ry+5)}
+   x.fillStyle='#212529';x.fillRect(W*0.2,H?8:12,W*0.6,8);x.fillStyle='#4dabf7';x.fillRect(W*0.2,H?8:12,W*0.6*(0.5+pos/2),8);
+   if(msgT>0){x.fillStyle='#212529';x.strokeStyle='#fff';x.lineWidth=4;x.font='bold 20px sans-serif';x.strokeText(msg,W/2,H?34:44);x.fillText(msg,W/2,H?34:44)}};
+  const tick=now=>{if(!open())return;const dt=Math.min(0.05,(now-(last||now))/1000);last=now;t+=dt;if(msgT>0)msgT-=dt;
+   if(state==='play'){st+=dt;const F=(0.2+0.06*lv())*(1+0.6*Math.sin(t*1.7+ph))*(1+0.35*Math.sin(t*4.1));pos-=F*dt;
+    if(pos>=1)endRd(1);else if(pos<=-1)endRd(-1);else if(st>=RT)endRd(pos>0?1:-1)}
+   else if(state==='between'){fl-=dt;if(fl<=0){if(pw>=2||bw>=2||rd>=BEST-1&&pw!==bw){fin()}else{rd++;pos=0;st=0;taps=[];state='play'}}}
+   hud();dw();if(!over)requestAnimationFrame(tick)};
+  cv.onpointerdown=e=>{e.preventDefault();tap()};
+  $('tgX').onclick=()=>{$('modal').style.display='none'};hud();dw();requestAnimationFrame(tick)})}
