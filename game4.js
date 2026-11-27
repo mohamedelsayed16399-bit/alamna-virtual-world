@@ -368,7 +368,7 @@ function buildArt(){
  [[-4.5,-5,0xe03131],[-3.5,-5.4,0xfcc419],[3.5,-5.4,0x40c057],[4.5,-5,0x228be6]].forEach(([x,z,c])=>g.add(mesh(G.cyl(0.3,0.3,0.6,10),0xf1f3f5,x,0.3,z),mesh(G.cyl(0.24,0.24,0.1,10),c,x,0.64,z,c)));
  g.add(mesh(G.box(0.12,2.6,0.12),0x8d6e63,-1.7,1.3,-6.4),mesh(G.box(0.12,2.6,0.12),0x8d6e63,1.7,1.3,-6.4),mesh(G.box(3.8,0.14,0.2),0x8d6e63,0,0.3,-6.3),mesh(G.box(3.5,2.7,0.1),0x5c3d2e,0,2.1,-6.45));
  arth={it:{x:0,z:0.2,label:'🎨 ارسم لوحة',fn:artStart}};interacts.push(arth.it);
- g.add(portalMesh('ارجع لموقع التنقيب',5.8,5.8,0xa9792f,'digsite'));
+ g.add(portalMesh('ارجع لموقع التنقيب',5.8,5.8,0xa9792f,'digsite'),portalMesh('🎵 الصندوق الموسيقي',-5.8,5.8,0x7048e8,'musicbox'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  if(!artCv){artCv=document.createElement('canvas');artCv.width=256;artCv.height=192}
  artTex=new THREE.CanvasTexture(artCv);artLoad();
@@ -398,3 +398,45 @@ function artStart(){
   const up=()=>{if(drawing){drawing=false;strokes++}};cv.onpointerup=up;cv.onpointercancel=up;
   $('drSv').onclick=()=>{try{const t=document.createElement('canvas');t.width=256;t.height=192;t.getContext('2d').drawImage(cv,0,0,256,192);localStorage.setItem('ealam_drw',t.toDataURL('image/jpeg',0.72));me.drwGames=(me.drwGames||0)+1;saveMe();saved=true;sfx('win');toast('✅ اتحفظت على الحامل، اطلع بره وارجع تشوفها',3200)}catch(e){toast('مقدرتش أحفظ اللوحة',2500)}};
   $('drX').onclick=()=>{$('modal').style.display='none'}})}
+
+/* R273: music box */
+let mbh=null,mbT=null,mbCount=0;
+const MBF=[1046.5,880,784,659.3,587.3,523.3];
+function mbTone(f,d){if(me&&me.mute)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.25,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+0.05);mbCount++}catch(e){}}
+function mbLoad(){try{const a=JSON.parse(localStorage.getItem('ealam_mbx')||'null');if(a&&Array.isArray(a.g)&&a.g.length===8)return{g:a.g.map(r=>Array.from({length:6},(_,i)=>r[i]?1:0)),tp:[0,1,2].includes(a.tp)?a.tp:1}}catch(e){}return null}
+const MBTP=[0.32,0.22,0.14];
+function mbPlay(tune){clearInterval(mbT);let s=0;const st=()=>{tune.g[s].forEach((v,r)=>{if(v)mbTone(MBF[r],0.35)});s++;if(s>=8){clearInterval(mbT);mbT=null}};st();if(s<8)mbT=setInterval(st,MBTP[tune.tp]*1000)}
+function buildMbx(){
+ const g=indoor(0x7048e8,0xf3f0ff,0xb197fc);
+ sign(g,'🎵 غرفة الصندوق الموسيقي',0,4.6,-7.6,'rgba(112,72,232,.92)');
+ g.add(mesh(G.box(3,1.2,2),0x8d5524,0,0.6,-5),mesh(G.box(3.1,0.15,2.1),0xffd43b,0,1.25,-5,0xffd43b),mesh(G.cyl(0.55,0.55,2.6,16),0xced4da,0,1.8,-5));
+ [0xfa5252,0x4dabf7,0x51cf66,0xfcc419,0xcc5de8,0xff922b].forEach((c,i)=>g.add(mesh(G.sph(0.22,8),c,-3.4+i*1.36,0.3+(i%3)*0.5,-1.5,c)));
+ g.add(mesh(G.cyl(0.35,0.35,1.1,10),0x7048e8,-5,0.55,0),mesh(G.cyl(0.35,0.35,1.1,10),0x7048e8,5,0.55,0));
+ mbh={it:{x:0,z:0.2,label:'🎵 ألّف لحن',fn:mbStart},it2:{x:2.6,z:-1.8,label:'▶️ شغّل لحنك المحفوظ',fn:()=>{const t=mbLoad();if(t){mbPlay(t);toast('🎵 بيشغّل لحنك',1800)}else toast('مفيش لحن محفوظ لسه، ألّف واحد الأول',2500)}}};
+ interacts.push(mbh.it,mbh.it2);
+ g.add(portalMesh('ارجع للمرسم',5.8,5.8,0xd6336c,'artroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🎵 ألّف لحن من 8 نوتات واحفظه',3000)
+}
+function mbStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),cw=Math.floor(W/8),chh=H?Math.max(12,Math.min(cw,Math.floor((innerHeight-185)/6))):Math.min(cw,40),CH=chh*6;
+ const sv=mbLoad()||{g:Array.from({length:8},()=>[0,0,0,0,0,0]),tp:1};
+ let G2=sv.g,tp=sv.tp,step=-1,iv=null;
+ const COL=['#fa5252','#ff922b','#fcc419','#51cf66','#4dabf7','#cc5de8'];
+ window.mbq=()=>({g:G2.map(r=>r.slice()),step,playing:!!iv,tp});
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:'+(H?'26':'34')+'px!important;padding:'+(H?'1px 8px':'3px 10px')+';font-size:'+(H?'12':'14')+'px;margin:2px';
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🎵 الصندوق الموسيقي</h2>')+'<canvas id="mbC" style="display:block;margin:4px auto;border-radius:8px;touch-action:none"></canvas><div style="text-align:center"><button class="btn" id="mbP" style="'+bs+'">▶️ شغّل</button><button class="btn" id="mbT" style="'+bs+'"></button><button class="btn" id="mbK" style="'+bs+'">🗑️ مسح</button><button class="btn" id="mbS" style="'+bs+'">💾 احفظ</button><button class="btn d" id="mbX" style="'+bs+'">إغلاق</button></div>';
+  const cv=$('mbC');cv.width=cw*8;cv.height=CH;const x=cv.getContext('2d');
+  const open=()=>$('mbC')&&$('modal').style.display!=='none';
+  const dw=()=>{x.fillStyle='#2b2250';x.fillRect(0,0,cv.width,CH);
+   for(let col=0;col<8;col++)for(let r=0;r<6;r++){const px=col*cw,py=r*chh,on=G2[col][r];x.fillStyle=on?COL[r]:(col%2?'#3b3170':'#352b66');x.fillRect(px+2,py+2,cw-4,chh-4);if(on){x.fillStyle='rgba(255,255,255,.35)';x.fillRect(px+2,py+2,cw-4,4)}}
+   if(step>=0){x.strokeStyle='#ffd43b';x.lineWidth=3;x.strokeRect(step*cw+1,1,cw-2,CH-2)}};
+  const lbl=()=>{$('mbT').textContent=['🐢 بطيء','🚶 وسط','🐇 سريع'][tp]};
+  const stop=()=>{clearInterval(iv);iv=null;step=-1;if($('mbP'))$('mbP').textContent='▶️ شغّل';dw()};
+  $('mbP').onclick=()=>{if(iv){stop();return}step=0;$('mbP').textContent='⏹ وقف';const go=()=>{if(!open()){clearInterval(iv);iv=null;return}dw();G2[step].forEach((v,r)=>{if(v)mbTone(MBF[r],0.35)});step=(step+1)%8};go();iv=setInterval(go,MBTP[tp]*1000)};
+  $('mbT').onclick=()=>{tp=(tp+1)%3;lbl();if(iv){clearInterval(iv);const go=()=>{if(!open()){clearInterval(iv);iv=null;return}dw();G2[step].forEach((v,r)=>{if(v)mbTone(MBF[r],0.35)});step=(step+1)%8};iv=setInterval(go,MBTP[tp]*1000)}};
+  $('mbK').onclick=()=>{G2=Array.from({length:8},()=>[0,0,0,0,0,0]);dw()};
+  $('mbS').onclick=()=>{try{localStorage.setItem('ealam_mbx',JSON.stringify({g:G2,tp}));me.mbxGames=(me.mbxGames||0)+1;saveMe();sfx('win');toast('✅ اتحفظ اللحن، دوس "شغّل لحنك" بره',3000)}catch(e){toast('مقدرتش أحفظ',2000)}};
+  cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),col=Math.floor((e.clientX-r.left)*cv.width/r.width/cw),row=Math.floor((e.clientY-r.top)*CH/r.height/chh);if(col<0||col>7||row<0||row>5)return;G2[col][row]=G2[col][row]?0:1;if(G2[col][row])mbTone(MBF[row],0.3);dw()};
+  $('mbX').onclick=()=>{stop();$('modal').style.display='none'};lbl();dw()})}
