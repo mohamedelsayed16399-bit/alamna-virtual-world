@@ -232,7 +232,7 @@ function buildLily(){
  g.add(mesh(G.sph(0.5,10),0x40c057,0.3,0.55,-1.4,0x145c20),mesh(G.sph(0.14,6),0xffffff,0.15,0.95,-1.6),mesh(G.sph(0.14,6),0xffffff,0.45,0.95,-1.6),mesh(G.sph(0.07,6),0x212529,0.15,0.96,-1.72),mesh(G.sph(0.07,6),0x212529,0.45,0.96,-1.72));
  [[-5.5,-3],[5.5,-3],[-5.5,1],[5.5,1]].forEach(([x,z],i)=>{g.add(mesh(G.cyl(0.12,0.16,1.6+i%2*0.6,6),0x2b8a3e,x,0.8,z),mesh(G.sph(0.3,6),0x8d5a2b,x,1.7+i%2*0.6,z))});
  lly={it:{x:0,z:3,label:'🐸 اقفز لفوق',fn:frgStart}};interacts.push(lly.it);
- g.add(portalMesh('ارجع لحلبة السباق',5.8,5.8,0xf03e3e,'track'));
+ g.add(portalMesh('ارجع لحلبة السباق',5.8,5.8,0xf03e3e,'track'),portalMesh('📦 المخزن',-5.8,5.8,0xc2874b,'depot'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🐸 حرّك صباعك يمين وشمال، الضفدع بيقفز لوحده',3000)
 }
@@ -268,3 +268,71 @@ function frgStart(){
   const mv=e=>{e.preventDefault();const r=cv.getBoundingClientRect();tx=(e.clientX-r.left)*W/r.width};
   cv.onpointermove=mv;cv.onpointerdown=mv;
   $('frX').onclick=()=>{$('modal').style.display='none'};dw();requestAnimationFrame(tick)})}
+
+/* sokoban depot */
+let dpt=null;
+function buildDepot(){
+ const g=indoor(0x6f4e37,0xd9c8a9,0xc2874b);
+ sign(g,'📦 المخزن',0,4.6,-7.6,'rgba(160,104,56,.92)');
+ const crate=(x,z,y,s,c)=>{g.add(mesh(G.box(s,s,s),c,x,y+s/2,z,0x221100),mesh(G.box(s*1.02,s*0.1,s*1.02),0x8d5a2b,x,y+s*0.15,z),mesh(G.box(s*1.02,s*0.1,s*1.02),0x8d5a2b,x,y+s*0.85,z))};
+ for(let i=0;i<4;i++)crate(-5.6+i*0.9,-6.4,0,0.8,0xc2874b);
+ for(let i=0;i<3;i++)crate(-5.15+i*0.9,-6.4,0.8,0.8,0xd6a064);
+ crate(-4.7,-6.4,1.6,0.8,0xc2874b);
+ for(let i=0;i<4;i++)crate(2.4+i*0.9,-6.4,0,0.8,0xa9753d);
+ for(let i=0;i<2;i++)crate(2.85+i*0.9,-6.4,0.8,0.8,0xc2874b);
+ g.add(mesh(G.box(2.4,0.04,2.4),0x2f9e44,0,0.03,-3.2,0x144d1c));
+ [[-0.8,-3.2],[0.8,-3.2]].forEach(([x,z])=>g.add(mesh(G.cyl(0.35,0.35,0.05,10),0xfa5252,x,0.08,z,0x660000)));
+ crate(-0.8,-4.2,0,0.7,0xc2874b);crate(0.8,-2.2,0,0.7,0xc2874b);
+ [[-5,-2],[5,-2],[-5.5,1.5],[5.5,1.5]].forEach(([x,z],i)=>{g.add(mesh(G.cyl(0.35,0.35,0.9,8),0x495057,x,0.45,z),mesh(G.cyl(0.38,0.38,0.08,8),0xfab005,x,0.6,z,0x553300))});
+ dpt={it:{x:0,z:2.2,label:'📦 لغز المخزن',fn:sokStart}};interacts.push(dpt.it);
+ g.add(portalMesh('ارجع لبركة الضفادع',5.8,5.8,0x40c057,'lily'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('📦 ادفع الصناديق على النقط الحمرا',3000)
+}
+function sokLen(S){const C=S.C,R=S.R,w=new Set(S.wall),gs=new Set(S.goals),key=(p,b)=>p+'|'+b.slice().sort((a,c)=>a-c).join(','),seen=new Set([key(S.pl,S.box)]);let q=[[S.pl,S.box]],n=0,d=0;
+ while(q.length&&n<12000){const nq=[];d++;for(const [pp,bb] of q){n++;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const px=pp%C+dx,py=Math.floor(pp/C)+dy,ni=py*C+px;if(w.has(ni))continue;let nb=bb;const bi=bb.indexOf(ni);if(bi>=0){const ti=(py+dy)*C+px+dx;if(w.has(ti)||bb.includes(ti))continue;nb=bb.slice();nb[bi]=ti}const k=key(ni,nb);if(seen.has(k))continue;seen.add(k);if(nb.every(x=>gs.has(x)))return d;nq.push([ni,nb])}}q=nq}return -1}
+function sokGen(lv){let best=null,bl=-2,t0=Date.now();const want=Math.min(34,4+lv*4);for(let i=0;i<14&&(i<1||Date.now()-t0<220);i++){const L=sokGen1(lv),n=sokLen(L);if(n>=want)return L;if(n>bl){bl=n;best=L}}return best}
+function sokGen1(lv){
+ const C=6+Math.min(2,lv>>1),R=5+Math.min(2,(lv+1)>>1),nb=Math.min(4,1+(lv>>1)),T=10+lv*6;
+ for(let tr=0;tr<200;tr++){
+  const wall=new Set(),at=(x,y)=>y*C+x;
+  for(let x=0;x<C;x++){wall.add(at(x,0));wall.add(at(x,R-1))}for(let y=0;y<R;y++){wall.add(at(0,y));wall.add(at(C-1,y))}
+  const nw=Math.min(6,Math.floor(lv/1.5)+1);for(let i=0;i<nw;i++){const x=1+Math.floor(Math.random()*(C-2)),y=1+Math.floor(Math.random()*(R-2));wall.add(at(x,y))}
+  const free=[];for(let y=1;y<R-1;y++)for(let x=1;x<C-1;x++)if(!wall.has(at(x,y)))free.push(at(x,y));
+  if(free.length<nb+3)continue;free.sort(()=>Math.random()-.5);
+  const goals=free.slice(0,nb),box=goals.slice();let pl=free[nb];
+  const isF=i=>!wall.has(i)&&!box.includes(i);let pulls=0;
+  for(let st=0;st<T*40&&pulls<T;st++){const d=[[1,0],[-1,0],[0,1],[0,-1]][Math.floor(Math.random()*4)],px=pl%C,py=Math.floor(pl/C),f=at(px+d[0],py+d[1]),bk=at(px-d[0],py-d[1]);
+   const bi=box.indexOf(f);if(bi>=0&&isF(bk)&&px-d[0]>0&&px-d[0]<C-1&&py-d[1]>0&&py-d[1]<R-1){box[bi]=pl;pl=bk;pulls++}else if(bi<0&&!wall.has(f)){pl=f}}
+  if(box.some(b=>goals.includes(b)))continue;
+  if(pulls<Math.max(3,T*0.4))continue;
+  return{C,R,wall:[...wall],goals,box,pl}
+ }
+ return{C:5,R:4,wall:[0,1,2,3,4,5,9,10,14,15,16,17,18,19],goals:[8],box:[7],pl:6}
+}
+function sokStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),CHm=H?Math.max(110,innerHeight-205):Math.max(200,Math.min(innerHeight-400,330));
+ let lv=me.sokLv||0,L=sokGen(lv),{C,R}=L,wall=new Set(L.wall),goals=L.goals,box=L.box.slice(),pl=L.pl,mv=0,hist=[],done=false;
+ const CS=Math.floor(Math.min(W/C,CHm/R)),CW=CS*C,CHh=CS*R;
+ const solved=()=>box.every(b=>goals.includes(b));
+ window.sokq=()=>({C,R,wall:[...wall],goals,box,pl,mv,done,lv,state:()=>({C,R,wall:[...wall],goals,box:box.slice(),pl}),move:(dx,dy)=>move(dx,dy)});
+ let move=()=>{};
+ modal(c=>{
+  const bs='style="flex:1;min-width:0;padding:0;font-size:'+(H?18:22)+'px;min-height:'+(H?34:48)+'px!important"';
+  c.innerHTML=(H?'':'<h2 style="margin:4px">📦 لغز المخزن</h2>')+'<div id="skH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="skC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row" style="gap:4px"><button class="btn" id="skL" '+bs+'>⬅️</button><button class="btn" id="skU" '+bs+'>⬆️</button><button class="btn" id="skD" '+bs+'>⬇️</button><button class="btn" id="skRt" '+bs+'>➡️</button><button class="btn" id="skUn" '+bs+'>↩️</button><button class="btn" id="skRs" '+bs+'>🔁</button></div><div class="row"><button class="btn d" id="skX" style="'+(H?'min-height:34px!important':'')+'">إغلاق</button></div>';
+  const cv=$('skC');cv.width=CW;cv.height=CHh;const x=cv.getContext('2d');
+  const open=()=>$('skC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('skH'))$('skH').textContent='مرحلة '+(lv+1)+' · حركات '+mv+' · صناديق '+box.filter(b=>goals.includes(b)).length+'/'+box.length};
+  const dw=()=>{x.fillStyle='#2b2d42';x.fillRect(0,0,CW,CHh);
+   for(let i=0;i<R*C;i++){const cx=(i%C)*CS,cy=Math.floor(i/C)*CS;if(wall.has(i)){x.fillStyle='#7048e8';x.fillRect(cx,cy,CS,CS);x.fillStyle='#845ef7';x.fillRect(cx+2,cy+2,CS-4,CS/2-3);x.fillRect(cx+2,cy+CS/2+1,CS-4,CS/2-3)}else{x.fillStyle=(i%C+Math.floor(i/C))%2?'#f1e4c8':'#e8d9b5';x.fillRect(cx,cy,CS,CS)}}
+   for(const g of goals){const cx=(g%C)*CS+CS/2,cy=Math.floor(g/C)*CS+CS/2;x.fillStyle='#fa5252';x.beginPath();x.arc(cx,cy,CS*0.18,0,6.3);x.fill()}
+   for(const b of box){const cx=(b%C)*CS,cy=Math.floor(b/C)*CS,on=goals.includes(b);x.fillStyle=on?'#40c057':'#c2874b';x.fillRect(cx+3,cy+3,CS-6,CS-6);x.strokeStyle=on?'#2b8a3e':'#8d5a2b';x.lineWidth=3;x.strokeRect(cx+3,cy+3,CS-6,CS-6);x.beginPath();x.moveTo(cx+5,cy+5);x.lineTo(cx+CS-5,cy+CS-5);x.moveTo(cx+CS-5,cy+5);x.lineTo(cx+5,cy+CS-5);x.stroke()}
+   const px=(pl%C)*CS+CS/2,py=Math.floor(pl/C)*CS+CS/2;x.fillStyle='#4dabf7';x.beginPath();x.arc(px,py,CS*0.36,0,6.3);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(px-CS*.12,py-CS*.06,CS*.09,0,6.3);x.arc(px+CS*.12,py-CS*.06,CS*.09,0,6.3);x.fill();x.fillStyle='#212529';x.beginPath();x.arc(px-CS*.12,py-CS*.06,CS*.04,0,6.3);x.arc(px+CS*.12,py-CS*.06,CS*.04,0,6.3);x.fill()};
+  move=(dx,dy)=>{if(done||!open())return;const px=pl%C+dx,py=Math.floor(pl/C)+dy,ni=py*C+px;if(wall.has(ni))return;const bi=box.indexOf(ni);hist.push([pl,box.slice()]);if(bi>=0){const ti=(py+dy)*C+px+dx;if(wall.has(ti)||box.includes(ti)){hist.pop();return}box[bi]=ti;sfx('place')}else sfx('tick');pl=ni;mv++;dw();hud();if(solved())win()};
+  const win=()=>{done=true;setTimeout(()=>{if(!open())return;const d=today();if(!me.sokd||me.sokd.d!==d)me.sokd={d,c:0};let pay=2;pay=Math.max(0,Math.min(pay,12-me.sokd.c));me.sokd.c+=pay;me.coins+=pay;updCoins();me.sokLv=lv+1;me.sokBest=Math.max(me.sokBest||0,lv+1);me.sokGames=(me.sokGames||0)+1;saveMe();sfx('win');
+   c.innerHTML='<h2>✅ المرحلة '+(lv+1)+' خلصت!</h2><div style="text-align:center;font-size:16px">حركات: <b>'+mv+'</b><br>'+(pay?'+'+pay+'🪙':'(وصلت حد النهاردة)')+'<br>المراحل اللي خلصتها: '+me.sokBest+'</div><div class="row"><button class="btn g" id="skN">▶️ المرحلة الجاية</button><button class="btn d" id="skX">إغلاق</button></div>';$('skN').onclick=()=>{$('modal').style.display='none';sokStart()};$('skX').onclick=()=>{$('modal').style.display='none'}},500)};
+  $('skL').onclick=()=>move(-1,0);$('skRt').onclick=()=>move(1,0);$('skU').onclick=()=>move(0,-1);$('skD').onclick=()=>move(0,1);
+  $('skUn').onclick=()=>{if(done||!hist.length)return;const h=hist.pop();pl=h[0];box=h[1];mv=Math.max(0,mv-1);dw();hud()};
+  $('skRs').onclick=()=>{if(done)return;box=L.box.slice();pl=L.pl;mv=0;hist=[];dw();hud()};
+  let sx0=0,sy0=0;cv.onpointerdown=e=>{e.preventDefault();sx0=e.clientX;sy0=e.clientY};cv.onpointerup=e=>{e.preventDefault();const dx=e.clientX-sx0,dy=e.clientY-sy0;if(Math.max(Math.abs(dx),Math.abs(dy))<14)return;if(Math.abs(dx)>Math.abs(dy))move(dx>0?1:-1,0);else move(0,dy>0?1:-1)};
+  $('skX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
