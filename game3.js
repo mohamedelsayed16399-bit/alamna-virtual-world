@@ -9,7 +9,7 @@ function buildBoard(){
  for(let r=0;r<6;r++)for(let c=0;c<7;c++){const k=(r*3+c*5)%4,col=k===0?0xfa5252:k===1?0xfcc419:0x0b3d78;const d=mesh(G.cyl(0.13,0.13,0.06,10),col,fx-1.02+c*0.34,2.55-r*0.31,fz+0.18,k<2?col:0);d.rotation.x=Math.PI/2;g.add(d)}
  [[-6.5,-1],[6.5,-1.5]].forEach(([x,z],i)=>{g.add(mesh(G.box(1,0.5,1),0xa9753d,x,0.25,z),mesh(G.box(0.8,0.3,0.8),i?0xfa5252:0x4c6ef5,x,0.65,z,i?0x550000:0x001a66))});
  bd={it:{x:0,z:-2.2,label:'🔴 أربعة في صف ضد 🤖',fn:c4Start}};interacts.push(bd.it);
- g.add(portalMesh('ارجع للتتريس',5.8,5.8,0xff8787,'tetris'));
+ g.add(portalMesh('ارجع للتتريس',5.8,5.8,0xff8787,'tetris'),portalMesh('🐦 برج السماء',-5.8,5.8,0x74c0fc,'sky'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🔴 وصّل 4 قطع في صف قبل البوت 🤖',3000)
 }
@@ -35,3 +35,44 @@ function c4Start(){
   const pl=col=>{if(over||busy||turn!==1||b[col])return;const i=dr(b,col,1);last=i;mv++;sfx('place');dw();if(chk(1))return;turn=2;busy=true;st('🤖 بيفكر...');setTimeout(()=>{if(!open())return;const m=botMove(),j=dr(b,m,2);last=j;mv++;sfx('tick');busy=false;turn=1;dw();if(chk(2))return;st('دورك 🔴')},500)};
   cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect();pl(Math.max(0,Math.min(6,Math.floor((e.clientX-r.left)*W/r.width/CS))))};
   $('c4X').onclick=()=>{$('modal').style.display='none'};dw()})}
+
+/* flappy: sky tower */
+let skr=null;
+function buildSky(){
+ const g=indoor(0x1971c2,0xa5d8ff,0x74c0fc);
+ sign(g,'🐦 برج السماء',0,4.6,-7.6,'rgba(25,113,194,.92)');
+ for(let i=0;i<7;i++){const x=-6+i*2+Math.random()*.8,y=2.6+Math.random()*1.6,z=-7+Math.random()*1.2;g.add(mesh(G.sph(0.55+Math.random()*.3,8),0xffffff,x,y,z,0x8899aa),mesh(G.sph(0.4,8),0xf1f3f5,x+0.6,y-0.1,z))}
+ g.add(mesh(G.cyl(0.9,1.1,0.4,10),0x868e96,0,0.2,-4),mesh(G.cyl(0.35,0.5,3.2,8),0xfab005,0,1.8,-4),mesh(G.sph(0.7,10),0xff922b,0,3.7,-4,0x663300),mesh(G.sph(0.14,6),0x212529,0.28,3.85,-3.4),mesh(G.cyl(0.0,0.14,0.34,5),0xfa5252,0.0,3.7,-3.25,0xaa0000).rotateX(1.57));
+ [[-5,-1],[5,-1]].forEach(([x,z])=>{g.add(mesh(G.cyl(0.12,0.12,2.4,6),0x495057,x,1.2,z),mesh(G.box(0.9,0.3,0.3),0xff922b,x,2.5,z,0x663300))});
+ skr={it:{x:0,z:-1.6,label:'🐦 طيّر العصفور',fn:flpStart}};interacts.push(skr.it);
+ g.add(portalMesh('ارجع لصالة الألعاب',5.8,5.8,0xffa94d,'board'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🐦 دوس عشان تطيّر وعدّي من الفتحات',3000)
+}
+function flpStart(){
+ const H=innerHeight<420,CH=H?Math.max(130,innerHeight-165):Math.max(200,Math.min(innerHeight-300,420)),W=Math.min(innerWidth-30,360),S=CH/400;
+ let by=CH/2,vy=0,sc=0,over=false,started=false,pipes=[],px0=W+40,t0=0,last=0,fl=0;
+ const GAP=Math.max(72,CH*0.36),PW=46*W/360,SP=105*W/360,BX=W*0.28,R=11*Math.max(.7,S+.3);
+ const addPipe=x=>pipes.push({x,gy:GAP/2+14+Math.random()*(CH-GAP-28-0),ok:false});
+ for(let i=0;i<3;i++)addPipe(px0+i*W*0.62);
+ const flap=()=>{if(over)return;if(!started){started=true;last=performance.now()}vy=-300*Math.max(.55,S);sfx('tick')};
+ window.flq=()=>({y:by,vy,sc,over,started,flap,next:pipes.find(p=>p.x+PW>BX-R),H:CH});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🐦 طيّر العصفور</h2>')+'<div id="flH" style="text-align:center;font-size:14px;margin:2px">دوس عشان تبدأ</div><canvas id="flC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row"><button class="btn d" id="flX">إغلاق</button></div>';
+  const cv=$('flC');cv.width=W;cv.height=CH;const x=cv.getContext('2d');
+  const open=()=>$('flC')&&$('modal').style.display!=='none';
+  const dw=()=>{const gr=x.createLinearGradient(0,0,0,CH);gr.addColorStop(0,'#4dabf7');gr.addColorStop(1,'#d0ebff');x.fillStyle=gr;x.fillRect(0,0,W,CH);x.fillStyle='rgba(255,255,255,.8)';for(let i=0;i<4;i++){const cx=((i*140-fl*0.2)%(W+80)+W+80)%(W+80)-40;x.beginPath();x.arc(cx,40+i*CH*0.2,18,0,6.3);x.arc(cx+16,44+i*CH*0.2,13,0,6.3);x.fill()}
+   for(const p of pipes){x.fillStyle='#37b24d';x.fillRect(p.x,0,PW,p.gy-GAP/2);x.fillRect(p.x,p.gy+GAP/2,PW,CH);x.fillStyle='#2b8a3e';x.fillRect(p.x-3,p.gy-GAP/2-12,PW+6,12);x.fillRect(p.x-3,p.gy+GAP/2,PW+6,12)}
+   x.save();x.translate(BX,by);x.rotate(Math.max(-.5,Math.min(1.1,vy/600)));x.fillStyle='#fcc419';x.beginPath();x.arc(0,0,R,0,6.3);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(R*.35,-R*.3,R*.38,0,6.3);x.fill();x.fillStyle='#212529';x.beginPath();x.arc(R*.45,-R*.3,R*.17,0,6.3);x.fill();x.fillStyle='#fa5252';x.beginPath();x.moveTo(R*.8,-R*.05);x.lineTo(R*1.5,R*.15);x.lineTo(R*.8,R*.4);x.fill();x.fillStyle='#f08c00';x.beginPath();x.ellipse(-R*.3,R*.2+Math.sin(fl*.3)*3,R*.55,R*.3,0,0,6.3);x.fill();x.restore();
+   x.fillStyle='#fff';x.strokeStyle='#1864ab';x.lineWidth=4;x.font='bold 30px sans-serif';x.textAlign='center';x.strokeText(sc,W/2,38);x.fillText(sc,W/2,38)};
+  const fin=()=>{over=true;dw();sfx('err');setTimeout(()=>{if(!open())return;const d=today();if(!me.flpd||me.flpd.d!==d)me.flpd={d,c:0};let pay=sc>=3?Math.min(5,1+Math.floor(sc/5)):0;pay=Math.max(0,Math.min(pay,12-me.flpd.c));me.flpd.c+=pay;me.coins+=pay;updCoins();const nb=sc>(me.flpBest||0);if(nb)me.flpBest=sc;me.flpGames=(me.flpGames||0)+1;saveMe();if(pay||nb)sfx('win');
+   c.innerHTML='<h2>'+(sc>=3?'🐦 برافو!':'💥 خبطت')+'</h2><div style="text-align:center;font-size:16px">عدّيت: <b>'+sc+'</b> فتحة'+(nb&&sc?'<br>🏆 رقم قياسي!':'<br>أحسن نتيجة: '+(me.flpBest||0))+'<br>'+(pay?'+'+pay+'🪙':sc>=3?'(وصلت حد النهاردة)':'عدّي 3 فتحات عشان تكسب عملات')+'</div><div class="row"><button class="btn g" id="flR">🔁 تاني</button><button class="btn d" id="flX">إغلاق</button></div>';$('flR').onclick=()=>{$('modal').style.display='none';flpStart()};$('flX').onclick=()=>{$('modal').style.display='none'}},700)};
+  const tick=now=>{if(!open())return;if(over)return;let dt=Math.min(0.05,(now-(last||now))/1000);last=now;fl++;
+   if(started){vy+=900*Math.max(.55,S)*dt;by+=vy*dt;for(const p of pipes){p.x-=SP*dt;if(!p.ok&&p.x+PW<BX-R){p.ok=true;sc++;sfx('place');$('flH')&&($('flH').textContent='')}}
+    if(pipes[0].x+PW<-10){pipes.shift();addPipe(pipes[pipes.length-1].x+W*0.62)}
+    if(by+R>CH||by-R<0){dw();return fin()}
+    for(const p of pipes){if(BX+R*.8>p.x&&BX-R*.8<p.x+PW&&(by-R*.8<p.gy-GAP/2||by+R*.8>p.gy+GAP/2)){dw();return fin()}}}
+   else by=CH/2+Math.sin(now/250)*6;
+   dw();requestAnimationFrame(tick)};
+  cv.onpointerdown=e=>{e.preventDefault();flap()};
+  $('flX').onclick=()=>{$('modal').style.display='none'};dw();requestAnimationFrame(tick)})}
