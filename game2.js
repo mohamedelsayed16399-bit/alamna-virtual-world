@@ -1028,3 +1028,8 @@ function moleTick(dt){
 }
 /* R100: milestone gift hat 31 for everyone */
 try{if(me&&Array.isArray(me.owned)&&!me.owned.includes(31)){me.owned.push(31);saveMe();setTimeout(()=>{try{toast('🎉 الجولة 100! هدية: 👑 تاج المئة (من "شكلي")',4200);burst(player.root.position,0xffd43b,24);sfx('star')}catch(e){}},2500)}}catch(e){}
+/* R106: live avatar preview in the look modal */
+function lookPrev(){try{const c=$('modal').firstElementChild;if(!c||c.querySelector('#lkp'))return;const cv=document.createElement('canvas');cv.id='lkp';cv.width=240;cv.height=260;cv.style.cssText='display:block;margin:2px auto 6px;width:110px;height:120px;border-radius:14px;background:rgba(255,255,255,.1)';const h=c.querySelector('h2');if(h)h.after(cv);else c.prepend(cv);
+const r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});r.setSize(240,260,false);const sc=new THREE.Scene();sc.add(new THREE.HemisphereLight(0xffffff,0x667788,1.2));const dl=new THREE.DirectionalLight(0xffffff,0.8);dl.position.set(2,4,5);sc.add(dl);const cam=new THREE.PerspectiveCamera(36,240/260,0.1,50);cam.position.set(0,1.5,5.2);cam.lookAt(0,1.4,0);let key='',av=null;const t0=performance.now();
+const loop=()=>{if(!document.body.contains(cv)||cv.offsetParent===null){r.dispose();return}const k=JSON.stringify(myApp());if(k!==key){key=k;if(av)sc.remove(av);av=buildAvatar(myApp());sc.add(av)}av.rotation.y=(performance.now()-t0)/1400;r.render(sc,cam);requestAnimationFrame(loop)};loop()}catch(e){}}
+{const ob=$('bMe').onclick;$('bMe').onclick=function(){const x=ob.apply(this,arguments);setTimeout(lookPrev,30);return x}}
