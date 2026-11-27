@@ -462,7 +462,7 @@ function buildTwr(){
  for(let i=0;i<5;i++)g.add(mesh(G.cyl(0.3,0.3,0.8,8),0xff6b00,-5.5+i*0.9,0.4,1.8),mesh(G.cyl(0.18,0.3,0.25,8),0xffffff,-5.5+i*0.9,0.9,1.8));
  [[-5,-2],[5,-2]].forEach(([x,z],i)=>{g.add(mesh(G.box(1.1,0.8,1.1),cl[i+2],x,0.4,z),mesh(G.box(0.8,0.6,0.8),cl[i],x,1.1,z))});
  twh={it:{x:0,z:0.2,label:'🏗️ ابني البرج',fn:twrStart}};interacts.push(twh.it);
- g.add(portalMesh('ارجع لمطبخ الشيف',5.8,5.8,0xff922b,'chef'));
+ g.add(portalMesh('ارجع لمطبخ الشيف',5.8,5.8,0xff922b,'chef'),portalMesh('💥 ميدان المدفع',-5.8,5.8,0x2f9e44,'cannon'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🏗️ دوس في الوقت الصح عشان تركّب الدور فوق اللي قبله',3000)
 }
@@ -504,3 +504,60 @@ function twrStart(){
    dw();if(!over||fr.length)requestAnimationFrame(tick)};
   cv.onpointerdown=e=>{e.preventDefault();drop()};
   $('twX').onclick=()=>{$('modal').style.display='none'};hud();dw();requestAnimationFrame(tick)})}
+let cnh=null;
+function buildCnn(){
+ const g=indoor(0x2b8a3e,0xd3f9d8,0x74b816);
+ sign(g,'💥 ميدان المدفع',0,4.6,-7.6,'rgba(47,158,68,.92)');
+ g.add(mesh(G.box(2.4,0.5,2),0x495057,-3,0.25,-4.8),mesh(G.cyl(0.3,0.3,2,10),0x212529,-2.4,0.95,-4.8),mesh(G.sph(0.55,10),0x343a40,-3.3,0.8,-4.8));
+ g.children[g.children.length-2].rotation.z=-1.1;
+ for(let i=0;i<5;i++){const x=1+i*1.2,y=1+(i%3)*0.9;g.add(mesh(G.cyl(0.5,0.5,0.15,14),i%2?0xfa5252:0xffffff,x,y+1,-6.6),mesh(G.cyl(0.3,0.3,0.17,14),i%2?0xffffff:0xfa5252,x,y+1,-6.6),mesh(G.box(0.1,y+0.5,0.1),0x868e96,x,(y+0.5)/2,-6.7))}
+ for(let i=0;i<6;i++)g.add(mesh(G.sph(0.3,8),0x343a40,-5.5+(i%3)*0.6,0.3+Math.floor(i/3)*0.5,2.2))
+ g.add(mesh(G.box(1.3,0.7,1.3),0xc2874b,5,0.35,-1.5),mesh(G.box(1.3,0.7,1.3),0xe8a96a,5,1.05,-1.5));
+ cnh={it:{x:0,z:0.2,label:'💥 اضرب الأهداف',fn:cnnStart}};interacts.push(cnh.it);
+ g.add(portalMesh('ارجع لورشة البناء',5.8,5.8,0xfcc419,'tower'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('💥 اسحب عشان تصوّب، وسيب عشان تضرب',3000)
+}
+function cnnStart(){
+ const H=innerHeight<420,CH=H?Math.max(130,innerHeight-165):Math.max(240,Math.min(innerHeight-340,380)),W=Math.min(innerWidth-50,360),G0=450,VM=440,cx=26,cy=CH-30,R=H?12:15;
+ let tg=[],shots=8,sc=0,hits=0,wave=0,over=false,last=0,ball=null,aim=null,msg='',msgT=0,msgC='#fff',t0=0,puffs=[];
+ const spawn=()=>{wave++;tg=[];const n=Math.min(6,4+Math.floor(wave/2));let tries=0;while(tg.length<n&&tries++<200){const x=110+Math.random()*(W-110-R-6),y=CH*0.3+Math.random()*(CH*0.5-R);if(y>CH-30-R-4)continue;if(tg.every(o=>Math.hypot(o.x-x,o.y-y)>R*2.6))tg.push({x,y,y0:y,ph:Math.random()*6})}};
+ spawn();
+ let fire=()=>{};
+ window.cnq=()=>({sc,hits,over,shots,wave,ball:!!ball,G:G0,VM,cx,cy,R,t:tg.map(o=>({x:o.x,y:o.y})),fire:(a,p)=>fire(a,p)});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">💥 ميدان المدفع</h2>')+'<div id="cnH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="cnC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row"><button class="btn d" id="cnX">إغلاق</button></div>';
+  const cv=$('cnC');cv.width=W;cv.height=CH;const x=cv.getContext('2d');
+  const open=()=>$('cnC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('cnH'))$('cnH').textContent='💣 الطلقات: '+shots+' · 🎯 '+hits+' · موجة '+wave};
+  const say=(m,cc)=>{msg=m;msgC=cc;msgT=0.9};
+  const dw=()=>{const gr=x.createLinearGradient(0,0,0,CH);gr.addColorStop(0,'#a5d8ff');gr.addColorStop(1,'#e7f5ff');x.fillStyle=gr;x.fillRect(0,0,W,CH);
+   x.fillStyle='rgba(255,255,255,.8)';[[60,30],[200,50],[300,24]].forEach(([a,b])=>{x.beginPath();x.arc(a,b,12,0,6.3);x.arc(a+14,b+3,10,0,6.3);x.arc(a-13,b+4,9,0,6.3);x.fill()});
+   x.fillStyle='#69db7c';x.fillRect(0,CH-22,W,22);x.fillStyle='#37b24d';x.fillRect(0,CH-22,W,4);
+   tg.forEach(o=>{x.fillStyle='#fff';x.beginPath();x.arc(o.x,o.y,R,0,6.3);x.fill();x.fillStyle='#fa5252';x.beginPath();x.arc(o.x,o.y,R*0.75,0,6.3);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(o.x,o.y,R*0.45,0,6.3);x.fill();x.fillStyle='#fa5252';x.beginPath();x.arc(o.x,o.y,R*0.2,0,6.3);x.fill()});
+   x.save();x.translate(cx,cy);let ang=aim?aim.a:-0.8;x.rotate(ang);x.fillStyle='#343a40';x.fillRect(-4,-7,34,14);x.restore();x.fillStyle='#495057';x.beginPath();x.arc(cx,cy,12,0,6.3);x.fill();x.fillStyle='#868e96';x.fillRect(cx-14,cy+8,28,10);
+   if(aim&&!ball){x.fillStyle='rgba(0,0,0,.45)';let px=cx+Math.cos(aim.a)*30,py=cy+Math.sin(aim.a)*30,vx=Math.cos(aim.a)*VM*aim.p,vy=Math.sin(aim.a)*VM*aim.p;for(let i=0;i<40;i++){const dt=0.03;vy+=G0*dt;px+=vx*dt;py+=vy*dt;if(i%2===0){x.beginPath();x.arc(px,py,2.2,0,6.3);x.fill()}if(py>CH-22)break}
+    x.fillStyle='#212529';x.fillRect(6,CH-14,52,6);x.fillStyle=aim.p>0.8?'#fa5252':'#51cf66';x.fillRect(6,CH-14,52*aim.p,6)}
+   if(ball){x.fillStyle='#212529';x.beginPath();x.arc(ball.x,ball.y,5,0,6.3);x.fill()}
+   puffs.forEach(p=>{x.globalAlpha=Math.max(0,p.a);x.fillStyle=p.c;x.beginPath();x.arc(p.x,p.y,p.r,0,6.3);x.fill();x.globalAlpha=1});
+   if(msgT>0){x.fillStyle=msgC;x.strokeStyle='#212529';x.lineWidth=4;x.font='bold 22px sans-serif';x.textAlign='center';x.strokeText(msg,W/2,28);x.fillText(msg,W/2,28)}
+   x.fillStyle='#212529';x.font='bold 16px sans-serif';x.textAlign='right';x.fillText(sc,W-8,CH-5)};
+  const fin=()=>{over=true;dw();sfx('err');setTimeout(()=>{if(!open())return;const d=today();if(!me.cnnd||me.cnnd.d!==d)me.cnnd={d,c:0};let pay=Math.min(5,Math.floor(sc/40));pay=Math.max(0,Math.min(pay,12-me.cnnd.c));me.cnnd.c+=pay;me.coins+=pay;updCoins();const nb=sc>(me.cnnBest||0);if(nb)me.cnnBest=sc;me.cnnGames=(me.cnnGames||0)+1;saveMe();if(pay||nb)sfx('win');
+   c.innerHTML='<h2>'+(sc>=80?'💥 مدفعجي شاطر!':'🎯 خلصت الطلقات')+'</h2><div style="text-align:center;font-size:16px">النقاط: <b>'+sc+'</b> · أهداف: <b>'+hits+'</b>'+(nb&&sc?'<br>🏆 رقم قياسي!':'<br>أحسن نتيجة: '+(me.cnnBest||0))+'<br>'+(pay?'+'+pay+'🪙':sc>=40?'(وصلت حد النهاردة)':'اوصل 40 نقطة عشان تكسب عملات')+'</div><div class="row"><button class="btn g" id="cnR">🔁 تاني</button><button class="btn d" id="cnX">إغلاق</button></div>';$('cnR').onclick=()=>{$('modal').style.display='none';cnnStart()};$('cnX').onclick=()=>{$('modal').style.display='none'}},700)};
+  fire=(a,p)=>{if(over||ball||shots<=0||!open())return;p=Math.max(0.25,Math.min(1,p));ball={x:cx+Math.cos(a)*30,y:cy+Math.sin(a)*30,vx:Math.cos(a)*VM*p,vy:Math.sin(a)*VM*p,h:0};shots--;aim=null;sfx('place');hud()};
+  const boom=(px,py,cc)=>{for(let i=0;i<8;i++)puffs.push({x:px+(Math.random()-.5)*10,y:py+(Math.random()-.5)*10,r:3+Math.random()*5,a:1,c:cc,vx:(Math.random()-.5)*80,vy:(Math.random()-.5)*80})};
+  const endShot=()=>{const b=ball;ball=null;if(b&&b.h>1)say('x'+b.h+' مرة واحدة! 🔥','#ffd43b');if(!tg.length){sc+=20;shots+=3;say('موجة جديدة! +20 · +3 طلقات','#69db7c');sfx('win');spawn()}if(shots<=0&&!ball){hud();fin();return}hud()};
+  const tick=now=>{if(!open())return;const dt=Math.min(0.04,(now-(last||now))/1000);last=now;t0+=dt;if(msgT>0)msgT-=dt;
+   tg.forEach(o=>{o.y=o.y0+Math.sin(t0*1.6+o.ph)*4});
+   puffs.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.a-=dt*1.8});puffs=puffs.filter(p=>p.a>0);
+   if(ball&&!over){const n=3;for(let k=0;k<n&&ball;k++){const d=dt/n;ball.vy+=G0*d;ball.x+=ball.vx*d;ball.y+=ball.vy*d;
+     for(let i=tg.length-1;i>=0;i--){const o=tg[i];if(Math.hypot(o.x-ball.x,o.y-ball.y)<R+5){tg.splice(i,1);ball.h++;hits++;sc+=10*ball.h;boom(o.x,o.y,'#fa5252');boom(o.x,o.y,'#ffd43b');sfx('win')}}
+     if(ball.y>CH-22||ball.x>W+10||ball.x<-10){endShot()}}}
+   hud();dw();if(!over||puffs.length)requestAnimationFrame(tick)};
+  const pt=e=>{const r=cv.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width,py=(e.clientY-r.top)*CH/r.height;let a=Math.atan2(py-cy,px-cx);a=Math.max(-1.45,Math.min(-0.05,a));return{a,p:Math.max(0.25,Math.min(1,Math.hypot(px-cx,py-cy)/(W*0.7)))}};
+  let drag=false;
+  cv.onpointerdown=e=>{e.preventDefault();if(ball||over)return;drag=true;aim=pt(e);try{cv.setPointerCapture(e.pointerId)}catch(_){}};
+  cv.onpointermove=e=>{if(drag&&!ball)aim=pt(e)};
+  cv.onpointerup=e=>{if(!drag)return;drag=false;if(aim&&!ball)fire(aim.a,aim.p)};
+  cv.onpointercancel=()=>{drag=false;aim=null};
+  $('cnX').onclick=()=>{$('modal').style.display='none'};hud();dw();requestAnimationFrame(tick)})}
