@@ -24,7 +24,7 @@ const DEFAULT_ITEMS=[['rug',5,6,0],['sofa',3,3,0],['plant',1,1,0]];
 let me;
 try{me=JSON.parse(localStorage.getItem('ealam_me')||'null')}catch(e){me=null}
 if(!me||!me.id){me={id:rnd(6),name:'زائر'+Math.floor(Math.random()*900+100),body:Math.floor(Math.random()*12),head:0,hat:0,coins:150,floor:0,wall:0,items:DEFAULT_ITEMS.map(a=>a.slice()),friends:[],best:0}}
-me.friends=me.friends||[];me.best=me.best||0;me.owned=me.owned||[];me.daily=me.daily||{d:'',streak:0};
+if(!Array.isArray(me.items))me.items=DEFAULT_ITEMS.map(a=>a.slice());me.friends=me.friends||[];me.best=me.best||0;me.owned=me.owned||[];me.daily=me.daily||{d:'',streak:0};
 function saveMe(){try{localStorage.setItem('ealam_me',JSON.stringify(me))}catch(e){}updCoins()}
 function updCoins(){$('coins').textContent='🪙 '+me.coins}
 /* ===================== three setup ===================== */
