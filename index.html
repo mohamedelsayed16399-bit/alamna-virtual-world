@@ -50,6 +50,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#101830;font-family:sy
 .it span{display:block;font-size:22px}
 #shoptools{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;align-items:center;font-size:13px}
 #shoptools .btn{padding:6px 10px;min-width:0;flex-direction:row;font-size:13px}
+@media(max-height:420px){#shop{bottom:calc(48px + env(safe-area-inset-bottom));padding:3px 8px}#shoptools{margin-bottom:3px;font-size:11px}#shoptools .btn{padding:3px 8px;font-size:12px;min-height:0}#shoptools>:not(button){display:none}.it{padding:2px 8px;min-width:56px;font-size:11px;border-radius:9px}.it span{font-size:16px}#shopitems{padding-bottom:2px}}
 #mm{position:fixed;right:8px;top:calc(max(8px,env(safe-area-inset-bottom)) + 44px);width:92px;height:92px;border-radius:50%;background:rgba(16,24,48,.6);border:1px solid rgba(255,255,255,.2);z-index:4;pointer-events:none}
 .qrow{background:#252e57;border-radius:10px;padding:8px 10px;margin-top:6px;font-size:14px}.qbar{height:6px;border-radius:3px;background:#0f1530;margin-top:5px;overflow:hidden}.qbar i{display:block;height:100%;background:#51cf66}
 #race{position:fixed;top:calc(max(8px,env(safe-area-inset-top)) + 140px);left:50%;transform:translateX(-50%);z-index:5;display:none;font-size:16px;font-weight:800;background:rgba(16,24,48,.8);border:1px solid #69db7c;color:#fff;border-radius:999px;padding:6px 16px;pointer-events:none}
@@ -90,7 +91,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#101830;font-family:sy
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js"></script>
-<script src="game.js?v=176"></script>
-<script src="game2.js?v=176"></script>
+<script src="game.js?v=177"></script>
+<script src="game2.js?v=177"></script>
 </body>
 </html>
