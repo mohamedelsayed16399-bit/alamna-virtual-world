@@ -186,7 +186,7 @@ function buildTrack(){
  car(-1.8,-3,0xf03e3e);car(0,-5,0xfcc419);car(1.8,-2,0x4dabf7);
  [[-5,-3],[5,-3],[-5.5,1],[5.5,1]].forEach(([x,z],i)=>{g.add(mesh(G.cyl(0.4,0.4,0.5,10),0x212529,x,0.25,z),mesh(G.cyl(0.4,0.4,0.1,10),i%2?0xf03e3e:0xf8f9fa,x,0.52,z))});
  trk={it:{x:0,z:3,label:'🏎️ ابدأ السباق',fn:rcrStart}};interacts.push(trk.it);
- g.add(portalMesh('ارجع لركن الغزاة',5.8,5.8,0x7950f2,'invade'));
+ g.add(portalMesh('ارجع لركن الغزاة',5.8,5.8,0x7950f2,'invade'),portalMesh('🐸 بركة الضفادع',-5.8,5.8,0x40c057,'lily'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🏎️ دوس يمين أو شمال عشان تغيّر الحارة',3000)
 }
@@ -211,7 +211,7 @@ function rcrStart(){
    c.innerHTML='<h2>'+(sc>=40?'🏎️ برافو!':'💥 خبطت')+'</h2><div style="text-align:center;font-size:16px">النقاط: <b>'+sc+'</b> · نجوم: <b>'+stars+'</b>'+(nb&&sc?'<br>🏆 رقم قياسي!':'<br>أحسن نتيجة: '+(me.rcrBest||0))+'<br>'+(pay?'+'+pay+'🪙':sc>=40?'(وصلت حد النهاردة)':'اوصل 40 نقطة عشان تكسب عملات')+'</div><div class="row"><button class="btn g" id="rcR">🔁 تاني</button><button class="btn d" id="rcX">إغلاق</button></div>';$('rcR').onclick=()=>{$('modal').style.display='none';rcrStart()};$('rcX').onclick=()=>{$('modal').style.display='none'}},700)};
   const tick=now=>{if(!open()||over)return;const dt=Math.min(0.04,(now-(last||now))/1000);last=now;const v=sp();dist+=v*dt;roll+=v*dt;sc=Math.floor(dist/22)+stars*5;
    const tx=LW*(lane+0.5);px+=(tx-px)*Math.min(1,dt*14);
-   spawnT-=dt;if(spawnT<=0){spawnT=Math.max(.42,1.0-dist/9000);const l=Math.floor(Math.random()*3),l2=(l+1+Math.floor(Math.random()*2))%3;ob.push({x:LW*(l+0.5),y:-CHt,c:Math.floor(Math.random()*5),l});if(Math.random()<0.28)ob.push({x:LW*(l2+0.5),y:-CHt*2.5,c:Math.floor(Math.random()*5),l:l2});if(Math.random()<0.5){const l3=Math.floor(Math.random()*3);if(!ob.some(o=>o.l===l3&&o.y<CHt*2))st.push({x:LW*(l3+0.5),y:-CHt*3.2})}}
+   spawnT-=dt;if(spawnT<=0){spawnT=Math.max(.42,1.0-dist/9000)+(H?0.5:0);const l=Math.floor(Math.random()*3),l2=(l+1+Math.floor(Math.random()*2))%3;ob.push({x:LW*(l+0.5),y:-CHt,c:Math.floor(Math.random()*5),l});if(!H&&Math.random()<0.28)ob.push({x:LW*(l2+0.5),y:-CHt*2.5,c:Math.floor(Math.random()*5),l:l2});if(Math.random()<0.5){const l3=Math.floor(Math.random()*3);if(!ob.some(o=>o.l===l3&&o.y<CHt*2))st.push({x:LW*(l3+0.5),y:-CHt*3.2})}}
    for(const o of ob)o.y+=v*0.78*dt;for(const s of st)s.y+=v*0.78*dt;ob=ob.filter(o=>o.y<CH+CHt);st=st.filter(s=>s.y<CH+20);
    const py=CH-CHt*0.9;
    for(const o of ob)if(Math.abs(o.x-px)<CW*0.9&&Math.abs(o.y-py)<CHt*0.92){dw();return fin()}
@@ -221,3 +221,50 @@ function rcrStart(){
   const mv=e=>{e.preventDefault();const r=cv.getBoundingClientRect();const fx=(e.clientX-r.left)/r.width;lane=fx<0.33?0:fx>0.66?2:1};
   cv.onpointerdown=mv;
   $('rcX').onclick=()=>{$('modal').style.display='none'};dw();requestAnimationFrame(tick)})}
+
+/* frog jump */
+let lly=null;
+function buildLily(){
+ const g=indoor(0x2b8a3e,0x1c7ed6,0x40c057);
+ sign(g,'🐸 بركة الضفادع',0,4.6,-7.6,'rgba(43,138,62,.92)');
+ g.add(mesh(G.cyl(5.2,5.2,0.1,20),0x3b9be0,0,0.06,-1.2,0x0b3d78));
+ for(let i=0;i<9;i++){const a=i*0.7,r=1.2+(i%4)*0.9,x=Math.cos(a)*r*1.1,z=-1.2+Math.sin(a)*r*0.9;g.add(mesh(G.cyl(0.55,0.55,0.08,10),i%3?0x51cf66:0x2f9e44,x,0.14,z,0x144d1c));if(i%3===0)g.add(mesh(G.sph(0.14,6),0xff8787,x+0.1,0.28,z,0xaa3333))}
+ g.add(mesh(G.sph(0.5,10),0x40c057,0.3,0.55,-1.4,0x145c20),mesh(G.sph(0.14,6),0xffffff,0.15,0.95,-1.6),mesh(G.sph(0.14,6),0xffffff,0.45,0.95,-1.6),mesh(G.sph(0.07,6),0x212529,0.15,0.96,-1.72),mesh(G.sph(0.07,6),0x212529,0.45,0.96,-1.72));
+ [[-5.5,-3],[5.5,-3],[-5.5,1],[5.5,1]].forEach(([x,z],i)=>{g.add(mesh(G.cyl(0.12,0.16,1.6+i%2*0.6,6),0x2b8a3e,x,0.8,z),mesh(G.sph(0.3,6),0x8d5a2b,x,1.7+i%2*0.6,z))});
+ lly={it:{x:0,z:3,label:'🐸 اقفز لفوق',fn:frgStart}};interacts.push(lly.it);
+ g.add(portalMesh('ارجع لحلبة السباق',5.8,5.8,0xf03e3e,'track'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🐸 حرّك صباعك يمين وشمال، الضفدع بيقفز لوحده',3000)
+}
+function frgStart(){
+ const H=innerHeight<420,CH=H?Math.max(130,innerHeight-165):Math.max(220,Math.min(innerHeight-300,440)),W=Math.min(innerWidth-50,360),S=CH/400,PWd=W*0.2,PT=7,HJ=CH*0.42,GR=1500*S,V0=Math.sqrt(2*GR*HJ),R=Math.max(8,W*0.03);
+ let fx=W/2,fy=CH-30,vy=-V0,cam=0,best=0,pl=[],over=false,last=0,sc=0,tx=W/2,topY=CH-10;
+ const addP=y=>{const h=Math.max(0,-y/CH),k=Math.random(),t=h>0.5&&k<0.18?2:h>0.2&&k<0.38?1:0;pl.push({x:Math.random()*(W-PWd),y,t,d:Math.random()<.5?1:-1,on:true})};
+ pl.push({x:W/2-PWd/2,y:CH-10,t:0,d:1,on:true});topY=CH-10;
+ while(topY>-CH*0.3){topY-=HJ*(0.3+Math.random()*0.35);addP(topY)}
+ window.frq=()=>({fx,fy,vy,sc,over,pl,cam,W,CH,PWd,HJ,setX:v=>{tx=v}});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🐸 قفزة الضفدع</h2>')+'<div id="frH" style="text-align:center;font-size:14px;margin:2px">حرّك صباعك يمين وشمال</div><canvas id="frC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row"><button class="btn d" id="frX">إغلاق</button></div>';
+  const cv=$('frC');cv.width=W;cv.height=CH;const x=cv.getContext('2d');
+  const open=()=>$('frC')&&$('modal').style.display!=='none';
+  const dw=()=>{const gr=x.createLinearGradient(0,0,0,CH);gr.addColorStop(0,'#74c0fc');gr.addColorStop(1,'#d3f9d8');x.fillStyle=gr;x.fillRect(0,0,W,CH);
+   for(const p of pl){if(!p.on)continue;const y=p.y-cam;if(y<-20||y>CH+20)continue;x.fillStyle=p.t===1?'#f783ac':p.t===2?'#a9744f':'#51cf66';x.beginPath();x.ellipse(p.x+PWd/2,y+PT/2,PWd/2,PT,0,0,6.3);x.fill();x.fillStyle='rgba(0,0,0,.18)';x.beginPath();x.ellipse(p.x+PWd/2,y+PT/2+2,PWd/2-3,PT-3,0,0,6.3);x.fill()}
+   const y=fy-cam;x.fillStyle='#40c057';x.beginPath();x.ellipse(fx,y,R,R*(vy<0?1.15:0.95),0,0,6.3);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(fx-R*.4,y-R*.5,R*.33,0,6.3);x.arc(fx+R*.4,y-R*.5,R*.33,0,6.3);x.fill();x.fillStyle='#212529';x.beginPath();x.arc(fx-R*.4,y-R*.5,R*.15,0,6.3);x.arc(fx+R*.4,y-R*.5,R*.15,0,6.3);x.fill();x.strokeStyle='#2b8a3e';x.lineWidth=2;x.beginPath();x.arc(fx,y+R*.1,R*.45,0.2,2.9);x.stroke();
+   x.fillStyle='#fff';x.strokeStyle='#1864ab';x.lineWidth=4;x.font='bold 22px sans-serif';x.textAlign='center';x.strokeText(sc,W/2,26);x.fillText(sc,W/2,26)};
+  const fin=()=>{over=true;dw();sfx('err');setTimeout(()=>{if(!open())return;const d=today();if(!me.frgd||me.frgd.d!==d)me.frgd={d,c:0};let pay=Math.min(5,Math.floor(sc/50));pay=Math.max(0,Math.min(pay,12-me.frgd.c));me.frgd.c+=pay;me.coins+=pay;updCoins();const nb=sc>(me.frgBest||0);if(nb)me.frgBest=sc;me.frgGames=(me.frgGames||0)+1;saveMe();if(pay||nb)sfx('win');
+   c.innerHTML='<h2>'+(sc>=50?'🐸 برافو!':'💦 وقعت في المية')+'</h2><div style="text-align:center;font-size:16px">الارتفاع: <b>'+sc+'</b> م'+(nb&&sc?'<br>🏆 رقم قياسي!':'<br>أحسن نتيجة: '+(me.frgBest||0))+'<br>'+(pay?'+'+pay+'🪙':sc>=50?'(وصلت حد النهاردة)':'اطلع 50 متر عشان تكسب عملات')+'</div><div class="row"><button class="btn g" id="frR">🔁 تاني</button><button class="btn d" id="frX">إغلاق</button></div>';$('frR').onclick=()=>{$('modal').style.display='none';frgStart()};$('frX').onclick=()=>{$('modal').style.display='none'}},700)};
+  const tick=now=>{if(!open()||over)return;const dt=Math.min(0.035,(now-(last||now))/1000);last=now;
+   fx+=(tx-fx)*Math.min(1,dt*12);fx=Math.max(R,Math.min(W-R,fx));
+   const oy=fy;vy+=GR*dt;fy+=vy*dt;
+   if(vy>0)for(const p of pl){if(!p.on)continue;if(fx>p.x-R*.5&&fx<p.x+PWd+R*.5&&oy+R*.6<=p.y+2&&fy+R*.6>=p.y){fy=p.y-R*.6;vy=-V0;sfx('tick');if(p.t===2)p.on=false;break}}
+   for(const p of pl)if(p.t===1&&p.on){p.x+=p.d*50*(W/360)*dt;if(p.x<0){p.x=0;p.d=1}if(p.x>W-PWd){p.x=W-PWd;p.d=-1}}
+   if(fy-cam<CH*0.4)cam=fy-CH*0.4;
+   while(topY>cam-CH*0.3){topY-=HJ*(0.3+Math.min(0.5,Math.max(0,-topY)/CH/40+Math.random()*0.35));addP(topY)}
+   pl=pl.filter(p=>p.y-cam<CH+30);
+   sc=Math.max(sc,Math.floor((CH-30-fy)/(CH/40)));
+   if(fy-cam>CH+R){dw();return fin()}
+   if($('frH'))$('frH').textContent='🐸 '+sc+' م';
+   dw();requestAnimationFrame(tick)};
+  const mv=e=>{e.preventDefault();const r=cv.getBoundingClientRect();tx=(e.clientX-r.left)*W/r.width};
+  cv.onpointermove=mv;cv.onpointerdown=mv;
+  $('frX').onclick=()=>{$('modal').style.display='none'};dw();requestAnimationFrame(tick)})}
