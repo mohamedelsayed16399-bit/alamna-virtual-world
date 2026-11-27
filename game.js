@@ -478,8 +478,8 @@ if(subRoom&&subRoom!==room.id){try{client.unsubscribe(topicRoom(subRoom))}catch(
 client.subscribe(topicRoom(room.id));subRoom=room.id;sendPos(true);
 }
 function pub(obj){if(netOK&&client){try{client.publish(topicRoom(room.id),JSON.stringify(obj))}catch(e){}}}
-const BADRX=/(fuck\w*|shit\w*|bitch\w*|asshole|pussy|nigg\w*|whore|slut|شرموط\S*|متناك\S*|منيوك\S*|قحب\S*|ابن الكلب|ولاد الكلب|كسمك|كس امك)/gi;
-const BADN=['fuck','shit','bitch','whore','slut','nigg','pussy','asshole','dickhead','motherfuck','شرموط','متناك','منيوك','قحبه','كسمك','كساميك','كسامك','ابنالكلب','ولادالكلب','ابنالمتناكه','ابنالشرموطه'].map(w=>w.replace(/(.)\1+/g,'$1'));
+const BADRX=/(fuck\w*|shit\w*|bitch\w*|asshole|pussy|nigg\w*|whore|slut|شرموط\S*|متناك\S*|منيوك\S*|قحب\S*|ابن الكلب|ولاد الكلب|كسمك|كس امك|ديوث|معرص|cunt|faggot)/gi;
+const BADN=['fuck','shit','bitch','whore','slut','nigg','pussy','asshole','dickhead','motherfuck','شرموط','متناك','منيوك','قحبه','كسمك','كساميك','كسامك','ابنالكلب','ولادالكلب','ابنالمتناكه','ابنالشرموطه','ديوث','معرص','كسختك','كساختك','ابنوسخه','sharmot','kosomak','cunt','faggot'].map(w=>w.replace(/(.)\1+/g,'$1'));
 function modNorm(t){return String(t).toLowerCase().replace(/[\u064b-\u065f\u0670\u0640\u200b-\u200f]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[@4]/g,'a').replace(/[3]/g,'e').replace(/[0]/g,'o').replace(/[1!|]/g,'i').replace(/[$5]/g,'s').replace(/[^a-z\u0621-\u064a]/g,'').replace(/(.)\1+/g,'$1')}
 function modBad(t){const n=modNorm(t);return BADN.some(w=>n.includes(w))}
 const URLRX=/(https?:\/\/\S+|www\.\S+|\b\S+\.(com|net|org|io|me|ly|xyz|app|gg|tk)\b\S*)/gi;
