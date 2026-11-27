@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -257,6 +257,7 @@ function buildBxr(){
  g.add(mesh(G.box(0.3,2,0.3),0x1098ad,-5,1,-2),mesh(G.box(0.3,2,0.3),0x1098ad,5,1,-2));
  bxrh={it:{x:0,z:0.2,label:'🧱 العب كسّارة الطوب',fn:bxrStart}};interacts.push(bxrh.it);
  g.add(portalMesh('ارجع لـ2048',5.8,5.8,0xf08c00,'tferoom'));
+ g.add(portalMesh('لغز الأرقام',-5.8,5.8,0x37b24d,'slproom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🧱 حرّك اللوح بصباعك واكسر كل الطوب. عندك 3 محاولات',3400)
 }
@@ -295,4 +296,39 @@ function bxrStart(){
   cv.onpointerdown=e=>{e.preventDefault();mv(e);launch()};cv.onpointermove=mv;
   $('bxN').onclick=()=>{fill();lives=3;over=false;won=false;msg='';px=W/2;reset();info()};
   $('bxX').onclick=()=>{$('modal').style.display='none'};
+  info();requestAnimationFrame(loop)})}
+function buildSlp(){
+ const g=indoor(0x37b24d,0xebfbee,0xb2f2bb);
+ sign(g,'🧩 لغز الأرقام',0,4.6,-7.6,'rgba(55,178,77,.92)');
+ for(let i=0;i<8;i++)g.add(mesh(G.box(0.7,0.2,0.7),[0x37b24d,0x74c69d,0x69db7c][i%3],-1.1+(i%3)*0.8,0.4,-5.4+Math.floor(i/3)*0.8));
+ g.add(mesh(G.box(0.3,2,0.3),0x37b24d,-5,1,-2),mesh(G.box(0.3,2,0.3),0x37b24d,5,1,-2));
+ slph={it:{x:0,z:0.2,label:'🧩 العب لغز الأرقام',fn:slpStart}};interacts.push(slph.it);
+ g.add(portalMesh('ارجع للطوب',5.8,5.8,0x1098ad,'bxrroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🧩 رتّب الأرقام من 1 لـ8 بأقل حركات',3400)
+}
+function slpStart(){
+ const H=innerHeight<420,S=H?140:Math.min(innerWidth-50,270),cs=S/3;
+ let b=[1,2,3,4,5,6,7,8,0],path=[8],moves=0,over=false,msg='';
+ const nb=i=>{const r=Math.floor(i/3),c=i%3,o=[];if(r>0)o.push(i-3);if(r<2)o.push(i+3);if(c>0)o.push(i-1);if(c<2)o.push(i+1);return o};
+ const shuffle=()=>{b=[1,2,3,4,5,6,7,8,0];path=[8];let bl=8,prev=-1;for(let k=0;k<60;k++){const o=nb(bl).filter(v=>v!==prev);const n=o[Math.floor(Math.random()*o.length)];b[bl]=b[n];b[n]=0;prev=bl;bl=n;path.push(n)}if(b.every((v,i)=>v===(i+1)%9))shuffle()};
+ shuffle();
+ let tap=()=>{};
+ window.slpq=()=>({b:b.slice(),path:path.slice(),moves,over,coins:me.coins,tap:i=>tap(i),set:a=>{b=a.slice();moves=0;over=false}});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🧩 لغز الأرقام</h2>')+'<div id="slS" style="text-align:center;font-size:14px;margin:2px;min-height:1.4em"></div><div style="text-align:center"><canvas id="slC" width="'+S+'" height="'+S+'" style="border-radius:10px;max-width:100%;touch-action:none"></canvas></div><div id="slM" style="text-align:center;font-size:13px;margin:5px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="slN" style="width:auto!important;display:inline-block!important">🔁 لغز جديد</button><button class="btn d" id="slX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('slC'),x=cv.getContext('2d');
+  const open=()=>$('slC')&&$('modal').style.display!=='none';
+  const info=()=>{if($('slS'))$('slS').textContent='الحركات '+moves+' · أحسن '+(me.slpBest||'-');if($('slM'))$('slM').textContent=msg};
+  const finish=()=>{over=true;me.slpGames=(me.slpGames||0)+1;me.slpBest=me.slpBest?Math.min(me.slpBest,moves):moves;const d=today();if(me.slpDD!==d){me.slpDD=d;me.slpDC=0}
+   let c=moves<=30?3:moves<=50?2:1;c=Math.min(c,Math.max(0,6-(me.slpDC||0)));
+   if(c){me.coins+=c;me.slpDC=(me.slpDC||0)+c;updCoins();sfx('win')}
+   msg='🏁 حليتها في '+moves+' حركة'+(c?' · +'+c+'🪙':'')+(moves>30?' · اقل من 31 تديك أكتر':'');saveMe();info()};
+  tap=i=>{if(over)return;const z=b.indexOf(0);if(!nb(z).includes(i))return;b[z]=b[i];b[i]=0;moves++;sfx('tick');msg='';if(b.every((v,k)=>v===(k+1)%9))finish();info()};
+  const loop=()=>{if(!open())return;x.fillStyle='#b2f2bb';x.fillRect(0,0,S,S);x.textAlign='center';x.textBaseline='middle';x.font='bold '+cs*.45+'px sans-serif';
+   b.forEach((v,i)=>{if(!v)return;const px=(i%3)*cs,py=Math.floor(i/3)*cs;x.fillStyle=v===i+1?'#2f9e44':'#51cf66';x.fillRect(px+3,py+3,cs-6,cs-6);x.fillStyle='#fff';x.fillText(v,px+cs/2,py+cs/2)});
+   info();requestAnimationFrame(loop)};
+  cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),px=(e.clientX-r.left)*S/r.width,py=(e.clientY-r.top)*S/r.height;tap(Math.floor(py/cs)*3+Math.floor(px/cs))};
+  $('slN').onclick=()=>{shuffle();moves=0;over=false;msg='';info()};
+  $('slX').onclick=()=>{$('modal').style.display='none'};
   info();requestAnimationFrame(loop)})}
