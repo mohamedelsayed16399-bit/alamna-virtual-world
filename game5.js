@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;
+let bpph=null;let mg2h=null;let skbh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -42,6 +42,7 @@ function buildMg2(){
  g.add(mesh(G.box(0.3,2,0.3),0x2f9e44,-5,1,-2),mesh(G.box(0.3,2,0.3),0x2f9e44,5,1,-2));
  mg2h={it:{x:0,z:0.2,label:'⛳ العب جولف',fn:mg2Start}};interacts.push(mg2h.it);
  g.add(portalMesh('ارجع للبالونات',5.8,5.8,0xd6336c,'bpproom'));
+ g.add(portalMesh('برج السحاب',-5.8,5.8,0x4263eb,'skbroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('⛳ 3 حفر. اسحب لورا من الكورة وسيّب. أقل ضربات أحسن',3400)
 }
@@ -82,4 +83,46 @@ function mg2Start(){
   cv.onpointermove=e=>{if(drag)drag=pos(e)};
   cv.onpointerup=e=>{if(!drag)return;const d=pos(e),dx=bx-d[0],dy=by-d[1],len=Math.hypot(dx,dy);drag=null;if(len>8)shoot(Math.atan2(dy,dx),len*5)};
   $('mgN').onclick=()=>{total=0;over=false;msg='';load(0);info()};$('mgX').onclick=()=>{$('modal').style.display='none'};
+  info();requestAnimationFrame(loop)})}
+function buildSkb(){
+ const g=indoor(0x4263eb,0xedf2ff,0xbac8ff);
+ sign(g,'🏗️ برج السحاب',0,4.6,-7.6,'rgba(66,99,235,.92)');
+ [0,1,2,3,4].forEach(i=>g.add(mesh(G.box(2.4-i*0.4,0.5,1.4),[0x4263eb,0x5c7cfa,0x748ffc,0x91a7ff,0xbac8ff][i],0,0.25+i*0.5,-4.5)));
+ g.add(mesh(G.box(0.3,2,0.3),0x4263eb,-5,1,-2),mesh(G.box(0.3,2,0.3),0x4263eb,5,1,-2));
+ skbh={it:{x:0,z:0.2,label:'🏗️ ابني البرج',fn:skbStart}};interacts.push(skbh.it);
+ g.add(portalMesh('ارجع للجولف',5.8,5.8,0x2f9e44,'mg2room'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🏗️ دوس في اللحظة المظبوطة عشان الطبقة تنزل فوق اللي تحتها',3400)
+}
+function skbStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,320),CH=H?150:250,BH=14;
+ let L=[{x:W/2-60,w:120}],n=0,bx=0,bw=120,dir=1,over=false,perf=0,msg='',coinsGot=0;
+ const spd=()=>Math.min(260,90+n*5);
+ window.skbq=()=>({n,bx,bw,top:L[L.length-1],over,W,perf,coins:me.coins,drop:()=>drop(),align:()=>{bx=L[L.length-1].x}});
+ let drop=()=>{};
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🏗️ برج السحاب</h2>')+'<div id="skS" style="text-align:center;font-size:14px;margin:2px;min-height:1.4em"></div><div style="text-align:center"><canvas id="skC" width="'+W+'" height="'+CH+'" style="border-radius:10px;max-width:100%;touch-action:none"></canvas></div><div id="skM" style="text-align:center;font-size:13px;margin:5px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="skN" style="width:auto!important;display:inline-block!important">🔁 من الأول</button><button class="btn d" id="skX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('skC'),x=cv.getContext('2d');
+  const open=()=>$('skC')&&$('modal').style.display!=='none';
+  const info=()=>{if($('skS'))$('skS').textContent='الطبقات '+n+' · ممتاز '+perf+' · أحسن '+(me.skbBest||0);if($('skM'))$('skM').textContent=msg};
+  const reset=()=>{L=[{x:W/2-60,w:120}];n=0;bw=120;bx=0;dir=1;over=false;perf=0;msg='';coinsGot=0};
+  const finish=()=>{over=true;me.skbGames=(me.skbGames||0)+1;me.skbBest=Math.max(me.skbBest||0,n);const d=today();if(me.skbDD!==d){me.skbDD=d;me.skbDC=0}
+   let c=n>=25?3:n>=18?2:n>=10?1:0;c=Math.min(c,Math.max(0,6-(me.skbDC||0)));
+   if(c){me.coins+=c;me.skbDC=(me.skbDC||0)+c;updCoins();sfx('win')}else sfx('err');
+   msg='💥 البرج وقع عند '+n+' طبقة'+(c?' · +'+c+'🪙':' · وصّل 10 طبقات للجايزة');saveMe();info()};
+  drop=()=>{if(over)return;const t=L[L.length-1];let l=Math.max(bx,t.x),r=Math.min(bx+bw,t.x+t.w);
+   if(r-l<=1){finish();return}
+   if(Math.abs(bx-t.x)<4){l=t.x;r=t.x+t.w;perf++;msg='✨ ممتاز';sfx('star')}else{msg='';sfx('place')}
+   L.push({x:l,w:r-l});n++;bw=r-l;bx=n%2?0:W-bw;dir=n%2?1:-1;info()};
+  let tm=performance.now();
+  const loop=ts=>{if(!open())return;const dt=Math.min(.03,(ts-tm)/1000);tm=ts;
+   if(!over){bx+=dir*spd()*dt;if(bx<0){bx=0;dir=1}if(bx+bw>W){bx=W-bw;dir=-1}}
+   x.fillStyle='#dbe4ff';x.fillRect(0,0,W,CH);
+   const oy=Math.max(0,(L.length+1)*BH-(CH-30));
+   L.forEach((b,i)=>{x.fillStyle='hsl('+(220+i*9)%360+',70%,'+(55+(i%2)*6)+'%)';x.fillRect(b.x,CH-(i+1)*BH+oy,b.w,BH-1)});
+   if(!over){x.fillStyle='#e8590c';x.fillRect(bx,CH-(L.length+1)*BH+oy,bw,BH-1)}
+   info();requestAnimationFrame(loop)};
+  bx=0;
+  cv.onpointerdown=e=>{e.preventDefault();drop()};
+  $('skN').onclick=()=>{reset();info()};$('skX').onclick=()=>{$('modal').style.display='none'};
   info();requestAnimationFrame(loop)})}
