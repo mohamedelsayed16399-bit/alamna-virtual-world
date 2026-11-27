@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -417,6 +417,7 @@ function buildWsc(){
  g.add(mesh(G.box(0.3,2,0.3),0x0ca678,-5,1,-2),mesh(G.box(0.3,2,0.3),0x0ca678,5,1,-2));
  wsch={it:{x:0,z:0.2,label:'🔤 العب فك الكلمة',fn:wscStart}};interacts.push(wsch.it);
  g.add(portalMesh('ارجع للحارات',5.8,5.8,0x495057,'ldgroom'));
+ g.add(portalMesh('بنج بونج',-5.8,5.8,0x1971c2,'pnkroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🔤 رتّب الحروف المتلخبطة عشان تكوّن الكلمة. 60 ثانية',3400)
 }
@@ -440,3 +441,45 @@ function wscStart(){
   $('wcG').onclick=()=>{score=0;left=60;over=false;run=true;msg='';pickW();clearInterval(tmr);tmr=setInterval(()=>{if(!open()){clearInterval(tmr);return}left-=.5;if(left<=0){left=0;finish()}else tick()},500);paint()};
   $('wcX').onclick=()=>{clearInterval(tmr);$('modal').style.display='none'};
   paint()})}
+function buildPnk(){
+ const g=indoor(0x1971c2,0xe7f5ff,0xa5d8ff);
+ sign(g,'🏓 بنج بونج ضد 🤖',0,4.6,-7.6,'rgba(25,113,194,.92)');
+ g.add(mesh(G.box(3.2,0.15,2),0x1971c2,0,0.7,-4.5),mesh(G.box(0.12,0.3,2),0xffffff,0,0.9,-4.5),mesh(G.cyl(0.1,0.1,0.7,6),0x495057,-1.4,0.35,-3.6),mesh(G.cyl(0.1,0.1,0.7,6),0x495057,1.4,0.35,-3.6),mesh(G.sph(0.12,8),0xffffff,0.7,1,-4.5));
+ g.add(mesh(G.box(0.3,2,0.3),0x1971c2,-5,1,-2),mesh(G.box(0.3,2,0.3),0x1971c2,5,1,-2));
+ pnkh={it:{x:0,z:0.2,label:'🏓 العب ضد البوت 🤖',fn:pnkStart}};interacts.push(pnkh.it);
+ g.add(portalMesh('ارجع للكلمات',5.8,5.8,0x0ca678,'wscroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🏓 حرّك اللوح بصباعك. أول واحد يوصل 5 يكسب. الخصم بوت 🤖',3400)
+}
+function pnkStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,300),CH=H?150:260,PW=56,PH=7,BR=5,TOP=14,BOT=CH-14;
+ let px=W/2,ox=W/2,bx=W/2,by=CH/2,vx=0,vy=0,go=false,me_=0,bot=0,over=false,msg='',tsc=1,sp=170,wait=0;
+ const serve=d=>{bx=W/2;by=CH/2;sp=170;const a=(Math.random()-.5)*.9;vx=Math.sin(a)*sp;vy=Math.cos(a)*sp*d;wait=.6};
+ let start=()=>{};
+ window.pnkq=()=>({me:me_,bot,over,go,bx,by,px,ox,W,CH,coins:me.coins,setP:v=>{px=Math.max(PW/2,Math.min(W-PW/2,v))},fast:k=>{tsc=k},start:()=>$('poG')&&$('poG').click()});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🏓 بنج بونج ضد 🤖</h2>')+'<div id="poS" style="text-align:center;font-size:14px;margin:2px;min-height:1.4em"></div><div style="text-align:center"><canvas id="poC" width="'+W+'" height="'+CH+'" style="border-radius:10px;max-width:100%;touch-action:none"></canvas></div><div id="poM" style="text-align:center;font-size:13px;margin:5px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="poG" style="width:auto!important;display:inline-block!important">▶ ابدأ</button><button class="btn d" id="poX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('poC'),x=cv.getContext('2d');
+  const open=()=>$('poC')&&$('modal').style.display!=='none';
+  const info=()=>{if($('poS'))$('poS').textContent='أنت '+me_+' : '+bot+' 🤖 (الأول لـ5) · أحسن فوز '+(me.pnkBest||0);if($('poM'))$('poM').textContent=msg};
+  const finish=()=>{over=true;go=false;me.pnkGames=(me.pnkGames||0)+1;const win=me_>bot,mar=me_-bot;if(win)me.pnkBest=Math.max(me.pnkBest||0,mar);
+   const d=today();if(me.pnkDD!==d){me.pnkDD=d;me.pnkDC=0}let c=win?(mar>=3?3:2):0;c=Math.min(c,Math.max(0,6-(me.pnkDC||0)));
+   if(c){me.coins+=c;me.pnkDC=(me.pnkDC||0)+c;updCoins();sfx('win')}else sfx('err');
+   msg=(win?'🏆 كسبت البوت':'🤖 البوت كسب')+' '+me_+':'+bot+(c?' · +'+c+'🪙':'');saveMe();info()};
+  const point=(who)=>{if(who)me_++;else bot++;sfx(who?'star':'err');info();if(me_>=5||bot>=5){finish();return}serve(who?-1:1)};
+  const step=dt=>{if(wait>0){wait-=dt;return}
+   bx+=vx*dt;by+=vy*dt;if(bx<BR){bx=BR;vx=Math.abs(vx)}if(bx>W-BR){bx=W-BR;vx=-Math.abs(vx)}
+   const tx=bx+vx*0.05,d=tx-ox,mx=120*dt*(sp/170);ox+=Math.max(-mx,Math.min(mx,d*(vy<0?1:.15)));ox=Math.max(PW/2,Math.min(W-PW/2,ox));
+   if(vy>0&&by+BR>=BOT&&by-BR<=BOT+PH&&Math.abs(bx-px)<=PW/2+BR){sp=Math.min(300,sp+10);const o=(bx-px)/(PW/2),a=o*1.0;vx=Math.sin(a)*sp;vy=-Math.cos(a)*sp;by=BOT-BR;sfx('place')}
+   if(vy<0&&by-BR<=TOP+PH&&by+BR>=TOP&&Math.abs(bx-ox)<=PW/2+BR){sp=Math.min(300,sp+10);const o=(bx-ox)/(PW/2),a=o*1.0;vx=Math.sin(a)*sp;vy=Math.cos(a)*sp;by=TOP+PH+BR;sfx('tick')}
+   if(by>CH+BR)point(0);else if(by<-BR)point(1)};
+  let tm=performance.now();
+  const loop=ts=>{if(!open())return;let dt=Math.min(.05,(ts-tm)/1000)*tsc;tm=ts;if(go&&!over){while(dt>0&&go&&!over){const s=Math.min(dt,.008);step(s);dt-=s}}
+   x.fillStyle='#e7f5ff';x.fillRect(0,0,W,CH);x.strokeStyle='#a5d8ff';x.setLineDash([6,6]);x.beginPath();x.moveTo(0,CH/2);x.lineTo(W,CH/2);x.stroke();x.setLineDash([]);
+   x.fillStyle='#868e96';x.fillRect(ox-PW/2,TOP,PW,PH);x.fillStyle='#1971c2';x.fillRect(px-PW/2,BOT,PW,PH);
+   x.fillStyle='#212529';x.beginPath();x.arc(bx,by,BR,0,7);x.fill();info();requestAnimationFrame(loop)};
+  const mv=e=>{const r=cv.getBoundingClientRect();px=Math.max(PW/2,Math.min(W-PW/2,(e.clientX-r.left)*W/r.width))};
+  cv.onpointerdown=e=>{e.preventDefault();mv(e)};cv.onpointermove=mv;
+  $('poG').onclick=()=>{me_=0;bot=0;over=false;go=true;msg='';px=W/2;ox=W/2;serve(1);info()};
+  $('poX').onclick=()=>{$('modal').style.display='none'};
+  info();requestAnimationFrame(loop)})}
