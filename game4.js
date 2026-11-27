@@ -615,7 +615,7 @@ function buildCfl(){
  for(let i=0;i<6;i++)for(let j=0;j<6;j++){const c=i+j<3?cl[3]:cl[(i*7+j*3+(i>3?1:0))%5];g.add(mesh(G.box(0.62,0.1,0.62),c,-1.6+i*0.64,0.2,-5.6+j*0.64))}
  g.add(mesh(G.cyl(0.4,0.4,1,10),0x1098ad,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x1098ad,5,0.5,0));
  cfh={it:{x:0,z:0.2,label:'🌊 العب تلوين الفيضان',fn:cflStart}};interacts.push(cfh.it);
- g.add(portalMesh('ارجع لسودوكو',5.8,5.8,0x7048e8,'sdkroom'));
+ g.add(portalMesh('ارجع لسودوكو',5.8,5.8,0x7048e8,'sdkroom'),portalMesh('🧩 الصور المخفية',-5.8,5.8,0xe64980,'nngroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🌊 ابدأ من الركن اللي فوق وغطّي اللوحة بلون واحد قبل ما الحركات تخلص',3200)
 }
@@ -644,3 +644,45 @@ function cflStart(){
    else if(moves>=lim){pend=true;msg='الحركات خلصت ❌';hud();dw();sfx('err');setTimeout(()=>{if(open())fin()},1300)}else{hud();dw()}return true};
   c.querySelectorAll('.cfp').forEach(b=>b.onclick=()=>mv(+b.dataset.c));
   $('cfR').onclick=()=>{init();hud();dw()};$('cfX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
+let nngh=null;
+const NNGP=[['❤️','0101011111111110111000100'],['🏠','0010001110111111101111011'],['😊','0101001010000001000101110'],['🌲','0010001110111110010000100'],['➕','0010000100111110010000100']];
+function buildNng(){
+ const g=indoor(0xe64980,0xfff0f6,0xfaa2c1);
+ sign(g,'🧩 غرفة الصور المخفية',0,4.6,-7.6,'rgba(230,73,128,.92)');
+ g.add(mesh(G.box(4.4,0.12,4.4),0xf8f9fa,0,0.08,-4));
+ const s=NNGP[0][1];for(let i=0;i<5;i++)for(let j=0;j<5;j++)g.add(mesh(G.box(0.7,0.12,0.7),s[i*5+j]==='1'?0xe64980:0xdee2e6,-1.7+j*0.85,0.2,-5.7+i*0.85));
+ g.add(mesh(G.cyl(0.4,0.4,1,10),0xe64980,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0xe64980,5,0.5,0));
+ nngh={it:{x:0,z:0.2,label:'🧩 العب الصور المخفية',fn:nngStart}};interacts.push(nngh.it);
+ g.add(portalMesh('ارجع لتلوين الفيضان',5.8,5.8,0x1098ad,'cflroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🧩 الأرقام بتقولك كام مربع ملون ورا بعض في كل صف وعمود. اكتشف الصورة!',3400)
+}
+function nngStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),S=H?Math.max(130,Math.min(W,innerHeight-210)):Math.min(W,Math.max(240,Math.min(innerHeight-400,320)));
+ let st=0,pi=[],sol=[],g=[],mist=0,cleared=0,eff=0,over=false,pend=false,msg='',mark=false;
+ const ord=[0,1,2,3,4].sort(()=>Math.random()-0.5).slice(0,3);
+ const clue=(arr,ln)=>{const o=[];let n=0;for(const v of ln.map(i=>arr[i])){if(v)n++;else if(n){o.push(n);n=0}}if(n)o.push(n);return o.length?o:[0]};
+ const init=()=>{const p=NNGP[ord[st]];pi=p;sol=[...p[1]].map(v=>+v);g=Array(25).fill(0);mist=0;pend=false;msg=''};
+ init();
+ let tap=()=>false;
+ window.nngq=()=>({st,pat:pi[0],g:g.slice(),sol:sol.slice(),mist,over,cleared,eff,tap:i=>tap(i)});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🧩 الصور المخفية</h2>')+'<div id="ngH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="ngC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="ngM" style="width:auto!important;display:inline-block!important">⬛ تلوين</button><button class="btn" id="ngR" style="width:auto!important;display:inline-block!important">🔁 من الأول</button><button class="btn d" id="ngX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('ngC');cv.width=S;cv.height=S;const x=cv.getContext('2d'),m=S*0.3,cs=(S-m)/5;
+  const open=()=>$('ngC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('ngH'))$('ngH').textContent='صورة '+(st+1)+'/3 · أخطاء '+mist+(msg?' · '+msg:'')};
+  const dw=()=>{x.fillStyle='#fff0f6';x.fillRect(0,0,S,S);const rc=[],cc=[];for(let i=0;i<5;i++){rc.push(clue(sol,[0,1,2,3,4].map(j=>i*5+j)));cc.push(clue(sol,[0,1,2,3,4].map(j=>j*5+i)))}
+   x.fillStyle='#862e57';x.font='bold '+Math.round(cs*0.38)+'px sans-serif';x.textAlign='center';x.textBaseline='middle';
+   for(let i=0;i<5;i++){x.fillText(rc[i].join(' '),m*0.5,m+i*cs+cs/2);const a=cc[i];a.forEach((v,k)=>x.fillText(v,m+i*cs+cs/2,m-(a.length-k)*cs*0.4+cs*0.15))}
+   for(let i=0;i<25;i++){const X=m+(i%5)*cs,Y=m+Math.floor(i/5)*cs;x.fillStyle=g[i]===1?(sol[i]?'#d6336c':'#e03131'):'#fff';x.fillRect(X+1,Y+1,cs-2,cs-2);if(g[i]===1&&!sol[i]){x.fillStyle='#fff';x.font='bold '+Math.round(cs*0.6)+'px sans-serif';x.fillText('✖',X+cs/2,Y+cs/2+2)}else if(g[i]===2){x.fillStyle='#adb5bd';x.font=Math.round(cs*0.55)+'px sans-serif';x.fillText('·',X+cs/2,Y+cs/2)}}
+   x.strokeStyle='#862e57';x.lineWidth=2;x.strokeRect(m,m,cs*5,cs*5)};
+  const fin=()=>{over=true;sfx('win');const d=today();if(!me.nngD||me.nngD.d!==d)me.nngD={d,c:0};const sc=cleared+eff;let pay=Math.max(0,Math.min(5,sc,12-me.nngD.c));me.nngD.c+=pay;me.coins+=pay;updCoins();me.nngGames=(me.nngGames||0)+1;const nb=sc>(me.nngBest||0);if(nb)me.nngBest=sc;saveMe();
+   c.innerHTML='<h2>'+(cleared>=3?'🧩 كشفت كل الصور! 🏆':'🧩 خلصت')+'</h2><div style="text-align:center;font-size:16px">كشفت <b>'+cleared+'/3</b> صور<br>بأقل من خطأين في <b>'+eff+'</b><br>'+(nb&&sc?'🏆 رقم قياسي! ':'أحسن نتيجة: '+(me.nngBest||0)+' ')+'<br>'+(pay?'+'+pay+'🪙':'(مفيش جايزة)')+'</div><div class="row"><button class="btn" id="ngR2">🔁 تاني</button><button class="btn d" id="ngX2">إغلاق</button></div>';
+   $('ngR2').onclick=nngStart;$('ngX2').onclick=()=>{$('modal').style.display='none'}};
+  tap=(i,mk)=>{if(over||pend||i<0||i>24)return false;const mm=mk===undefined?mark:mk;
+   if(mm){g[i]=g[i]===2?0:g[i]===1?1:2;sfx('tick')}
+   else if(g[i]===1){g[i]=0;sfx('tick')}else{g[i]=1;if(!sol[i]){mist++;sfx('err');msg='مربع غلط ❌'}else{sfx('place');msg=''}}
+   if(sol.every((v,k)=>(g[k]===1)===!!v)){pend=true;cleared++;if(mist<2)eff++;msg=mist<2?'🌟 '+pi[0]:'تمام ✅ '+pi[0];hud();dw();sfx('win');setTimeout(()=>{if(!open())return;if(st>=2)fin();else{st++;init();hud();dw()}},1300)}else{hud();dw()}return true};
+  cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),X=(e.clientX-r.left)*S/r.width-m,Y=(e.clientY-r.top)*S/r.height-m;const cx=Math.floor(X/cs),cy=Math.floor(Y/cs);if(X<0||Y<0||cx>4||cy>4)return;tap(cy*5+cx)};
+  $('ngM').onclick=()=>{mark=!mark;$('ngM').textContent=mark?'· علّم فاضي':'⬛ تلوين'};
+  $('ngR').onclick=()=>{init();hud();dw()};$('ngX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
