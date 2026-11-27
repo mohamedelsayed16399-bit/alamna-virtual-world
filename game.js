@@ -134,6 +134,7 @@ if(a.q===3){const sc=mesh(G.cyl(0.2,0.2,0.08,10),0xe03131,0,0.36,0.17);pg.add(sc
 if(a.q===4)pg.add(mesh(G.cyl(0.14,0.14,0.03,10),0x111111,0,0.56,0.2),mesh(G.cyl(0.09,0.09,0.2,10),0x111111,0,0.67,0.2),mesh(G.box(0.1,0.03,0.092),0xe03131,0,0.6,0.2));
 if(a.q===5)pg.add(mesh(G.cyl(0.1,0.12,0.07,8),0xffd43b,0,0.58,0.22,0xaa7a00),mesh(G.cone(0.04,0.1,4),0xffd43b,-0.08,0.66,0.22,0xaa7a00),mesh(G.cone(0.04,0.12,4),0xffd43b,0,0.67,0.22,0xaa7a00),mesh(G.cone(0.04,0.1,4),0xffd43b,0.08,0.66,0.22,0xaa7a00));
 if(a.q===6)pg.add(mesh(G.box(0.3,0.16,0.03),0xf8f9fa,-0.2,0.34,0.02,0x888888).rotateZ(0.5),mesh(G.box(0.3,0.16,0.03),0xf8f9fa,0.2,0.34,0.02,0x888888).rotateZ(-0.5));
+if(a.pn&&a.p){const pl=labelSprite('🐾 '+a.pn,{s:2.3});pl.position.set(0,1.0,0);pg.add(pl)}
 g.add(pg);g.userData.pet=pg}
 const sh=new THREE.Mesh(new THREE.CircleGeometry(0.5,16),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:0.25}));sh.rotation.x=-Math.PI/2;sh.position.y=0.02;g.add(sh);
 mergeAvatar(g);
@@ -163,7 +164,7 @@ this.root.rotation.y+= (angDiff(this.root.rotation.y,this.yaw))*Math.min(1,dt*12
 }
 }
 function angDiff(a,b){let d=(b-a)%(Math.PI*2);if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;return d}
-const myApp=()=>({b:me.body,h:me.head,a:me.hat,p:me.pet|0,l:Math.floor((me.fed||0)/3),q:me.pacc|0});
+const myApp=()=>({b:me.body,h:me.head,a:me.hat,p:me.pet|0,l:Math.floor((me.fed||0)/3),q:me.pacc|0,pn:me.pname||''});
 const parts=[],pGeo=new THREE.SphereGeometry(0.09,5,4);
 function burst(p,col,n){for(let i=0;i<n;i++){const m=new THREE.Mesh(pGeo,new THREE.MeshBasicMaterial({color:Array.isArray(col)?col[i%col.length]:col}));m.position.set(p.x,p.y+1.6,p.z);scene.add(m);const a=Math.random()*6.283,u=1+Math.random()*3;parts.push({m,vx:Math.cos(a)*u,vy:2+Math.random()*4,vz:Math.sin(a)*u,t:1.3})}}
 function tickParts(dt){for(let i=parts.length-1;i>=0;i--){const q=parts[i];q.t-=dt;q.vy-=9*dt;q.m.position.x+=q.vx*dt;q.m.position.y+=q.vy*dt;q.m.position.z+=q.vz*dt;if(q.t<=0){scene.remove(q.m);q.m.material.dispose();parts.splice(i,1)}}}
@@ -476,9 +477,9 @@ const str=(s,n)=>{let r=String(s==null?'':s).replace(/[\u0000-\u001f<>]/g,'').sl
 const num=(v,a,b,d=0)=>{v=+v;return isFinite(v)?clamp(v,a,b):d};
 function getRemote(m){
 let r=remotes.get(m.i);
-const app={b:num(m.b,0,20,0)|0,h:num(m.h,0,20,0)|0,a:num(m.a,0,40,0)|0,p:num(m.p,0,5,0)|0,l:num(m.l,0,50,0)|0,q:num(m.q,0,6,0)|0};
+const app={b:num(m.b,0,20,0)|0,h:num(m.h,0,20,0)|0,a:num(m.a,0,40,0)|0,p:num(m.p,0,5,0)|0,l:num(m.l,0,50,0)|0,q:num(m.q,0,6,0)|0,pn:str(m.pn,10)};
 if(!r){r=new Actor(app,str(m.n,16)||'لاعب');r.tx=0;r.tz=0;r.root.position.set(num(m.x,-50,50),0,num(m.z,-50,50));scene.add(r.root);remotes.set(m.i,r);setOnline();{const tn=Date.now();joinLog[m.i]=joinLog[m.i]||0;if(tn-joinLog[m.i]>20000){joinLog[m.i]=tn;addLog('','🔔 '+r.name+' دخل الغرفة')}};if(room&&room.type==='home'&&room.owner===me.id){toast('🏡 '+r.name+' زار بيتك!',3000);sfx('star');qAdd('visit')}}
-else{if(r.app.b!==app.b||r.app.h!==app.h||r.app.a!==app.a||r.app.p!==app.p||r.app.l!==app.l||r.app.q!==app.q)r.setApp(app);r.setName(str(m.n,16)||'لاعب')}
+else{if(r.app.b!==app.b||r.app.h!==app.h||r.app.a!==app.a||r.app.p!==app.p||r.app.l!==app.l||r.app.q!==app.q||(r.app.pn||'')!==app.pn)r.setApp(app);r.setName(str(m.n,16)||'لاعب')}
 r.seen=performance.now();return r;
 }
 function onMsg(topic,payload){
@@ -515,7 +516,7 @@ if(!player)return;const n=performance.now();
 const moved=Math.abs(player.root.position.x-lastX)+Math.abs(player.root.position.z-lastZ)>0.05;
 if(!force&&!((moved&&n-lastPos>220)||n-lastPos>2500))return;
 lastPos=n;lastX=player.root.position.x;lastZ=player.root.position.z;
-pub({t:'p',i:me.id,n:me.name,b:me.body,h:me.head,a:me.hat,p:me.pet|0,q:me.pacc|0,l:Math.floor((me.fed||0)/3),x:+lastX.toFixed(2),z:+lastZ.toFixed(2),s:stars})
+pub({t:'p',i:me.id,n:me.name,b:me.body,h:me.head,a:me.hat,p:me.pet|0,q:me.pacc|0,pn:me.pname||'',l:Math.floor((me.fed||0)/3),x:+lastX.toFixed(2),z:+lastZ.toFixed(2),s:stars})
 }
 addEventListener('beforeunload',()=>{pub({t:'bye',i:me.id})});
 function publishHome(){
