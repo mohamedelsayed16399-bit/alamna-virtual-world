@@ -537,7 +537,7 @@ function buildLgo(){
  for(let i=0;i<5;i++)for(let j=0;j<5;j++){const on=(i*3+j*2)%3===0;g.add(mesh(G.box(0.72,0.1,0.72),on?0xffd43b:0x495057,-1.7+i*0.85,0.2,-5.7+j*0.85,on?0xffd43b:undefined))}
  g.add(mesh(G.cyl(0.4,0.4,1,10),0xf59f00,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0xf59f00,5,0.5,0));
  lgoh={it:{x:0,z:0.2,label:'💡 العب طفي الأنوار',fn:lgoStart}};interacts.push(lgoh.it);
- g.add(portalMesh('ارجع لأبراج هانوي',5.8,5.8,0x1c7ed6,'hanroom'));
+ g.add(portalMesh('ارجع لأبراج هانوي',5.8,5.8,0x1c7ed6,'hanroom'),portalMesh('🔢 سودوكو',-5.8,5.8,0x7048e8,'sdkroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('💡 الضغطة بتقلب القرص وجيرانه الأربعة. طفّي كل الأنوار!',3200)
 }
@@ -563,3 +563,46 @@ function lgoStart(){
    if(g.every(v=>!v)){pend=true;cleared++;const ok=moves<=K[st]+2;if(ok)eff++;msg=ok?'ممتاز! 🌟':'تمام ✅';hud();dw();setTimeout(()=>{if(!open())return;if(st>=2)fin();else{st++;init();hud();dw()}},1100)}else{hud();dw()}return true};
   cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),cx=Math.floor((e.clientX-r.left)*S/r.width/cs),cy=Math.floor((e.clientY-r.top)*S/r.height/cs);if(cx<0||cx>4||cy<0||cy>4)return;press(cy*5+cx)};
   $('lgR').onclick=()=>{init();hud();dw()};$('lgX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
+let sdh=null;
+function buildSdk(){
+ const g=indoor(0x7048e8,0xf3f0ff,0xd0bfff);
+ sign(g,'🔢 غرفة سودوكو',0,4.6,-7.6,'rgba(112,72,232,.92)');
+ g.add(mesh(G.box(4.4,0.12,4.4),0xf8f9fa,0,0.08,-4));
+ [-1.1,0,1.1].forEach(o=>{g.add(mesh(G.box(0.1,0.08,4.4),0x212529,o,0.16,-4),mesh(G.box(4.4,0.08,0.1),0x212529,0,0.16,-4+o))});
+ const B=[[1,2,3,4],[3,4,1,2],[2,1,4,3],[4,3,2,1]],cl=[0xfa5252,0xfab005,0x40c057,0x228be6];
+ for(let i=0;i<4;i++)for(let j=0;j<4;j++)g.add(mesh(G.cyl(0.28,0.28,0.12,12),cl[B[i][j]-1],-1.65+j*1.1,0.24,-5.65+i*1.1));
+ g.add(mesh(G.cyl(0.4,0.4,1,10),0x7048e8,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x7048e8,5,0.5,0));
+ sdh={it:{x:0,z:0.2,label:'🔢 العب سودوكو',fn:sdkStart}};interacts.push(sdh.it);
+ g.add(portalMesh('ارجع لطفي الأنوار',5.8,5.8,0xf59f00,'lgoroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🔢 كل رقم من 1 لـ4 مرة واحدة في كل صف وعمود ومربع',3200)
+}
+function sdkStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),S=H?Math.max(120,Math.min(W,innerHeight-210)):Math.min(W,Math.max(240,Math.min(innerHeight-400,320)));
+ const GV=[10,8,6];let st=0,g=[],fx=[],sol=[],sel=-1,mist=0,cleared=0,eff=0,over=false,pend=false,msg='';
+ const sh=a=>a.sort(()=>Math.random()-0.5);
+ const init=()=>{const B=[[1,2,3,4],[3,4,1,2],[2,1,4,3],[4,3,2,1]],dg=sh([1,2,3,4]),rb=sh([0,1]),cb=sh([0,1]);const rows=[],ro=[];rb.forEach(b=>sh([0,1]).forEach(k=>ro.push(b*2+k)));const co=[];cb.forEach(b=>sh([0,1]).forEach(k=>co.push(b*2+k)));
+  sol=[];ro.forEach(r=>co.forEach(cc=>sol.push(dg[B[r][cc]-1])));const keep=new Set(sh([...Array(16).keys()]).slice(0,GV[st]));g=sol.map((v,i)=>keep.has(i)?v:0);fx=g.map(v=>!!v);sel=-1;mist=0;pend=false;msg=''};
+ const bad=(i,v)=>{const r=Math.floor(i/4),c=i%4;for(let k=0;k<16;k++){if(k===i||g[k]!==v)continue;const kr=Math.floor(k/4),kc=k%4;if(kr===r||kc===c||(Math.floor(kr/2)===Math.floor(r/2)&&Math.floor(kc/2)===Math.floor(c/2)))return true}return false};
+ init();
+ let put=()=>false;
+ window.sdq=()=>({st,g:g.slice(),fx:fx.slice(),sol:sol.slice(),mist,over,cleared,eff,put:(i,v)=>put(i,v)});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">🔢 سودوكو صغير</h2>')+'<div id="sdH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="sdC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row" style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap">'+[1,2,3,4].map(n=>'<button class="btn sdp" data-n="'+n+'" style="width:auto!important;display:inline-block!important;min-width:46px">'+n+'</button>').join('')+'<button class="btn sdp" data-n="0" style="width:auto!important;display:inline-block!important">⌫</button></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="sdR" style="width:auto!important;display:inline-block!important">🔁 لوحة جديدة</button><button class="btn d" id="sdX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('sdC');cv.width=S;cv.height=S;const x=cv.getContext('2d'),cs=S/4;
+  const open=()=>$('sdC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('sdH'))$('sdH').textContent='مرحلة '+(st+1)+'/3 · أخطاء '+mist+(msg?' · '+msg:'')};
+  const dw=()=>{x.fillStyle='#f8f9fa';x.fillRect(0,0,S,S);for(let i=0;i<16;i++){const cx=(i%4)*cs,cy=Math.floor(i/4)*cs;if(i===sel){x.fillStyle='#d0ebff';x.fillRect(cx,cy,cs,cs)}else if(fx[i]){x.fillStyle='#e9ecef';x.fillRect(cx,cy,cs,cs)}
+   if(g[i]){const b=!fx[i]&&bad(i,g[i]);x.fillStyle=b?'#e03131':fx[i]?'#212529':'#1c7ed6';x.font='bold '+Math.round(cs*0.55)+'px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(g[i],cx+cs/2,cy+cs/2+2)}}
+   x.strokeStyle='#adb5bd';x.lineWidth=1.5;for(let i=1;i<4;i++){x.beginPath();x.moveTo(i*cs,0);x.lineTo(i*cs,S);x.moveTo(0,i*cs);x.lineTo(S,i*cs);x.stroke()}
+   x.strokeStyle='#212529';x.lineWidth=4;x.strokeRect(2,2,S-4,S-4);x.beginPath();x.moveTo(S/2,0);x.lineTo(S/2,S);x.moveTo(0,S/2);x.lineTo(S,S/2);x.stroke()};
+  const fin=()=>{over=true;sfx('win');const d=today();if(!me.sdkD||me.sdkD.d!==d)me.sdkD={d,c:0};const sc=cleared+eff;let pay=Math.max(0,Math.min(5,sc,12-me.sdkD.c));me.sdkD.c+=pay;me.coins+=pay;updCoins();me.sdkGames=(me.sdkGames||0)+1;const nb=sc>(me.sdkBest||0);if(nb)me.sdkBest=sc;saveMe();
+   c.innerHTML='<h2>'+(cleared>=3?'🔢 عبقري سودوكو! 🏆':'🔢 خلصت')+'</h2><div style="text-align:center;font-size:16px">حليت <b>'+cleared+'/3</b> مراحل<br>من غير أخطاء في <b>'+eff+'</b><br>'+(nb&&sc?'🏆 رقم قياسي! ':'أحسن نتيجة: '+(me.sdkBest||0)+' ')+'<br>'+(pay?'+'+pay+'🪙':'(مفيش جايزة)')+'</div><div class="row"><button class="btn" id="sdR2">🔁 تاني</button><button class="btn d" id="sdX2">إغلاق</button></div>';
+   $('sdR2').onclick=sdkStart;$('sdX2').onclick=()=>{$('modal').style.display='none'}};
+  put=(i,v)=>{if(over||pend||i<0||i>15||fx[i])return false;sel=i;g[i]=v;msg='';
+   if(v){if(bad(i,v)){mist++;sfx('err');msg='رقم متكرر ❌'}else sfx('place')}
+   const full=g.every(q=>q),ok=full&&g.every((q,k)=>!bad(k,q));
+   if(ok){pend=true;cleared++;if(!mist)eff++;msg=mist?'تمام ✅':'من غير أخطاء 🌟';hud();dw();sfx('win');setTimeout(()=>{if(!open())return;if(st>=2)fin();else{st++;init();hud();dw()}},1100)}else{hud();dw()}return true};
+  cv.onpointerdown=e=>{e.preventDefault();if(over||pend)return;const r=cv.getBoundingClientRect(),cx=Math.floor((e.clientX-r.left)*S/r.width/cs),cy=Math.floor((e.clientY-r.top)*S/r.height/cs);if(cx<0||cx>3||cy<0||cy>3)return;const i=cy*4+cx;sel=fx[i]?-1:i;sfx('tick');dw()};
+  c.querySelectorAll('.sdp').forEach(b=>b.onclick=()=>{if(sel>=0)put(sel,+b.dataset.n)});
+  $('sdR').onclick=()=>{init();hud();dw()};$('sdX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
