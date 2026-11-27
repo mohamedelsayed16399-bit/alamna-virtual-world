@@ -383,7 +383,7 @@ const GBG=[['golf','⛳ جولف',1],['hoops','🏀 سلة',0],['bowl','🎳 ب�
 function myBests(){return{golf:me.golfBest||0,hoops:me.hoopBest||0,bowl:me.bowlBest||0,gal:me.galBest||0,tag:me.tagBest||0,pen:me.penBest||0,seek:me.seekBest||0,kite:me.kiteBest||0,bump:me.bumpBest||0,bake:me.bakeBest||0,star:me.simonBest||0,ice:me.iceBest||0,bal:me.balBest||0,mol:me.molBest||0}}
 function pubBests(){try{const o=JSON.stringify({n:me.name,g:myBests()});if(o===chLast||!netOK)return;chLast=o;client.publish(NS+'/ch/'+me.id,o,{retain:true})}catch(e){}}
 const _sv0=saveMe;saveMe=function(){_sv0.apply(this,arguments);pubBests()};
-const WKEYS=['ice','simon','mem','tag','seek','kite','bump','bake','pen','hoop','gal','bowl','bal','dash','mol'];
+const WKEYS=['ice','simon','mem','tag','seek','kite','bump','bake','pen','hoop','gal','bowl','bal','dash','mol','mth'];
 function wkId(){const d=new Date(),j=new Date(d.getFullYear(),0,1);return d.getFullYear()+'w'+Math.floor(((d-j)/864e5+j.getDay())/7)}
 function wkCounts(){const o={};for(const k of WKEYS)o[k]=me[k+'Games']||0;return o}
 function wkInit(){if(!me.wk||me.wk.w!==wkId()){me.wk={w:wkId(),base:wkCounts(),cl:[]};saveMe()}return me.wk}
@@ -394,7 +394,7 @@ function openWeekly(){const w=wkInit();modal(c=>{const p=wkProg();let h='<h2>�
  c.innerHTML=h+'<div class="row"><button class="btn d" id="wkx">إغلاق</button></div>';$('wkx').onclick=()=>{$('modal').style.display='none'};
  c.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const i=+b.dataset.q,q=WCH[i];if(w.cl.indexOf(i)>=0||q[1](wkProg())<q[2])return;w.cl.push(i);me.coins+=q[3];updCoins();saveMe();sfx('win');toast('🎁 +'+q[3]+'🪙 تحدي الأسبوع',1600);openWeekly()})})}
 function lvUnlock(){const L=plLevel().lv;for(const k in LVH){if(L>=LVH[k]&&!me.owned.includes(+k)){me.owned.push(+k);setTimeout(()=>toast('🎖️ مستوى '+L+'! اتفتحت: '+HATS[k],2600),400)}}saveMe()}
-function plLevel(){let n=0;for(const k of['tag','seek','kite','bump','bake','pen','hoop','gal','bowl','mem','simon','ice','bal','dash','mol'])n+=me[k+'Games']||0;const lv=Math.floor(Math.sqrt(n/2))+1,nx=2*lv*lv,cur=2*(lv-1)*(lv-1);return{n,lv,pct:Math.round((n-cur)/(nx-cur)*100),nx}}
+function plLevel(){let n=0;for(const k of['tag','seek','kite','bump','bake','pen','hoop','gal','bowl','mem','simon','ice','bal','dash','mol','mth'])n+=me[k+'Games']||0;const lv=Math.floor(Math.sqrt(n/2))+1,nx=2*lv*lv,cur=2*(lv-1)*(lv-1);return{n,lv,pct:Math.round((n-cur)/(nx-cur)*100),nx}}
 function lvBar(){const L=plLevel();return '<div style="background:rgba(255,255,255,.08);border-radius:12px;padding:8px 10px;margin:6px 0;text-align:center"><b>🎖️ مستوى اللاعب '+L.lv+'</b> · '+L.n+' جولة<div style="height:8px;background:rgba(255,255,255,.15);border-radius:6px;margin:6px 0"><div style="height:8px;width:'+L.pct+'%;background:#ffd43b;border-radius:6px"></div></div><span style="font-size:11px;opacity:.7">الجولة اللي بعدها لحد '+L.nx+' للمستوى '+(L.lv+1)+'</span></div>'}
 function openChamps(){const e={};modal(c=>{let cur=1;c.innerHTML='<h2>🏆 لوحة الأبطال</h2>'+lvBar()+'<div class="row" id="cg" style="flex-wrap:wrap"></div><div id="cl"></div><div class="row"><button class="btn d" id="cx">إغلاق</button></div>';
 const render=()=>{const l=$('cl');if(!l)return;l.innerHTML='';const G0=GBG[cur];const a=Object.entries(e).map(([id,v])=>({id,n:v.n,v:v.g[G0[0]]})).filter(x=>x.v>0).sort((x,y)=>G0[2]?x.v-y.v:y.v-x.v).slice(0,10);if(!a.length)l.textContent='لسه مفيش أرقام، العب وسجل رقمك!';a.forEach((v,i)=>{const d=document.createElement('div');d.className='qrow';d.textContent=(i+1)+'. '+v.n+' · '+v.v+(v.id===me.id?' (إنت)':'');l.appendChild(d)})};
@@ -638,11 +638,25 @@ function buildPlan(){
  for(let i=0;i<60;i++){const a=Math.random()*6.283,r=3+Math.random()*4.5,h=2+Math.random()*4.5;g.add(mesh(G.sph(0.05+Math.random()*0.08,5),[0xffffff,0xffd43b,0x74c0fc][i%3],Math.cos(a)*r,h,Math.sin(a)*r-1,0xffffaa))}
  g.add(mesh(G.sph(0.7,12),0xffe066,0,3.2,-5,0xffaa00),mesh(G.sph(0.35,10),0x74c0fc,-3,4,-4,0x225588),mesh(G.sph(0.45,10),0xff8787,3.5,3.4,-3.5,0x882222));
  sign(g,'🔭 القبة النجمية · تتبّع النجوم',0,5.5,-6.8,'rgba(92,124,250,.92)');
+ sign(g,'⚡ تحدي الحساب',-4,3,1.2,'rgba(230,119,0,.92)');
+ interacts.push({x:-4,z:1.2,label:'⚡ ابدأ تحدي الحساب'+(me.mthBest?' (أحسن '+me.mthBest+')':''),fn:openMath});
  interacts.push({x:0,z:1.2,label:'🌌 ابدأ تتبّع النجوم'+(me.simonBest?' (أحسن '+me.simonBest+')':''),fn:openStarSeq});
  g.add(portalMesh('ارجع للكافيه',5.8,5.8,0xff8787,'cafe'));
  mergeStatic(g);scene.add(g);room.group=g;room.bounds=7;room.pickables=[];
  toast('🔭 اتفرج على النجوم وكرّر الترتيب',2600)
 }
+function openMath(){modal(c=>{let t=30,sc=0,tot=0,alive=true,ans=0;const td=today();if(!me.mtd||me.mtd.d!==td)me.mtd={d:td,paid:0};
+ c.innerHTML='<h2>⚡ تحدي الحساب</h2><div id="mhd" style="text-align:center;margin:4px;font-size:15px"></div><div id="mq" style="text-align:center;font-size:34px;margin:10px;direction:ltr"></div><div id="mo" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div><div class="row"><button class="btn d" id="mx">إغلاق</button></div>';
+ $('mx').onclick=()=>{alive=false;clearInterval(iv);closeModal()};
+ const q=()=>{const op=Math.random()<0.5?'+':(Math.random()<0.5?'-':'×');let a,b;if(op==='×'){a=2+Math.floor(Math.random()*9);b=2+Math.floor(Math.random()*9);ans=a*b}else{a=5+Math.floor(Math.random()*(20+sc*2));b=2+Math.floor(Math.random()*(15+sc));if(op==='-'&&b>a){const x=a;a=b;b=x}ans=op==='+'?a+b:a-b}
+  $('mq').textContent=a+' '+op+' '+b+' = ?';const o=new Set([ans]);while(o.size<4){const d=Math.floor(Math.random()*9)-4;if(d)o.add(Math.max(0,ans+d))}
+  const arr=[...o].sort(()=>Math.random()-0.5);const box=$('mo');box.innerHTML='';arr.forEach(v=>{const bt=document.createElement('button');bt.className='btn';bt.style.cssText='height:60px;font-size:24px';bt.textContent=v;bt.onclick=()=>pick(v);box.appendChild(bt)})};
+ const hd=()=>{const e=$('mhd');if(e)e.textContent='⏱ '+t+' ث · ✅ '+sc};
+ const pick=v=>{if(!alive)return;tot++;if(v===ans){sc++;sfx('chat')}else{sfx('err');t=Math.max(0,t-2)}hd();q()};
+ const end=()=>{alive=false;me.mthGames=(me.mthGames||0)+1;const nb=sc>(me.mthBest||0);if(nb)me.mthBest=sc;let pay=Math.min(Math.floor(sc/3),10-me.mtd.paid);if(pay<0)pay=0;me.mtd.paid+=pay;me.coins+=pay;updCoins();lvUnlock();saveMe();sfx(sc>=8?'win':'err');
+  c.innerHTML='<h2>⚡ خلص الوقت</h2><div style="text-align:center;font-size:16px">إجابات صح: <b>'+sc+'</b> من '+tot+(nb?'<br>🏆 رقم قياسي!':'<br>أحسن: '+me.mthBest)+'<br>'+(pay?'+'+pay+'🪙':'(وصلت حد النهاردة)')+'</div><div class="row"><button class="btn g" id="mr">🔁 تاني</button><button class="btn d" id="mx2">إغلاق</button></div>';$('mr').onclick=openMath;$('mx2').onclick=closeModal};
+ const iv=setInterval(()=>{if(!alive||!$('mq')){clearInterval(iv);return}t--;hd();if(t<=0){clearInterval(iv);end()}},1000);
+ window.__math={get ans(){return ans},pick,get sc(){return sc}};hd();q()})}
 function openStarSeq(){modal(c=>{const COL=['#fa5252','#fab005','#40c057','#339af0'],EM=['🔴','🟡','🟢','🔵'],FR=[262,330,392,523];let seq=[],pi=0,busy=true,alive=true;
  const tone=i=>{try{if(me&&me.mute)return;if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),gn=AC.createGain();o.frequency.value=FR[i];o.type='triangle';gn.gain.value=0.12;o.connect(gn);gn.connect(AC.destination);o.start();gn.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.3);o.stop(AC.currentTime+0.32)}catch(e){}};
  c.innerHTML='<h2>🌌 تتبّع النجوم</h2><div id="sm" style="text-align:center;margin:6px;min-height:22px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div><div class="row"><button class="btn d" id="smx">إغلاق</button></div>';
