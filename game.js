@@ -7,8 +7,8 @@ function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a
 function toast(msg,ms=2200){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',ms)}
 const BODY=['#e8590c','#2f9e44','#3b5bdb','#9c36b5','#e03131','#f08c00','#0c8599','#495057','#d6336c','#1098ad','#74b816','#f783ac','#f2c94c','#dee2e6','#38d9a9'];const CLV={12:4,13:7,14:10};
 const HEAD=['#ffd8a8','#f1b98a','#d9a066','#a9744f','#7a4b2a','#ffe3e3'];
-const HATS=['بدون','كاب','تاج','طاقية','هوائي','نظارة','قرون','طربوش','شعر ملون','هالة','أجنحة','تاج ملكي','أذن قطة','قبعة ساحر','كعكة','سماعات','نجمة','تاج ورد','خوذة فضاء','قبعة صياد','قبعة قرصان','خوذة فايكنج','تاج جواهر','قبعة نحلة','تاج المستكشف','قبعة الجنرال','تاج الأسطورة','إكليل النجوم'];const LVH={25:3,26:5,27:8};
-const HPRICE={9:60,10:120,11:250,12:40,13:90,14:30,15:70,16:50,17:60,18:110,19:35,20:55,21:65,22:140,23:30,24:99999,25:99999,26:99999,27:99999};
+const HATS=['بدون','كاب','تاج','طاقية','هوائي','نظارة','قرون','طربوش','شعر ملون','هالة','أجنحة','تاج ملكي','أذن قطة','قبعة ساحر','كعكة','سماعات','نجمة','تاج ورد','خوذة فضاء','قبعة صياد','قبعة قرصان','خوذة فايكنج','تاج جواهر','قبعة نحلة','تاج المستكشف','قبعة الجنرال','تاج الأسطورة','إكليل النجوم','قبعة الشيف','تاج الجليد','هالة العظماء'];const LVH={25:3,26:5,27:8,28:10,29:12,30:15};
+const HPRICE={9:60,10:120,11:250,12:40,13:90,14:30,15:70,16:50,17:60,18:110,19:35,20:55,21:65,22:140,23:30,24:99999,25:99999,26:99999,27:99999,28:99999,29:99999,30:99999};
 const FLOORS=['#c8a27a','#8d99ae','#b7e4c7','#f4acb7','#6c757d','#2b2d42','#ffe066','#74c0fc','#a9e34b','#d0bfff'];
 const WALLS=['#f1faee','#ffe8d6','#cdeac0','#bde0fe','#e0aaff','#fff3bf','#ffc9c9','#c5f6fa','#343a40','#fcc2d7'];
 const TRICKS=['🤸','🦘','🙏','🌀'];const EMOJIS=['👋','😂','❤️','💃','👍','😮','🎉','😴','🍵','☕','🧃','🏆','🔥','😎','🎈','🌟','🥳','🤩','🫶','🚀','👑'];const LEMO=[['🥳',2],['🤩',3],['🫶',4],['🚀',6],['👑',9]];
@@ -110,6 +110,9 @@ if(h===22){g.add(mesh(G.cyl(0.42,0.46,0.22,12),0xffd43b,0,1.9,0,0x664400));for(l
 if(h===23){g.add(mesh(G.cyl(0.03,0.03,0.4,5),0x212529,-0.18,2.0,0.1),mesh(G.cyl(0.03,0.03,0.4,5),0x212529,0.18,2.0,0.1),mesh(G.sph(0.09,7),0xffd43b,-0.18,2.25,0.1,0x886600),mesh(G.sph(0.09,7),0xffd43b,0.18,2.25,0.1,0x886600),mesh(G.cyl(0.46,0.46,0.06,12),0xffd43b,0,1.78,0),mesh(G.cyl(0.47,0.47,0.04,12),0x212529,0,1.82,0))}
 if(h===25){g.add(mesh(G.cyl(0.47,0.5,0.22,14),0x2f5d3a,0,1.86,0,0x113311),mesh(G.box(0.75,0.05,0.5),0x1c3d26,0,1.76,0.4),mesh(G.sph(0.1,7),0xffd43b,0,1.98,0.46,0x886600),mesh(G.box(0.5,0.04,0.04),0xffd43b,0,1.92,0.47,0x886600))}
 if(h===26){g.add(mesh(G.cyl(0.46,0.5,0.22,14),0xffd43b,0,1.88,0,0xaa7700));for(let k=0;k<5;k++){const a=k/5*6.283;g.add(mesh(G.cone(0.1,0.42,4),0xffd43b,Math.cos(a)*0.4,2.2,Math.sin(a)*0.4,0xaa7700),mesh(G.sph(0.07,6),[0xff6b6b,0x4dabf7,0x69db7c,0xcc5de8,0xff922b][k],Math.cos(a)*0.4,2.46,Math.sin(a)*0.4,0xffffff))}}
+if(h===28){g.add(mesh(G.cyl(0.4,0.43,0.3,14),0xf8f9fa,0,1.95,0),mesh(G.sph(0.34,10),0xffffff,0,2.25,0),mesh(G.sph(0.22,8),0xffffff,-0.22,2.2,0.1),mesh(G.sph(0.22,8),0xffffff,0.22,2.2,-0.1))}
+if(h===29){g.add(mesh(G.cyl(0.46,0.5,0.14,14),0x74c0fc,0,1.84,0,0x1971c2));for(let k=0;k<6;k++){const a=k/6*6.283;g.add(mesh(G.cone(0.09,0.38+(k%2)*0.2,5),0xe3fafc,Math.cos(a)*0.4,2.08+(k%2)*0.1,Math.sin(a)*0.4,0x74c0fc))}}
+if(h===30){const t=new THREE.Mesh(new THREE.TorusGeometry(0.42,0.06,8,20),M(0xffd43b,0xffaa00));t.rotation.x=Math.PI/2;t.position.set(0,2.35,0);g.add(t);g.add(mesh(G.sph(0.1,6),0xffffff,0,2.35,0.42,0xffffaa),mesh(G.sph(0.1,6),0xffffff,0,2.35,-0.42,0xffffaa))}
 if(h===27){for(let k=0;k<8;k++){const a=k/8*6.283;g.add(mesh(G.sph(0.09,6),k%2?0xffd43b:0xffffff,Math.cos(a)*0.5,2.0+Math.sin(k*1.7)*0.06,Math.sin(a)*0.5,0xffdd55))}g.add(mesh(G.sph(0.14,7),0xffd43b,0,2.3,0,0xffaa00))}
 if(h===24){g.add(mesh(G.cyl(0.46,0.5,0.2,14),0xffd43b,0,1.88,0,0x886600),mesh(G.sph(0.2,8),0x4dabf7,0,2.1,0.0,0x1971c2),mesh(G.box(0.7,0.04,0.04),0xe03131,0,2.0,0.46));for(let k=0;k<6;k++){const a=k/6*6.283;g.add(mesh(G.cone(0.08,0.22,4),0xffd43b,Math.cos(a)*0.42,2.08,Math.sin(a)*0.42,0x886600))}}
 if(h===15){const b=mesh(G.cyl(0.42,0.42,0.06,14),0x212529,0,1.92,0);g.add(b);for(const sx of[-1,1])g.add(mesh(G.cyl(0.14,0.14,0.2,10),0x339af0,sx*0.44,1.55,0,0x0b3a66))}
@@ -462,7 +465,7 @@ const str=(s,n)=>{let r=String(s==null?'':s).replace(/[\u0000-\u001f<>]/g,'').sl
 const num=(v,a,b,d=0)=>{v=+v;return isFinite(v)?clamp(v,a,b):d};
 function getRemote(m){
 let r=remotes.get(m.i);
-const app={b:num(m.b,0,20,0)|0,h:num(m.h,0,20,0)|0,a:num(m.a,0,24,0)|0,p:num(m.p,0,3,0)|0,l:num(m.l,0,50,0)|0,q:num(m.q,0,3,0)|0};
+const app={b:num(m.b,0,20,0)|0,h:num(m.h,0,20,0)|0,a:num(m.a,0,40,0)|0,p:num(m.p,0,3,0)|0,l:num(m.l,0,50,0)|0,q:num(m.q,0,3,0)|0};
 if(!r){r=new Actor(app,str(m.n,16)||'لاعب');r.tx=0;r.tz=0;r.root.position.set(num(m.x,-50,50),0,num(m.z,-50,50));scene.add(r.root);remotes.set(m.i,r);setOnline();{const tn=Date.now();joinLog[m.i]=joinLog[m.i]||0;if(tn-joinLog[m.i]>20000){joinLog[m.i]=tn;addLog('','🔔 '+r.name+' دخل الغرفة')}};if(room&&room.type==='home'&&room.owner===me.id){toast('🏡 '+r.name+' زار بيتك!',3000);sfx('star');qAdd('visit')}}
 else{if(r.app.b!==app.b||r.app.h!==app.h||r.app.a!==app.a||r.app.p!==app.p||r.app.l!==app.l||r.app.q!==app.q)r.setApp(app);r.setName(str(m.n,16)||'لاعب')}
 r.seen=performance.now();return r;
