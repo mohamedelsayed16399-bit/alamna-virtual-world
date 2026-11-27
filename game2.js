@@ -766,7 +766,7 @@ const sgn=labelSprite('🐾 أكل الحيوانات',{s:3.2,bg:'rgba(30,110,60
 g.rotation.y=0.6;room.group.add(g);
 interacts.push({x:-10.5,z:10-1.5,label:'🐾 أطعم حيوانك',fn:openPetShop});
 }
-const TRK=[['🤸','قلبة في الهوا',15],['🦘','قفزات',25],['🙏','سلام وانحناءة',20],['🌀','لفة دوّارة',30],['💤','ينام',20],['🎶','يرقص',25],['🔝','يقف على رجليه',30]];
+const TRK=[['🤸','قلبة في الهوا',15],['🦘','قفزات',25],['🙏','سلام وانحناءة',20],['🌀','لفة دوّارة',30],['💤','ينام',20],['🎶','يرقص',25],['🔝','يقف على رجليه',30],['🤾','يتدحرج على جنبه',35],['🛹','ينزلق',35],['🪂','يطفو في الهوا',40]];
 function openTrainer(){modal(c=>{if(!me.pet){closeModal();toast('اختار حيوان من "شكلي" الأول');return}me.tricks=me.tricks||[];c.innerHTML='<h2>🎓 تدريب الحيوان</h2><div style="text-align:center;margin:4px;font-size:13px">اتعلم حيلة وبعدين استخدمها من زرار "تفاعل" وصحابك هيشوفوها</div><div id="tl"></div><div class="row"><button class="btn g" id="ok">تمام</button></div>';for(const [e,n,p] of TRK){const d=document.createElement('div');d.className='qrow';const has=me.tricks.includes(e);d.textContent=e+' '+n+(has?' · ✅ اتعلمها':' · '+p+'🪙');if(!has){const b=document.createElement('button');b.className='btn o';b.style.cssText='margin-inline-start:8px;padding:2px 10px';b.textContent='علّمه';b.onclick=()=>{if(me.coins<p){toast('محتاج '+p+' عملة');return}me.coins-=p;me.tricks.push(e);updCoins();saveMe();renderEmo();sfx('win');player.emote(e);pub({t:'e',i:me.id,e});toast('🎓 حيوانك اتعلم: '+n,2800);openTrainer()};d.appendChild(b)}$('tl').appendChild(d)}$('ok').onclick=closeModal})}
 function openPetShop(){
 const names=['','قطة','كلب','بطة','أرنب','ثعلب','باندا','ضفدع','يونيكورن','سلحفاة','بطريق','بومة','قنفذ','دب','هامستر'];
