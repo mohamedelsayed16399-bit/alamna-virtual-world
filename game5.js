@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -371,6 +371,7 @@ function buildLdg(){
  g.add(mesh(G.box(0.3,2,0.3),0x495057,-5,1,-2),mesh(G.box(0.3,2,0.3),0x495057,5,1,-2));
  ldgh={it:{x:0,z:0.2,label:'🏎️ العب سباق الحارات',fn:ldgStart}};interacts.push(ldgh.it);
  g.add(portalMesh('ارجع للألوان',5.8,5.8,0xae3ec9,'stproom'));
+ g.add(portalMesh('فك الكلمة',-5.8,5.8,0x0ca678,'wscroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🏎️ دوس يمين أو شمال عشان تغيّر الحارة وتتفادى العربيات',3400)
 }
@@ -409,3 +410,33 @@ function ldgStart(){
   $('ldG').onclick=()=>{ob=[];n=0;lane=1;over=false;acc=0;go=true;msg='';info()};
   $('ldX').onclick=()=>{$('modal').style.display='none'};
   info();requestAnimationFrame(loop)})}
+function buildWsc(){
+ const g=indoor(0x0ca678,0xe6fcf5,0x96f2d7);
+ sign(g,'🔤 فك الكلمة',0,4.6,-7.6,'rgba(12,166,120,.92)');
+ [0,1,2,3,4].forEach(i=>g.add(mesh(G.box(0.7,0.7,0.7),[0x0ca678,0x20c997,0x63e6be,0x38d9a9,0x12b886][i],-2+i*1,0.35+(i%2)*0.2,-5)));
+ g.add(mesh(G.box(0.3,2,0.3),0x0ca678,-5,1,-2),mesh(G.box(0.3,2,0.3),0x0ca678,5,1,-2));
+ wsch={it:{x:0,z:0.2,label:'🔤 العب فك الكلمة',fn:wscStart}};interacts.push(wsch.it);
+ g.add(portalMesh('ارجع للحارات',5.8,5.8,0x495057,'ldgroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🔤 رتّب الحروف المتلخبطة عشان تكوّن الكلمة. 60 ثانية',3400)
+}
+function wscStart(){
+ const WL=['كتاب','مدرسة','سيارة','طائرة','حديقة','مفتاح','شجرة','نافذة','ساعة','حاسوب','مطار','طعام','هاتف','مكتبة'];
+ let wd='',tiles=[],pos=0,score=0,left=60,run=false,over=false,msg='',tmr=null,used=[];
+ const pickW=()=>{let w;do{w=WL[Math.floor(Math.random()*WL.length)]}while(w===wd||used.includes(w)&&used.length<WL.length);wd=w;used.push(w);if(used.length>=WL.length)used=[];const a=[...w];let t;do{t=a.map((c,i)=>({c,i,d:false}));for(let i=t.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[t[i],t[j]]=[t[j],t[i]]}}while(t.map(k=>k.c).join('')===w);tiles=t;pos=0};
+ pickW();
+ let tap=()=>{};
+ window.wscq=()=>({wd,pos,score,left,over,run,tiles:tiles.map(t=>t.c),coins:me.coins,tap:i=>tap(i),start:()=>$('wcG')&&$('wcG').click()});
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🔤 فك الكلمة</h2><div id="wcS" style="text-align:center;font-size:14px;margin:2px;min-height:1.4em"></div><div id="wcW" style="text-align:center;font-size:30px;font-weight:bold;margin:8px 0;min-height:1.4em;direction:rtl;letter-spacing:4px"></div><div id="wcT" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;direction:rtl;min-height:56px"></div><div id="wcM" style="text-align:center;font-size:13px;margin:6px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="wcG" style="width:auto!important;display:inline-block!important">▶ ابدأ</button><button class="btn d" id="wcX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const open=()=>$('wcS')&&$('modal').style.display!=='none';
+  const tick=()=>{if(!$('wcS'))return;$('wcS').textContent='كلمات '+score+' · الوقت '+Math.ceil(left)+' · أحسن '+(me.wscBest||0)};const paint=()=>{if(!$('wcS'))return;tick();$('wcW').textContent=run?wd.slice(0,pos):'';const T=$('wcT');T.innerHTML='';if(run)tiles.forEach((t,i)=>{const b=document.createElement('button');b.className='btn';b.dataset.i=i;b.textContent=t.c;b.disabled=t.d;b.style.cssText='width:48px!important;height:48px;font-size:24px;padding:0;'+(t.d?'opacity:.25':'');T.appendChild(b)});$('wcM').textContent=msg};
+  const finish=()=>{run=false;over=true;clearInterval(tmr);me.wscGames=(me.wscGames||0)+1;me.wscBest=Math.max(me.wscBest||0,score);const d=today();if(me.wscDD!==d){me.wscDD=d;me.wscDC=0}
+   let c=score>=5?3:score>=4?2:score>=3?1:0;c=Math.min(c,Math.max(0,6-(me.wscDC||0)));
+   if(c){me.coins+=c;me.wscDC=(me.wscDC||0)+c;updCoins();sfx('win')}else sfx('err');
+   msg='🏁 فكّيت '+score+' كلمة'+(c?' · +'+c+'🪙':' · فُكّ 3 كلمات للجايزة');saveMe();paint()};
+  tap=i=>{if(!run)return;const t=tiles[i];if(!t||t.d)return;if(t.c===wd[pos]){t.d=true;pos++;sfx('tick');if(pos>=wd.length){score++;msg='✅ '+wd;sfx('star');pickW()}else msg=''}else{msg='❌ حرف غلط';sfx('err')}paint()};
+  $('wcT').onclick=e=>{const b=e.target.closest('button');if(b)tap(+b.dataset.i)};
+  $('wcG').onclick=()=>{score=0;left=60;over=false;run=true;msg='';pickW();clearInterval(tmr);tmr=setInterval(()=>{if(!open()){clearInterval(tmr);return}left-=.5;if(left<=0){left=0;finish()}else tick()},500);paint()};
+  $('wcX').onclick=()=>{clearInterval(tmr);$('modal').style.display='none'};
+  paint()})}
