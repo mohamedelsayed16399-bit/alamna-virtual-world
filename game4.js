@@ -262,7 +262,7 @@ function buildTgw(){
  [[-3.6,0x4dabf7],[-3,0x4dabf7],[3,0xfcc419],[3.6,0xfcc419]].forEach(([x,c])=>g.add(mesh(G.cyl(0.28,0.3,0.8,10),c,x,0.4,-3),mesh(G.sph(0.28,8),0xffd8a8,x,1,-3)));
  g.add(mesh(G.box(0.1,1.2,0.1),0x4dabf7,-4.4,0.6,-3),mesh(G.box(0.1,1.2,0.1),0xfcc419,4.4,0.6,-3));
  tgh={it:{x:0,z:0.2,label:'🪢 شد الحبل ضد 🤖',fn:tgwStart}};interacts.push(tgh.it);
- g.add(portalMesh('ارجع لساحة الثلج',5.8,5.8,0x339af0,'snowfight'));
+ g.add(portalMesh('ارجع لساحة الثلج',5.8,5.8,0x339af0,'snowfight'),portalMesh('⛏️ موقع التنقيب',-5.8,5.8,0xa9792f,'digsite'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🪢 دوس بسرعة، والدوسة الأقوى لما الدايرة تكبر',3200)
 }
@@ -307,3 +307,54 @@ function tgwStart(){
    hud();dw();if(!over)requestAnimationFrame(tick)};
   cv.onpointerdown=e=>{e.preventDefault();tap()};
   $('tgX').onclick=()=>{$('modal').style.display='none'};hud();dw();requestAnimationFrame(tick)})}
+
+/* R271: treasure dig */
+let dgh=null;
+function buildDgt(){
+ const g=indoor(0xa9792f,0xfff3d6,0xffd43b);
+ sign(g,'⛏️ موقع التنقيب',0,4.6,-7.6,'rgba(169,121,47,.92)');
+ g.add(mesh(G.box(7,0.08,5),0xe9c46a,0,0.05,-3.2));
+ for(let i=0;i<9;i++)g.add(mesh(G.cyl(0.35+Math.random()*0.3,0.5+Math.random()*0.3,0.25+Math.random()*0.2,8),0xd4a24c,-3+Math.random()*6,0.15,-5.2+Math.random()*3.8));
+ g.add(mesh(G.box(0.9,0.6,0.6),0x8d5524,2.2,0.3,-1.6),mesh(G.box(0.92,0.18,0.62),0xffd43b,2.2,0.65,-1.6,0xffd43b));
+ g.add(mesh(G.box(0.1,1.4,0.1),0x8d6e63,-2.4,0.7,-1.4),mesh(G.box(0.5,0.5,0.1),0x868e96,-2.4,0.1,-1.3));
+ dgh={it:{x:0,z:0.2,label:'⛏️ ابدأ التنقيب',fn:dgtStart}};interacts.push(dgh.it);
+ g.add(portalMesh('ارجع لساحة شد الحبل',5.8,5.8,0xe67700,'tug'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('⛏️ احفر، والرقم بيقولك الكنز بعيد قد إيه',3200)
+}
+function dgtStart(){
+ const H=innerHeight<420,CH=H?Math.max(130,innerHeight-165):Math.max(260,Math.min(innerHeight-330,380)),W=Math.min(innerWidth-50,360);
+ const cols=H?9:7,rows=H?5:7,TOP=H?0:6,cs=Math.floor(Math.min(W/cols,(CH-TOP)/rows)),gx=Math.floor((W-cs*cols)/2),gy=Math.floor((CH-cs*rows)/2),R=3,DG=6;
+ let rd=0,sc=0,dug=[],left=DG,tr=null,state='play',over=false,fl=0,last=0,msg='',msgT=0,found=0,t=0;
+ const newR=()=>{tr={c:Math.floor(Math.random()*cols),r:Math.floor(Math.random()*rows)};dug=[];left=DG;state='play'};
+ newR();
+ const dist=(c,r)=>Math.max(Math.abs(c-tr.c),Math.abs(r-tr.r));
+ const say=m=>{msg=m;msgT=1.2};
+ let dig=()=>{};
+ window.dgtq=()=>({rd,sc,left,state,over,found,cols,rows,dug:dug.map(d=>({c:d.c,r:d.r,d:d.d})),dig:(c,r)=>dig(c,r)});
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">⛏️ موقع التنقيب</h2>')+'<div id="dgH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="dgC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row"><button class="btn d" id="dgX">إغلاق</button></div>';
+  const cv=$('dgC');cv.width=W;cv.height=CH;const x=cv.getContext('2d');
+  const open=()=>$('dgC')&&$('modal').style.display!=='none';
+  const hud=()=>{if($('dgH'))$('dgH').textContent='كنز '+Math.min(rd+1,R)+'/'+R+' · ⭐ '+sc+' · ⛏️ '+left+(H?'':' · رقم الخانة = بُعد الكنز بالخانات')};
+  const fin=()=>{over=true;dw();sfx('win');setTimeout(()=>{if(!open())return;const d=today();if(!me.dgtd||me.dgtd.d!==d)me.dgtd={d,c:0};let pay=Math.min(5,Math.floor(sc/50));pay=Math.max(0,Math.min(pay,12-me.dgtd.c));me.dgtd.c+=pay;me.coins+=pay;updCoins();const nb=sc>(me.dgtBest||0);if(nb)me.dgtBest=sc;me.dgtGames=(me.dgtGames||0)+1;saveMe();
+   c.innerHTML='<h2>'+(found===R?'⛏️ لقيت كل الكنوز! 💎':'⛏️ خلص التنقيب')+'</h2><div style="text-align:center;font-size:16px">لقيت <b>'+found+'/'+R+'</b> · النقاط: <b>'+sc+'</b>'+(nb&&sc?'<br>🏆 رقم قياسي!':'<br>أحسن نتيجة: '+(me.dgtBest||0))+'<br>'+(pay?'+'+pay+'🪙':sc>=50?'(وصلت حد النهاردة)':'اوصل 50 نقطة عشان تكسب عملات')+'</div><div class="row"><button class="btn" id="dgR">🔁 تاني</button><button class="btn d" id="dgX2">إغلاق</button></div>';
+   $('dgR').onclick=dgtStart;$('dgX2').onclick=()=>{$('modal').style.display='none'}},900)};
+  dig=(cc,rr)=>{if(over||state!=='play'||cc<0||rr<0||cc>=cols||rr>=rows||dug.some(d=>d.c===cc&&d.r===rr))return false;const d=dist(cc,rr);dug.push({c:cc,r:rr,d});left--;sfx('place');
+   if(d===0){const g2=20+left*10;sc+=g2;found++;state='won';fl=1.4;say('💎 لقيته! +'+g2);sfx('win')}
+   else if(left<=0){state='lost';fl=1.6;say('خلصت الحفر 😢 الكنز كان هنا');}
+   hud();return true};
+  const col=d=>d<=1?'#e03131':d===2?'#f76707':d===3?'#fab005':d===4?'#74c0fc':'#4c6ef5';
+  const dw=()=>{x.fillStyle='#fff3d6';x.fillRect(0,0,W,CH);
+   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const px=gx+c*cs,py=gy+r*cs,dd=dug.find(d=>d.c===c&&d.r===r);
+    x.fillStyle=dd?'#b8864b':((c+r)%2?'#e9c46a':'#e3bb5c');x.fillRect(px+1,py+1,cs-2,cs-2);
+    if(!dd){x.fillStyle='rgba(255,255,255,.18)';x.fillRect(px+1,py+1,cs-2,3)}
+    if(dd){if(dd.d===0){x.fillStyle='#8d5524';x.fillRect(px+cs*0.18,py+cs*0.3,cs*0.64,cs*0.46);x.fillStyle='#ffd43b';x.fillRect(px+cs*0.18,py+cs*0.3,cs*0.64,cs*0.16);x.fillRect(px+cs*0.44,py+cs*0.4,cs*0.12,cs*0.16)}
+     else{x.fillStyle=col(dd.d);x.beginPath();x.arc(px+cs/2,py+cs/2,cs*0.36,0,6.3);x.fill();x.fillStyle='#fff';x.font='bold '+Math.floor(cs*0.46)+'px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(dd.d,px+cs/2,py+cs/2+1);x.textBaseline='alphabetic'}}}
+   if(state==='lost'){const px=gx+tr.c*cs,py=gy+tr.r*cs;x.strokeStyle='#e03131';x.lineWidth=3;x.strokeRect(px+2,py+2,cs-4,cs-4);x.fillStyle='#8d5524';x.fillRect(px+cs*0.18,py+cs*0.3,cs*0.64,cs*0.46);x.fillStyle='#ffd43b';x.fillRect(px+cs*0.18,py+cs*0.3,cs*0.64,cs*0.16)}
+   if(msgT>0){x.fillStyle='rgba(33,37,41,.85)';x.fillRect(0,CH/2-16,W,30);x.fillStyle='#ffd43b';x.font='bold 18px sans-serif';x.textAlign='center';x.fillText(msg,W/2,CH/2+6)}};
+  const tick=now=>{if(!open())return;const dt=Math.min(0.05,(now-(last||now))/1000);last=now;t+=dt;if(msgT>0)msgT-=dt;
+   if((state==='won'||state==='lost')){fl-=dt;if(fl<=0){rd++;if(rd>=R)fin();else{newR();hud()}}}
+   dw();if(!over)requestAnimationFrame(tick)};
+  cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width-gx,py=(e.clientY-r.top)*CH/r.height-gy;dig(Math.floor(px/cs),Math.floor(py/cs))};
+  $('dgX').onclick=()=>{$('modal').style.display='none'};hud();dw();requestAnimationFrame(tick)})}
