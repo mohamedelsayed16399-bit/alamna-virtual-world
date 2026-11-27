@@ -379,11 +379,11 @@ function photoApply(){const B=BACKS[ps.i];ps.back.material.color.set(B[1]);while
 function photoNext(){if(!ps)return;ps.i=(ps.i+1)%BACKS.length;photoApply();sfx('place');burst(new THREE.Vector3(0,3,-5),[0xffd43b,0xffffff],10)}
 function photoSnap(){if(!ps)return;ps.n++;me.studioPics=(me.studioPics||0)+1;saveMe();sfx('star');takePhoto()}
 let chCb=null,chLast='';
-const GBG=[['golf','⛳ جولف',1],['hoops','🏀 سلة',0],['bowl','🎳 بولينج',0],['gal','🎯 رماية',0],['tag','🏃 طاردة',0],['pen','⚽ جزاء',0],['seek','🙈 استغماية',0],['kite','🪁 طيارة',0],['bump','🚗 تصادم',0],['bake','🥐 مخبز',0],['star','🌌 نجوم',0],['ice','⛸️ تزلج',0],['bal','🎈 بالونات',0]];
-function myBests(){return{golf:me.golfBest||0,hoops:me.hoopBest||0,bowl:me.bowlBest||0,gal:me.galBest||0,tag:me.tagBest||0,pen:me.penBest||0,seek:me.seekBest||0,kite:me.kiteBest||0,bump:me.bumpBest||0,bake:me.bakeBest||0,star:me.simonBest||0,ice:me.iceBest||0,bal:me.balBest||0}}
+const GBG=[['golf','⛳ جولف',1],['hoops','🏀 سلة',0],['bowl','🎳 بولينج',0],['gal','🎯 رماية',0],['tag','🏃 طاردة',0],['pen','⚽ جزاء',0],['seek','🙈 استغماية',0],['kite','🪁 طيارة',0],['bump','🚗 تصادم',0],['bake','🥐 مخبز',0],['star','🌌 نجوم',0],['ice','⛸️ تزلج',0],['bal','🎈 بالونات',0],['mol','🔨 خلد',0]];
+function myBests(){return{golf:me.golfBest||0,hoops:me.hoopBest||0,bowl:me.bowlBest||0,gal:me.galBest||0,tag:me.tagBest||0,pen:me.penBest||0,seek:me.seekBest||0,kite:me.kiteBest||0,bump:me.bumpBest||0,bake:me.bakeBest||0,star:me.simonBest||0,ice:me.iceBest||0,bal:me.balBest||0,mol:me.molBest||0}}
 function pubBests(){try{const o=JSON.stringify({n:me.name,g:myBests()});if(o===chLast||!netOK)return;chLast=o;client.publish(NS+'/ch/'+me.id,o,{retain:true})}catch(e){}}
 const _sv0=saveMe;saveMe=function(){_sv0.apply(this,arguments);pubBests()};
-const WKEYS=['ice','simon','mem','tag','seek','kite','bump','bake','pen','hoop','gal','bowl','bal','dash'];
+const WKEYS=['ice','simon','mem','tag','seek','kite','bump','bake','pen','hoop','gal','bowl','bal','dash','mol'];
 function wkId(){const d=new Date(),j=new Date(d.getFullYear(),0,1);return d.getFullYear()+'w'+Math.floor(((d-j)/864e5+j.getDay())/7)}
 function wkCounts(){const o={};for(const k of WKEYS)o[k]=me[k+'Games']||0;return o}
 function wkInit(){if(!me.wk||me.wk.w!==wkId()){me.wk={w:wkId(),base:wkCounts(),cl:[]};saveMe()}return me.wk}
