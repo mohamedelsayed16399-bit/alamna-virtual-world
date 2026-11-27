@@ -414,7 +414,7 @@ function buildMbx(){
  g.add(mesh(G.cyl(0.35,0.35,1.1,10),0x7048e8,-5,0.55,0),mesh(G.cyl(0.35,0.35,1.1,10),0x7048e8,5,0.55,0));
  mbh={it:{x:0,z:0.2,label:'🎵 ألّف لحن',fn:mbStart},it2:{x:2.6,z:-1.8,label:'▶️ شغّل لحنك المحفوظ',fn:()=>{const t=mbLoad();if(t){mbPlay(t);toast('🎵 بيشغّل لحنك',1800)}else toast('مفيش لحن محفوظ لسه، ألّف واحد الأول',2500)}}};
  interacts.push(mbh.it,mbh.it2);
- g.add(portalMesh('ارجع للمرسم',5.8,5.8,0xd6336c,'artroom'));
+ g.add(portalMesh('ارجع للمرسم',5.8,5.8,0xd6336c,'artroom'),portalMesh('❌ ساحة إكس أو',-5.8,5.8,0x2b8a3e,'xoxroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🎵 ألّف لحن من 8 نوتات واحفظه',3000)
 }
@@ -440,3 +440,50 @@ function mbStart(){
   $('mbS').onclick=()=>{try{localStorage.setItem('ealam_mbx',JSON.stringify({g:G2,tp}));me.mbxGames=(me.mbxGames||0)+1;saveMe();sfx('win');toast('✅ اتحفظ اللحن، دوس "شغّل لحنك" بره',3000)}catch(e){toast('مقدرتش أحفظ',2000)}};
   cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),col=Math.floor((e.clientX-r.left)*cv.width/r.width/cw),row=Math.floor((e.clientY-r.top)*CH/r.height/chh);if(col<0||col>7||row<0||row>5)return;G2[col][row]=G2[col][row]?0:1;if(G2[col][row])mbTone(MBF[row],0.3);dw()};
   $('mbX').onclick=()=>{stop();$('modal').style.display='none'};lbl();dw()})}
+
+/* R274: tic-tac-toe tournament vs 3 bots */
+let xoh=null;
+const XOL=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function xoWin(b){for(const l of XOL)if(b[l[0]]&&b[l[0]]===b[l[1]]&&b[l[0]]===b[l[2]])return{p:b[l[0]],l};return b.every(v=>v)?{p:0,l:null}:null}
+function xoMM(b,t){const w=xoWin(b);if(w)return w.p===2?10:w.p===1?-10:0;let best=t===2?-99:99;for(let i=0;i<9;i++)if(!b[i]){b[i]=t;const s=xoMM(b,t===2?1:2);b[i]=0;if(t===2){if(s>best)best=s}else if(s<best)best=s}return best}
+function xoBot(b,lv){const em=[];for(let i=0;i<9;i++)if(!b[i])em.push(i);const rnd=()=>em[Math.floor(Math.random()*em.length)];
+ const find=p=>{for(const i of em){b[i]=p;const w=xoWin(b);b[i]=0;if(w&&w.p===p)return i}return -1};
+ if(lv===0){if(Math.random()<0.3){const w=find(2);if(w>=0)return w}return rnd()}
+ if(lv===1){let m=find(2);if(m<0)m=find(1);if(m>=0)return m;if(!b[4])return 4;const c=[0,2,6,8].filter(i=>!b[i]);return c.length?c[Math.floor(Math.random()*c.length)]:rnd()}
+ if(Math.random()<0.12)return rnd();let bi=-1,bs=-99;for(const i of em){b[i]=2;const s=xoMM(b,1);b[i]=0;if(s>bs||s===bs&&Math.random()<0.4){bs=s;bi=i}}return bi}
+function buildXox(){
+ const g=indoor(0x2b8a3e,0xebfbee,0x69db7c);
+ sign(g,'❌⭕ ساحة إكس أو',0,4.6,-7.6,'rgba(43,138,62,.92)');
+ g.add(mesh(G.box(4.2,0.1,4.2),0xf1f3f5,0,0.06,-4));
+ [-0.7,0.7].forEach(o=>{g.add(mesh(G.box(0.1,0.06,4.2),0x212529,o,0.12,-4),mesh(G.box(4.2,0.06,0.1),0x212529,0,0.12,-4+o))});
+ [[-1.4,-5.4,0],[0,-4,1],[1.4,-2.6,0],[1.4,-5.4,1],[-1.4,-2.6,1]].forEach(([x,z,k])=>{if(k)g.add(mesh(G.cyl(0.45,0.45,0.12,16),0xfa5252,x,0.2,z),mesh(G.cyl(0.25,0.25,0.14,16),0xf1f3f5,x,0.2,z));else{const a=mesh(G.box(1,0.12,0.2),0x228be6,x,0.2,z),b2=mesh(G.box(1,0.12,0.2),0x228be6,x,0.2,z);a.rotation.y=0.78;b2.rotation.y=-0.78;g.add(a,b2)}});
+ g.add(mesh(G.cyl(0.4,0.4,1,10),0x2b8a3e,-5,0.5,0),mesh(G.cyl(0.4,0.4,1,10),0x2b8a3e,5,0.5,0));
+ xoh={it:{x:0,z:0.2,label:'❌ العب بطولة إكس أو',fn:xoxStart}};interacts.push(xoh.it);
+ g.add(portalMesh('ارجع للصندوق الموسيقي',5.8,5.8,0x7048e8,'musicbox'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('❌ اهزم 3 روبوتات 🤖 واحد ورا التاني',3000)
+}
+function xoxStart(){
+ const H=innerHeight<420,W=Math.min(innerWidth-50,360),S=H?Math.max(120,Math.min(W,innerHeight-190)):Math.min(W,Math.max(240,Math.min(innerHeight-340,340)));
+ let b=Array(9).fill(0),lv=0,cleared=0,draws=0,over=false,turn=1,res=null,wl=null,pend=false;
+ window.xoxq=()=>({b:b.slice(),lv,cleared,over,turn,res,play:i=>play(i)});
+ let play=()=>{};
+ modal(c=>{
+  c.innerHTML=(H?'':'<h2 style="margin:4px">❌⭕ بطولة إكس أو</h2>')+'<div id="xoH" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="xoC" style="display:block;margin:4px auto;border-radius:10px;touch-action:none"></canvas><div class="row"><button class="btn d" id="xoX">إغلاق</button></div>';
+  const cv=$('xoC');cv.width=S;cv.height=S;const x=cv.getContext('2d'),cs=S/3;
+  const open=()=>$('xoC')&&$('modal').style.display!=='none';
+  const NM=['🤖 مبتدئ','🤖 ذكي','🤖 خبير'];
+  const hud=()=>{if($('xoH'))$('xoH').textContent='أنت ❌ ضد '+NM[Math.min(lv,2)]+' ⭕ · مستوى '+Math.min(lv+1,3)+'/3 · '+(res?res:(turn===1?'دورك':'دور 🤖'))};
+  const dw=()=>{x.fillStyle='#f8f9fa';x.fillRect(0,0,S,S);x.strokeStyle='#495057';x.lineWidth=4;x.lineCap='round';for(let i=1;i<3;i++){x.beginPath();x.moveTo(i*cs,8);x.lineTo(i*cs,S-8);x.moveTo(8,i*cs);x.lineTo(S-8,i*cs);x.stroke()}
+   for(let i=0;i<9;i++){const cx=(i%3+0.5)*cs,cy=(Math.floor(i/3)+0.5)*cs,r=cs*0.28;if(b[i]===1){x.strokeStyle='#1c7ed6';x.lineWidth=cs*0.1;x.beginPath();x.moveTo(cx-r,cy-r);x.lineTo(cx+r,cy+r);x.moveTo(cx+r,cy-r);x.lineTo(cx-r,cy+r);x.stroke()}else if(b[i]===2){x.strokeStyle='#e8590c';x.lineWidth=cs*0.1;x.beginPath();x.arc(cx,cy,r,0,6.3);x.stroke()}}
+   if(wl){x.strokeStyle='#40c057';x.lineWidth=cs*0.08;const a=wl[0],z=wl[2];x.beginPath();x.moveTo((a%3+0.5)*cs,(Math.floor(a/3)+0.5)*cs);x.lineTo((z%3+0.5)*cs,(Math.floor(z/3)+0.5)*cs);x.stroke()}};
+  const fin=()=>{over=true;turn=0;dw();sfx('win');setTimeout(()=>{if(!open())return;const d=today();if(!me.xoxd||me.xoxd.d!==d)me.xoxd={d,c:0};let pay=cleared+(cleared>=3?2:0);pay=Math.max(0,Math.min(5,pay,12-me.xoxd.c));me.xoxd.c+=pay;me.coins+=pay;updCoins();const nb=cleared>(me.xoxBest||0);if(nb)me.xoxBest=cleared;me.xoxGames=(me.xoxGames||0)+1;saveMe();
+   c.innerHTML='<h2>'+(cleared>=3?'❌ بطل البطولة! 🏆':'❌ خلصت البطولة')+'</h2><div style="text-align:center;font-size:16px">هزمت <b>'+cleared+'/3</b> روبوتات'+(nb&&cleared?'<br>🏆 رقم قياسي!':'<br>أحسن نتيجة: '+(me.xoxBest||0))+'<br>'+(pay?'+'+pay+'🪙':'(مفيش جايزة)')+'</div><div class="row"><button class="btn" id="xoR">🔁 تاني</button><button class="btn d" id="xoX2">إغلاق</button></div>';
+   $('xoR').onclick=xoxStart;$('xoX2').onclick=()=>{$('modal').style.display='none'}},900)};
+  const after=()=>{const w=xoWin(b);if(!w)return false;wl=w.l;pend=true;if(w.p===1){res='كسبت! 🎉';cleared++;sfx('win');hud();dw();setTimeout(()=>{if(!open())return;if(cleared>=3)fin();else{lv++;b=Array(9).fill(0);wl=null;res=null;turn=1;pend=false;hud();dw()}},1200)}
+   else if(w.p===2){res='🤖 كسب';hud();dw();setTimeout(()=>{if(open())fin()},1200)}
+   else{res='تعادل';draws++;hud();dw();setTimeout(()=>{if(!open())return;if(draws>=3)fin();else{b=Array(9).fill(0);wl=null;res=null;turn=1;pend=false;hud();dw()}},1000)}return true};
+  const bot=()=>{if(!open()||over)return;const m=xoBot(b,lv);b[m]=2;sfx('place');if(!after()){turn=1;hud();dw()}};
+  play=i=>{if(over||pend||turn!==1||b[i])return false;b[i]=1;sfx('place');if(!after()){turn=2;hud();dw();setTimeout(bot,500)}else dw();return true};
+  cv.onpointerdown=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),cx=Math.floor((e.clientX-r.left)*S/r.width/cs),cy=Math.floor((e.clientY-r.top)*S/r.height/cs);if(cx<0||cx>2||cy<0||cy>2)return;play(cy*3+cx)};
+  $('xoX').onclick=()=>{$('modal').style.display='none'};hud();dw()})}
