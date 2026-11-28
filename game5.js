@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1447,6 +1447,7 @@ function buildNrd(){
  for(let i=0;i<5;i++)for(let j=0;j<5;j++)g.add(mesh(G.box(0.4,0.2,0.4),P[j][i]?0x212529:0xdee2e6,(i-2)*0.5,0.8,-4.8+(j-2)*0.5));
  nrdh={it:{x:0,z:0.2,label:'🖼️ العب لغز الصورة',fn:nrdStart}};interacts.push(nrdh.it);
  g.add(portalMesh('ارجع للغز الدوائر',5.8,5.8,0x495057,'bnrroom'));
+ g.add(portalMesh('ظلّل المكرر',-5.8,5.8,0x37b24d,'htrroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🖼️ لغز الصورة: الأرقام على الصفوف والأعمدة بتقولك كام خانة متتالية تتلوّن. اضغط الخانة تلوّنها، اضغط تاني ✖ علامة، وتالت تفضّيها',4800)
 }
@@ -1482,4 +1483,40 @@ function nrdStart(){
   $('kzB').onclick=e=>{const x=e.target.closest('[data-r]');if(!x||over)return;tap(+x.dataset.r,+x.dataset.c);if(!over)msg='';paint()};
   $('kzN').onclick=()=>{load();paint()};
   $('kzX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildHtr(){
+ const g=indoor(0x37b24d,0xebfbee,0xb2f2bb);
+ sign(g,'⬛ ظلّل المكرر',0,4.6,-7.6,'rgba(55,178,77,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0x343a40,0,0.55,-4.8));
+ const P=[[1,0,1],[0,1,0],[1,0,1]];
+ for(let i=0;i<3;i++)for(let j=0;j<3;j++)g.add(mesh(G.box(0.8,0.2,0.8),P[j][i]?0x212529:0xf1f3f5,(i-1)*0.9,0.8,-4.8+(j-1)*0.9));
+ htrh={it:{x:0,z:0.2,label:'⬛ العب ظلّل المكرر',fn:htrStart}};interacts.push(htrh.it);
+ g.add(portalMesh('ارجع للغز الصورة',5.8,5.8,0x495057,'nrdroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('⬛ ظلّل المكرر: ظلّل (اسوّد) خانات لحد ما مفيش رقم يتكرر في أي صف أو عمود. القواعد: مفيش خليتين مظللتين جنب بعض، والخانات البيضا كلها لازم تفضل متصلة',5200)
+}
+function htrStart(){
+ const LV=[[[[2,4,1,2],[3,2,4,1],[1,3,2,1],[4,4,3,2]],[[0,3],[2,3],[3,1]]],[[[3,2,1,4,2],[5,1,2,3,2],[2,4,3,4,5],[1,2,4,5,3],[4,1,5,4,1]],[[0,1],[1,4],[2,3],[4,1],[4,3]]],[[[2,4,3,3,5],[3,1,5,2,3],[5,3,1,4,3],[2,3,3,5,1],[4,4,3,1,2]],[[0,0],[0,2],[1,4],[2,1],[3,2],[4,1]]],[[[4,1,1,6,6,2],[6,4,2,1,3,3],[2,1,3,5,3,6],[3,2,6,5,1,5],[1,3,5,6,5,4],[5,6,5,2,4,6]],[[0,1],[0,3],[1,4],[2,2],[3,3],[4,4],[5,2],[5,5]]],[[[4,6,3,4,1,6],[2,6,1,4,3,2],[6,6,2,5,3,1],[1,2,5,3,6,4],[6,1,1,6,6,3],[3,4,6,5,5,2]],[[0,1],[0,3],[1,5],[2,1],[2,4],[4,0],[4,2],[4,4],[5,3]]],[[[6,5,7,2,3,1,3],[6,4,2,6,3,5,6],[2,1,1,4,6,3,7],[4,3,1,5,2,6,6],[5,7,1,1,4,6,1],[4,2,6,4,1,4,5],[1,6,7,3,5,5,4]],[[0,2],[0,4],[1,0],[1,6],[2,2],[3,5],[4,2],[4,6],[5,0],[5,3],[6,5]]]];
+ let li=(me.htrLvl||0)%LV.length,N,G0,SH,mv=0,over=false,msg='',par;
+ const load=()=>{G0=LV[li][0].map(r=>r.slice());N=G0.length;SH=G0.map(r=>r.map(()=>false));par=LV[li][1].length;mv=0;over=false;msg='مستوى '+(li+1)+' من '+LV.length};load();
+ const adj=()=>{const s=new Set();for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(SH[r][c]){if(r+1<N&&SH[r+1][c]){s.add(r+','+c);s.add((r+1)+','+c)}if(c+1<N&&SH[r][c+1]){s.add(r+','+c);s.add(r+','+(c+1))}}return s};
+ const dup=()=>{const s=new Set();for(let r=0;r<N;r++)for(let c=0;c<N;c++){if(SH[r][c])continue;for(let j=0;j<N;j++)if(j!==c&&!SH[r][j]&&G0[r][j]===G0[r][c])s.add(r+','+c);for(let i=0;i<N;i++)if(i!==r&&!SH[i][c]&&G0[i][c]===G0[r][c])s.add(r+','+c)}return s};
+ const conn=()=>{const fr=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(!SH[r][c])fr.push([r,c]);if(!fr.length)return false;const seen=new Set([fr[0].join()]),st=[fr[0]];while(st.length){const[r,c]=st.pop();[[1,0],[-1,0],[0,1],[0,-1]].forEach(d=>{const a=r+d[0],b=c+d[1];if(a<0||b<0||a>=N||b>=N||SH[a][b]||seen.has(a+','+b))return;seen.add(a+','+b);st.push([a,b])})}return seen.size===fr.length};
+ const valid=()=>!adj().size&&!dup().size&&conn();
+ const tap=(r,c)=>{if(over||r<0||c<0||r>=N||c>=N)return false;SH[r][c]=!SH[r][c];mv++;sfx('place');if(valid())fin();return true};
+ window.htrq=()=>({G:G0.map(r=>r.slice()),SH:SH.map(r=>r.slice()),sol:LV[li][1],N,mv,over,msg,li,par,dup:dup().size,adj:adj().size,tap});
+ let paint=()=>{};
+ const fin=()=>{over=true;me.htrGames=(me.htrGames||0)+1;me.htrBest=(me.htrBest||0)+1;const dd=today();if(me.htrDD!==dd){me.htrDD=dd;me.htrDC=0}
+  let cn=mv<=par+4?3:2;cn=Math.min(cn,Math.max(0,6-(me.htrDC||0)));if(cn){me.coins+=cn;me.htrDC=(me.htrDC||0)+cn;updCoins();sfx('win')}else sfx('star');
+  me.htrLvl=(li+1)%LV.length;msg='🏆 حليتها في '+mv+' ضغطة'+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;padding:6px 12px';
+  c.innerHTML='<h2 style="margin:4px">⬛ ظلّل المكرر</h2><div id="hrS" style="text-align:center;font-size:14px;margin:2px"></div><div id="hrB" style="position:relative;margin:4px auto;direction:ltr;background:#212529;border-radius:6px"></div><div id="hrM" style="text-align:center;font-size:12px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><button class="btn" id="hrN" style="'+bs+'">من الأول</button><button class="btn d" id="hrX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('hrB'))return;const sm=innerHeight<420,cs=sm?Math.floor(116/N):Math.floor(306/N),B=$("hrB");B.style.width=cs*N+'px';B.style.height=cs*N+'px';B.innerHTML='';const ad=adj(),dp=dup();$('hrS').textContent='ضغطات '+mv+' · مستوى '+(li+1)+' · مكرر '+dp.size;
+   for(let r=0;r<N;r++)for(let c=0;c<N;c++){const k=r+','+c,e=document.createElement('div');e.dataset.r=r;e.dataset.c=c;
+    e.style.cssText='position:absolute;box-sizing:border-box;left:'+(c*cs)+'px;top:'+(r*cs)+'px;width:'+cs+'px;height:'+cs+'px;border:1px solid #495057;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:'+Math.floor(cs*0.5)+'px;background:'+(SH[r][c]?(ad.has(k)?'#c92a2a':'#000'):'#f1f3f5')+';color:'+(SH[r][c]?'#495057':(dp.has(k)?'#e03131':'#212529'));e.textContent=G0[r][c];B.appendChild(e)}
+   $('hrM').textContent=msg};
+  $('hrB').onclick=e=>{const x=e.target.closest('[data-r]');if(!x||over)return;tap(+x.dataset.r,+x.dataset.c);if(!over)msg='';paint()};
+  $('hrN').onclick=()=>{load();paint()};
+  $('hrX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
