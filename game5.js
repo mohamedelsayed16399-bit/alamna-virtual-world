@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -947,6 +947,7 @@ function buildMmd(){
  [0xe03131,0x2f9e44,0x1971c2,0xf08c00,0x9c36b5,0x15aabf].forEach((c,k)=>g.add(mesh(G.cyl(0.22,0.22,0.1,12),c,-1.25+k*0.5,0.78,-4.8)));
  mmdh={it:{x:0,z:0.2,label:'🎯 العب كسر الكود',fn:mmdStart}};interacts.push(mmdh.it);
  g.add(portalMesh('ارجع لنقط ومربعات',5.8,5.8,0xf08c00,'dbxroom'));
+ g.add(portalMesh('غمّر اللوحة',-5.8,5.8,0x1098ad,'fdiroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🎯 كسر الكود: خمّن ٤ ألوان مخفية في ٨ محاولات. "تمام" = لون ومكان صح، "لون" = لون صح ومكان غلط',4200)
 }
@@ -976,4 +977,36 @@ function mmdStart(){
    $('mxM').textContent=msg};
   $('mxP').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.c!==undefined)pick(+x.dataset.c)};
   $('mxX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildFdi(){
+ const g=indoor(0x1098ad,0xe3fafc,0x99e9f2);
+ sign(g,'🌊 غمّر اللوحة',0,4.6,-7.6,'rgba(16,152,173,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0x1098ad,0,0.55,-4.8));
+ const cc=[0xe03131,0x2f9e44,0x1971c2,0xf08c00,0x9c36b5,0xfab005];
+ for(let a=0;a<4;a++)for(let b=0;b<4;b++)g.add(mesh(G.box(0.6,0.1,0.6),cc[(a*2+b)%6],-1.05+a*0.7,0.74,-5.85+b*0.7));
+ fdih={it:{x:0,z:0.2,label:'🌊 العب غمّر اللوحة',fn:fdiStart}};interacts.push(fdih.it);
+ g.add(portalMesh('ارجع لكسر الكود',5.8,5.8,0x7048e8,'mmdroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🌊 غمّر اللوحة: ابدأ من الركن اللي فوق شمال واختار لون يغمّر الجيران. لوّن اللوحة كلها بلون واحد قبل ما الحركات تخلص',4200)
+}
+function fdiStart(){
+ const N=8,COL=['#e03131','#2f9e44','#1971c2','#f08c00','#9c36b5','#fab005'],MAX=16;
+ let gr,moves,over=false,msg='';
+ const init=()=>{gr=Array(64).fill(0).map(()=>(Math.random()*6)|0);moves=0};init();
+ const done=()=>gr.every(v=>v===gr[0]);
+ const flood=c=>{const o=gr[0];if(o===c)return false;const st=[0],seen={0:1};while(st.length){const i=st.pop();gr[i]=c;const r=(i/N)|0,x=i%N;[[r-1,x],[r+1,x],[r,x-1],[r,x+1]].forEach(p=>{if(p[0]<0||p[0]>=N||p[1]<0||p[1]>=N)return;const j=p[0]*N+p[1];if(!seen[j]&&gr[j]===o){seen[j]=1;st.push(j)}})}return true};
+ window.fdiq=()=>({gr:gr.slice(),moves,over,msg,set:a=>{gr=a.slice();moves=0},pick:c=>pick(c)});
+ let paint=()=>{};
+ const fin=win=>{over=true;me.fdiGames=(me.fdiGames||0)+1;if(win)me.fdiBest=(me.fdiBest||0)+1;const dd=today();if(me.fdiDD!==dd){me.fdiDD=dd;me.fdiDC=0}
+  let cn=win?(moves<=11?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.fdiDC||0)));if(cn){me.coins+=cn;me.fdiDC=(me.fdiDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg=(win?'🏆 غمّرتها في '+moves+' حركة':'الحركات خلصت قبل ما تتغمّر')+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const pick=c=>{if(over)return;if(!flood(c)){msg='اختار لون تاني';paint();return}moves++;msg='';sfx('place');if(done()){fin(true);return}if(moves>=MAX){fin(false);return}paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🌊 غمّر اللوحة</h2><div id="fiS" style="text-align:center;font-size:14px;margin:2px"></div><div id="fiB" style="display:grid;justify-content:center;direction:ltr;margin:4px auto;gap:1px"></div><div id="fiP" style="display:flex;gap:5px;justify-content:center;direction:ltr;margin-top:6px"></div><div id="fiM" style="text-align:center;font-size:13px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn d" id="fiX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('fiB'))return;const sm=innerHeight<420,cs=sm?12:34,ps=sm?20:38;$('fiS').textContent='الحركات '+moves+' من '+MAX;
+   const B=$('fiB');B.style.gridTemplateColumns='repeat(8,'+cs+'px)';B.innerHTML=gr.map(v=>'<div style="width:'+cs+'px;height:'+cs+'px;background:'+COL[v]+'"></div>').join('');
+   $('fiP').innerHTML=COL.map((c,i)=>'<button class="btn" data-c="'+i+'" style="width:'+ps+'px!important;height:'+ps+'px!important;min-width:0!important;min-height:0!important;padding:0;margin:0;border-radius:50%;background:'+c+(over?';opacity:.4':'')+'"></button>').join('');
+   $('fiM').textContent=msg};
+  $('fiP').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.c!==undefined)pick(+x.dataset.c)};
+  $('fiX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
