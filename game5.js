@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -586,6 +586,7 @@ function buildNim(){
  for(let k=0;k<9;k++)g.add(mesh(G.cyl(0.05,0.05,1.2,6),0xe8b86d,-1.6+k*0.4,0.6,-4.8));
  nimh={it:{x:0,z:0.2,label:'🥢 العب العيدان',fn:nimStart}};interacts.push(nimh.it);
  g.add(portalMesh('ارجع لحجر ورقة مقص',5.8,5.8,0xe03131,'rpsroom'));
+ g.add(portalMesh('خمّن الرقم',-5.8,5.8,0x1098ad,'gsnroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🥢 15 عود: شيل 1 أو 2 أو 3. اللي ياخد آخر عود يخسر. البوت 🤖 معاك',3400)
 }
@@ -604,4 +605,33 @@ function nimStart(){
   paint=()=>{if(!$('nmS'))return;$('nmS').textContent='باقي '+n+' عود · اللي ياخد الأخير يخسر';$('nmC').textContent='|'.repeat(n).replace(/(.{5})/g,'$1 ');$('nmM').textContent=msg;[['nmA',1],['nmB',2],['nmD',3]].forEach(a=>$(a[0]).disabled=over||a[1]>n)};
   $('nmA').onclick=()=>take(1);$('nmB').onclick=()=>take(2);$('nmD').onclick=()=>take(3);
   $('nmX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildGsn(){
+ const g=indoor(0x1098ad,0xe3fafc,0x99e9f2);
+ sign(g,'🔢 خمّن الرقم ضد 🤖',0,4.6,-7.6,'rgba(16,152,173,.92)');
+ [[-1.4,0x1098ad],[0,0x0b7285],[1.4,0x1098ad]].forEach((a,i)=>g.add(mesh(G.box(0.9,0.9,0.9),a[1],a[0],0.45,-4.8),mesh(G.box(0.5,0.1,0.05),0xffffff,a[0],0.6,-4.33)));
+ gsnh={it:{x:0,z:0.2,label:'🔢 العب خمّن الرقم',fn:gsnStart}};interacts.push(gsnh.it);
+ g.add(portalMesh('ارجع للعيدان',5.8,5.8,0x2f9e44,'nimroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🔢 رقم سري من 1 لـ100. تخمّنوا بالدور مع البوت 🤖 واللي يصيبه الأول يكسب',3400)
+}
+function gsnStart(){
+ let sec=1+Math.floor(Math.random()*100),lo=1,hi=100,tries=0,over=false,msg='';
+ const bot=()=>{let g=Math.floor((lo+hi)/2);if(Math.random()<0.3)g=lo+Math.floor(Math.random()*(hi-lo+1));return g};
+ window.gsnq=()=>({sec,lo,hi,tries,over,msg,set:v=>{sec=v},guess:v=>guess(v)});
+ let paint=()=>{};
+ const fin=win=>{over=true;me.gsnGames=(me.gsnGames||0)+1;if(win)me.gsnBest=(me.gsnBest||0)+1;const dd=today();if(me.gsnDD!==dd){me.gsnDD=dd;me.gsnDC=0}
+  let cn=win?(tries<=5?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.gsnDC||0)));if(cn){me.coins+=cn;me.gsnDC=(me.gsnDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg+='\n'+(win?'🏆 كسبت البوت! الرقم '+sec:'🤖 البوت كسب. الرقم كان '+sec)+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const note=(who,v)=>{if(v<sec){lo=Math.max(lo,v+1);return who+' '+v+' ⬆ أعلى'}return who+' '+v+' ⬇ أقل'};
+ const guess=v=>{if(over)return;v=Math.round(+v);if(!(v>=lo&&v<=hi)){msg='اكتب رقم بين '+lo+' و '+hi;sfx('err');paint();return}tries++;
+  if(v===sec){msg='أنت '+v+' ✅ صح';fin(true);return}
+  if(v>sec)hi=Math.min(hi,v-1);msg=note('أنت',v).replace(/ ⬆.*| ⬇.*/,'')+(v<sec?' ⬆ أعلى':' ⬇ أقل');sfx('tick');
+  const b=Math.min(hi,Math.max(lo,bot()));if(b===sec){msg+=' · 🤖 '+b+' ✅ صح';fin(false);return}
+  if(b<sec)lo=Math.max(lo,b+1);else hi=Math.min(hi,b-1);msg+=' · 🤖 '+b+(b<sec?' ⬆':' ⬇');paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🔢 خمّن الرقم ضد 🤖</h2><div id="gnS" style="text-align:center;font-size:15px;margin:4px"></div><div style="text-align:center;margin:8px 0"><input id="gnI" type="number" inputmode="numeric" style="width:90px;color:#111;background:#fff;font-size:22px;text-align:center;direction:ltr;padding:6px;border-radius:8px"></div><div id="gnM" style="text-align:center;font-size:13px;margin:6px 0;min-height:3.2em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="gnG" style="width:auto!important;display:inline-block!important">خمّن ✔</button><button class="btn d" id="gnX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('gnS'))return;$('gnS').textContent='الرقم بين '+lo+' و '+hi+' · محاولاتك '+tries;$('gnM').textContent=msg;$('gnG').disabled=over;$('gnI').disabled=over;if(!over)$('gnI').value=''};
+  $('gnG').onclick=()=>guess($('gnI').value);$('gnI').onkeydown=e=>{if(e.key==='Enter')guess($('gnI').value)};
+  $('gnX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
