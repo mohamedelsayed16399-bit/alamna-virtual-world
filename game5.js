@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -491,6 +491,7 @@ function buildPkd(){
  g.add(mesh(G.box(0.3,2,0.3),0xd9480f,-5,1,-2),mesh(G.box(0.3,2,0.3),0xd9480f,5,1,-2));
  pkdh={it:{x:0,z:0.2,label:'🎲 العب بوكر النرد',fn:pkdStart}};interacts.push(pkdh.it);
  g.add(portalMesh('ارجع للبنج بونج',5.8,5.8,0x1971c2,'pnkroom'));
+ g.add(portalMesh('أعلى أو أقل',-5.8,5.8,0x7048e8,'hilroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🎲 3 جولات ضد البوت 🤖. ثبّت النرد اللي عاجبك وأعد الرمي مرتين',3400)
 }
@@ -516,4 +517,34 @@ function pkdStart(){
   $('kdD').onclick=e=>{const b=e.target.closest('button');if(!b||over||rolls>=3)return;hold[+b.dataset.i]^=1;sfx('tick');paint()};
   $('kdR').onclick=roll;$('kdL').onclick=lock;
   $('kdX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildHil(){
+ const g=indoor(0x7048e8,0xf3f0ff,0xd0bfff);
+ sign(g,'🃏 أعلى أو أقل ضد 🤖',0,4.6,-7.6,'rgba(112,72,232,.92)');
+ [[-1.4,0],[0,0.3],[1.4,0.6]].forEach((a,i)=>g.add(mesh(G.box(0.9,0.06,1.3),0xffffff,a[0],0.9+a[1]*0.2,-4.8),mesh(G.box(0.7,0.07,1.1),0x7048e8,a[0],0.95+a[1]*0.2,-4.8)));
+ g.add(mesh(G.box(1,0.8,1),0x5f3dc4,0,0.4,-4.8));
+ hilh={it:{x:0,z:0.2,label:'🃏 العب أعلى أو أقل',fn:hilStart}};interacts.push(hilh.it);
+ g.add(portalMesh('ارجع لبوكر النرد',5.8,5.8,0xd9480f,'pkdroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🃏 10 كروت: خمّن الكارت الجاي أعلى ولا أقل. البوت 🤖 بيلعب معاك',3400)
+}
+function hilStart(){
+ const rc=()=>1+Math.floor(Math.random()*13);
+ const NMc=v=>v===1?'A':v===11?'J':v===12?'Q':v===13?'K':''+v;
+ let deck=[],i=0,my=0,bt=0,over=false,msg='';
+ for(let k=0;k<10;k++)deck.push(rc());
+ const step=dir=>{if(over)return;const a=deck[i],b=deck[i+1];const ok=x=>b===a?0:(x==='u'?b>a:b<a)?1:0;
+  const bd=a<=6?'u':'d';const m=ok(dir),n=ok(bd);my+=m;bt+=n;
+  msg='الكارت '+NMc(a)+' ← '+NMc(b)+' · '+(b===a?'تعادل':m?'✅ صح':'❌ غلط')+' · 🤖 '+(n?'✅':'❌');
+  sfx(m?'star':b===a?'tick':'err');i++;if(i>=9)fin();else paint()};
+ window.hilq=()=>({deck:deck.slice(),i,my,bt,over,set:d=>{deck=d.slice()},step});
+ let paint=()=>{};
+ const fin=()=>{over=true;me.hilGames=(me.hilGames||0)+1;const win=my>bt;if(win)me.hilBest=Math.max(me.hilBest||0,my);const dd=today();if(me.hilDD!==dd){me.hilDD=dd;me.hilDC=0}
+  let cn=win?(my>=8?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.hilDC||0)));if(cn){me.coins+=cn;me.hilDC=(me.hilDC||0)+cn;updCoins();sfx('win')}
+  msg+='\n'+(win?'🏆 كسبت البوت ':my===bt?'🤝 تعادل ':'🤖 البوت كسب ')+my+':'+bt+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🃏 أعلى أو أقل ضد 🤖</h2><div id="hvS" style="text-align:center;font-size:14px;margin:2px"></div><div id="hvC" style="display:flex;justify-content:center;margin:8px 0"></div><div id="hvM" style="text-align:center;font-size:13px;margin:6px 0;min-height:3.2em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="hvU" style="width:auto!important;display:inline-block!important">⬆ أعلى</button><button class="btn" id="hvD" style="width:auto!important;display:inline-block!important">⬇ أقل</button><button class="btn d" id="hvX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('hvS'))return;$('hvS').textContent='كارت '+Math.min(i+1,9)+'/9 · أنت '+my+' : '+bt+' 🤖';$('hvC').innerHTML='<div style="width:70px;height:96px;border-radius:10px;background:#fff;color:#5f3dc4;font-size:34px;font-weight:bold;display:flex;align-items:center;justify-content:center;border:3px solid #7048e8;direction:ltr">'+NMc(deck[over?9:i])+'</div>';$('hvM').textContent=msg;$('hvU').disabled=over;$('hvD').disabled=over};
+  $('hvU').onclick=()=>step('u');$('hvD').onclick=()=>step('d');
+  $('hvX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
