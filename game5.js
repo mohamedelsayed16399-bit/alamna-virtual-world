@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -448,6 +448,7 @@ function buildPnk(){
  g.add(mesh(G.box(0.3,2,0.3),0x1971c2,-5,1,-2),mesh(G.box(0.3,2,0.3),0x1971c2,5,1,-2));
  pnkh={it:{x:0,z:0.2,label:'🏓 العب ضد البوت 🤖',fn:pnkStart}};interacts.push(pnkh.it);
  g.add(portalMesh('ارجع للكلمات',5.8,5.8,0x0ca678,'wscroom'));
+ g.add(portalMesh('بوكر النرد',-5.8,5.8,0xd9480f,'pkdroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🏓 حرّك اللوح بصباعك. أول واحد يوصل 5 يكسب. الخصم بوت 🤖',3400)
 }
@@ -483,3 +484,36 @@ function pnkStart(){
   $('poG').onclick=()=>{me_=0;bot=0;over=false;go=true;msg='';px=W/2;ox=W/2;serve(1);info()};
   $('poX').onclick=()=>{$('modal').style.display='none'};
   info();requestAnimationFrame(loop)})}
+function buildPkd(){
+ const g=indoor(0xd9480f,0xfff4e6,0xffd8a8);
+ sign(g,'🎲 بوكر النرد ضد 🤖',0,4.6,-7.6,'rgba(217,72,15,.92)');
+ [[-1.2,0],[0,0.4],[1.2,0.9]].forEach((a,i)=>g.add(mesh(G.box(0.8,0.8,0.8),0xffffff,a[0],0.4+a[1]*0.2,-4.8+i*0.1),mesh(G.sph(0.09,6),0x212529,a[0],0.82+a[1]*0.2,-4.8+i*0.1)));
+ g.add(mesh(G.box(0.3,2,0.3),0xd9480f,-5,1,-2),mesh(G.box(0.3,2,0.3),0xd9480f,5,1,-2));
+ pkdh={it:{x:0,z:0.2,label:'🎲 العب بوكر النرد',fn:pkdStart}};interacts.push(pkdh.it);
+ g.add(portalMesh('ارجع للبنج بونج',5.8,5.8,0x1971c2,'pnkroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🎲 3 جولات ضد البوت 🤖. ثبّت النرد اللي عاجبك وأعد الرمي مرتين',3400)
+}
+function pkdStart(){
+ const sc=d=>{const c={};d.forEach(v=>c[v]=(c[v]||0)+1);const k=Object.values(c).sort((a,b)=>b-a);const s=[...d].sort();const st=s.join('')==='12345'||s.join('')==='23456';
+  if(k[0]===5)return 50;if(k[0]===4)return 30;if(k[0]===3&&k[1]===2)return 25;if(st)return 20;if(k[0]===3)return 15;if(k[0]===2&&k[1]===2)return 10;if(k[0]===2)return 5;return 0};
+ const NM=s=>s>=50?'خمسة متشابهة':s>=30?'أربعة متشابهة':s>=25?'فول هاوس':s>=20?'تسلسل':s>=15?'ثلاثة متشابهة':s>=10?'زوجين':s>=5?'زوج':'ولا حاجة';
+ const rl=()=>1+Math.floor(Math.random()*6);
+ let d=[0,0,0,0,0],hold=[0,0,0,0,0],rolls=0,rd=1,my=0,bt=0,over=false,msg='',log='';
+ const botPlay=()=>{let b=[rl(),rl(),rl(),rl(),rl()];for(let r=0;r<2;r++){const c={};b.forEach(v=>c[v]=(c[v]||0)+1);const best=+Object.keys(c).sort((x,y)=>c[y]-c[x]||y-x)[0];if(sc(b)>=20)break;b=b.map(v=>v===best?v:rl())}return b};
+ const first=()=>{d=[rl(),rl(),rl(),rl(),rl()];hold=[0,0,0,0,0];rolls=1};
+ first();
+ let roll=()=>{},lock=()=>{};
+ window.pkdq=()=>({d:d.slice(),hold:hold.slice(),rolls,rd,my,bt,over,coins:me.coins,sc,set:a=>{d=a.slice()},tog:i=>{if(rolls<3)hold[i]^=1},roll:()=>roll(),lock:()=>lock()});
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🎲 بوكر النرد ضد 🤖</h2><div id="kdS" style="text-align:center;font-size:14px;margin:2px;min-height:1.4em"></div><div id="kdD" style="display:flex;gap:6px;justify-content:center;direction:ltr;margin:8px 0"></div><div id="kdH" style="text-align:center;font-size:15px;min-height:1.5em"></div><div id="kdM" style="text-align:center;font-size:13px;margin:6px 0;min-height:3.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="kdR" style="width:auto!important;display:inline-block!important">🎲 ارمي</button><button class="btn" id="kdL" style="width:auto!important;display:inline-block!important">✔ ثبّت</button><button class="btn d" id="kdX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const paint=()=>{if(!$('kdS'))return;$('kdS').textContent='جولة '+Math.min(rd,3)+'/3 · أنت '+my+' : '+bt+' 🤖 · رميات '+rolls+'/3';const D=$('kdD');D.innerHTML='';d.forEach((v,i)=>{const b=document.createElement('button');b.className='btn';b.dataset.i=i;b.textContent=v;b.style.cssText='width:50px!important;height:56px;font-size:28px;padding:0;'+(hold[i]?'background:#f59f00;':'')+(over?'opacity:.5;':'');D.appendChild(b)});$('kdH').textContent=over?'':NM(sc(d))+' ('+sc(d)+')';$('kdM').textContent=msg;$('kdR').disabled=over||rolls>=3;$('kdL').disabled=over};
+  const finish=()=>{over=true;me.pkdGames=(me.pkdGames||0)+1;const win=my>bt;if(win)me.pkdBest=Math.max(me.pkdBest||0,my);const dd=today();if(me.pkdDD!==dd){me.pkdDD=dd;me.pkdDC=0}
+   let cn=win?(my>=50?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.pkdDC||0)));if(cn){me.coins+=cn;me.pkdDC=(me.pkdDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+   msg+='\n'+(win?'🏆 كسبت البوت ':my===bt?'🤝 تعادل ':'🤖 البوت كسب ')+my+':'+bt+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+  roll=()=>{if(over||rolls>=3)return;d=d.map((v,i)=>hold[i]?v:rl());rolls++;sfx('tick');paint()};
+  lock=()=>{if(over)return;const s=sc(d);my+=s;const b=botPlay(),bs=sc(b);bt+=bs;msg='جولة '+rd+': أنت '+NM(s)+' ('+s+') · 🤖 \u202A'+b.join(' ')+'\u202C '+NM(bs)+' ('+bs+')';sfx(s>=bs?'star':'place');rd++;if(rd>3){finish();return}first();paint()};
+  $('kdD').onclick=e=>{const b=e.target.closest('button');if(!b||over||rolls>=3)return;hold[+b.dataset.i]^=1;sfx('tick');paint()};
+  $('kdR').onclick=roll;$('kdL').onclick=lock;
+  $('kdX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
