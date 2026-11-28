@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1240,6 +1240,7 @@ function buildJam(){
  g.add(mesh(G.box(0.9,0.25,0.45),0xe03131,-0.6,0.82,-4.8),mesh(G.box(0.45,0.25,0.9),0x1971c2,0.4,0.82,-5.1),mesh(G.box(0.45,0.25,1.3),0x2f9e44,0.9,0.82,-4.5),mesh(G.box(0.9,0.25,0.45),0xf08c00,-0.3,0.82,-5.6));
  jamh={it:{x:0,z:0.2,label:'🚗 العب زحمة المرور',fn:jamStart}};interacts.push(jamh.it);
  g.add(portalMesh('ارجع للدومينو',5.8,5.8,0x495057,'dmoroom'));
+ g.add(portalMesh('سوليتير الأوتاد',-5.8,5.8,0x8d6e63,'pgsroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🚗 زحمة المرور: حرّك العربيات عشان العربية الحمرا تطلع من اليمين. اضغط عربية واختار الاتجاه. كل خطوة بتتحسب',4200)
 }
@@ -1271,4 +1272,45 @@ function jamStart(){
   $('jmC').onclick=()=>{if(sel>=0){if(!move(sel,1))msg='مسدود';else if(!over)msg='';paint()}};
   $('jmN').onclick=()=>{load();paint()};
   $('jmX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildPgs(){
+ const g=indoor(0x8d6e63,0xfff4e6,0xf3d9b1);
+ sign(g,'📍 سوليتير الأوتاد',0,4.6,-7.6,'rgba(141,110,99,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0x8d5524,0,0.55,-4.8));
+ for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)if(i||j)g.add(mesh(G.box(0.3,0.4,0.3),0xffd43b,i*0.9,0.9,-4.8+j*0.9));
+ pgsh={it:{x:0,z:0.2,label:'📍 العب سوليتير الأوتاد',fn:pgsStart}};interacts.push(pgsh.it);
+ g.add(portalMesh('ارجع لزحمة المرور',5.8,5.8,0x495057,'jamroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('📍 سوليتير الأوتاد: اقفز بوتد فوق وتد جنبه في خانة فاضية، والوتد اللي اتقفز عليه بيتشال. الهدف يفضل وتد واحد',4200)
+}
+function pgsStart(){
+ const N=7;let b,cnt,over=false,msg='',sel=null,hist=[];
+ const ok=(r,c)=>r>=0&&c>=0&&r<N&&c<N&&((r>=2&&r<=4)||(c>=2&&c<=4));
+ const load=()=>{b=[];cnt=0;for(let r=0;r<N;r++){b.push([]);for(let c=0;c<N;c++){if(!ok(r,c))b[r].push(-1);else if(r===3&&c===3)b[r].push(0);else{b[r].push(1);cnt++}}}over=false;sel=null;hist=[];msg='اضغط وتد وبعدين الخانة الخضرا'};load();
+ const D=[[0,2],[0,-2],[2,0],[-2,0]];
+ const targets=(r,c)=>{const o=[];if(!ok(r,c)||b[r][c]!==1)return o;for(const d of D){const r2=r+d[0],c2=c+d[1];if(ok(r2,c2)&&b[r2][c2]===0&&b[r+d[0]/2][c+d[1]/2]===1)o.push([r2,c2])}return o};
+ const anyMove=()=>{for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(targets(r,c).length)return true;return false};
+ const jump=(r,c,r2,c2)=>{if(over||!targets(r,c).some(t=>t[0]===r2&&t[1]===c2))return false;hist.push(b.map(x=>x.slice()));b[r][c]=0;b[(r+r2)/2][(c+c2)/2]=0;b[r2][c2]=1;cnt--;sel=null;sfx('place');
+  if(!anyMove())fin();return true};
+ window.pgsq=()=>({b:b.map(x=>x.slice()),cnt,over,msg,set:g=>{b=g.map(x=>x.slice());cnt=0;b.forEach(x=>x.forEach(v=>{if(v===1)cnt++}));over=false;hist=[];sel=null},jump});
+ let paint=()=>{};
+ const fin=()=>{over=true;me.pgsGames=(me.pgsGames||0)+1;const dd=today();if(me.pgsDD!==dd){me.pgsDD=dd;me.pgsDC=0}
+  let cn=cnt===1?3:cnt<=3?1:0;cn=Math.min(cn,Math.max(0,6-(me.pgsDC||0)));if(cnt===1)me.pgsBest=(me.pgsBest||0)+1;
+  if(cn){me.coins+=cn;me.pgsDC=(me.pgsDC||0)+cn;updCoins();sfx('win')}else sfx('star');
+  msg=cnt===1?'🏆 فضل وتد واحد! +'+cn+'🪙':'مفيش حركات تانية · فضل '+cnt+' أوتاد'+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;padding:6px 12px';
+  c.innerHTML='<h2 style="margin:4px">📍 سوليتير الأوتاد</h2><div id="pqS" style="text-align:center;font-size:14px;margin:2px"></div><div id="pqB" style="position:relative;margin:4px auto;direction:ltr;background:#8d5524;border-radius:10px"></div><div id="pqM" style="text-align:center;font-size:12px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><button class="btn" id="pqU" style="'+bs+'">تراجع</button><button class="btn" id="pqN" style="'+bs+'">من الأول</button><button class="btn d" id="pqX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('pqB'))return;const sm=innerHeight<420,cs=sm?20:42,B=$('pqB');B.style.width=cs*N+'px';B.style.height=cs*N+'px';B.innerHTML='';$('pqS').textContent='الأوتاد '+cnt;
+   const tg=sel?targets(sel[0],sel[1]):[];
+   for(let r=0;r<N;r++)for(let c=0;c<N;c++){if(b[r][c]<0)continue;const e=document.createElement('div');e.dataset.r=r;e.dataset.c=c;const isT=tg.some(t=>t[0]===r&&t[1]===c),isS=sel&&sel[0]===r&&sel[1]===c;
+    e.style.cssText='position:absolute;box-sizing:border-box;border-radius:50%;left:'+(c*cs+3)+'px;top:'+(r*cs+3)+'px;width:'+(cs-6)+'px;height:'+(cs-6)+'px;cursor:pointer;background:'+(b[r][c]===1?(isS?'#ffd43b':'#f08c00'):(isT?'#51cf66':'#5d3a1a'))+';border:2px solid '+(b[r][c]===1?'#7a4a00':'#3b2410');B.appendChild(e)}
+   $('pqU').disabled=!hist.length;$('pqM').textContent=msg};
+  $('pqB').onclick=e=>{const x=e.target.closest('[data-r]');if(!x||over)return;const r=+x.dataset.r,c=+x.dataset.c;
+   if(b[r][c]===1){sel=targets(r,c).length?[r,c]:null;msg=sel?'':'الوتد ده مش بيتحرك'}
+   else if(sel&&b[r][c]===0){if(!jump(sel[0],sel[1],r,c)){msg='مينفعش';sel=null}else if(!over)msg=''}
+   paint()};
+  $('pqU').onclick=()=>{if(hist.length&&!over){b=hist.pop();cnt++;sel=null;msg='';paint()}};
+  $('pqN').onclick=()=>{load();paint()};
+  $('pqX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
