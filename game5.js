@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -555,6 +555,7 @@ function buildRps(){
  g.add(mesh(G.sph(0.6,8),0x868e96,-1.6,0.6,-4.8),mesh(G.box(1.1,0.08,1.4),0xf8f9fa,0,0.9,-4.8),mesh(G.box(0.12,0.9,0.12),0xe03131,1.6,0.6,-4.8),mesh(G.box(0.12,0.9,0.12),0xe03131,1.75,0.6,-4.8));
  rpsh={it:{x:0,z:0.2,label:'✊ العب حجر ورقة مقص',fn:rpsStart}};interacts.push(rpsh.it);
  g.add(portalMesh('ارجع لأعلى أو أقل',5.8,5.8,0x7048e8,'hilroom'));
+ g.add(portalMesh('العيدان',-5.8,5.8,0x2f9e44,'nimroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('✊ أول واحد يوصل 3 يكسب. البوت 🤖 بيحاول يتوقع حركتك',3400)
 }
@@ -578,4 +579,29 @@ function rpsStart(){
   paint=()=>{if(!$('rpS'))return;$('rpS').textContent='أنت '+my+' : '+bt+' 🤖 · الأول لـ3';$('rpM').textContent=msg;['rpA','rpB','rpC'].forEach(k=>$(k).disabled=over)};
   $('rpA').onclick=()=>pick(0);$('rpB').onclick=()=>pick(1);$('rpC').onclick=()=>pick(2);
   $('rpX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildNim(){
+ const g=indoor(0x2f9e44,0xebfbee,0xb2f2bb);
+ sign(g,'🥢 لعبة العيدان ضد 🤖',0,4.6,-7.6,'rgba(47,158,68,.92)');
+ for(let k=0;k<9;k++)g.add(mesh(G.cyl(0.05,0.05,1.2,6),0xe8b86d,-1.6+k*0.4,0.6,-4.8));
+ nimh={it:{x:0,z:0.2,label:'🥢 العب العيدان',fn:nimStart}};interacts.push(nimh.it);
+ g.add(portalMesh('ارجع لحجر ورقة مقص',5.8,5.8,0xe03131,'rpsroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🥢 15 عود: شيل 1 أو 2 أو 3. اللي ياخد آخر عود يخسر. البوت 🤖 معاك',3400)
+}
+function nimStart(){
+ let n=15,over=false,msg='',turn=0;
+ const botMove=()=>{const opt=(n-1)%4;let t=opt>=1&&opt<=3&&Math.random()<0.75?opt:1+Math.floor(Math.random()*Math.min(3,n));return Math.min(t,n)};
+ window.nimq=()=>({n,over,msg,take:k=>take(k)});
+ let paint=()=>{};
+ const fin=win=>{over=true;me.nimGames=(me.nimGames||0)+1;if(win)me.nimBest=(me.nimBest||0)+1;const dd=today();if(me.nimDD!==dd){me.nimDD=dd;me.nimDC=0}
+  let cn=win?2:0;cn=Math.min(cn,Math.max(0,6-(me.nimDC||0)));if(cn){me.coins+=cn;me.nimDC=(me.nimDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg+='\n'+(win?'🏆 كسبت البوت ':'🤖 البوت كسب ')+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const take=k=>{if(over||k>n)return;n-=k;msg='أنت شلت '+k;sfx('place');if(n===0){msg+=' وأخدت آخر عود 😬';fin(false);return}
+  const b=botMove();n-=b;msg+=' · 🤖 شال '+b;if(n===0){msg+=' وأخد آخر عود';fin(true);return}paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🥢 العيدان ضد 🤖</h2><div id="nmS" style="text-align:center;font-size:15px;margin:4px"></div><div id="nmC" style="text-align:center;font-size:22px;line-height:1.3;margin:6px 0;direction:ltr;word-break:break-all"></div><div id="nmM" style="text-align:center;font-size:13px;margin:6px 0;min-height:3.2em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="nmA" style="width:auto!important;display:inline-block!important">شيل 1</button><button class="btn" id="nmB" style="width:auto!important;display:inline-block!important">شيل 2</button><button class="btn" id="nmD" style="width:auto!important;display:inline-block!important">شيل 3</button><button class="btn d" id="nmX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('nmS'))return;$('nmS').textContent='باقي '+n+' عود · اللي ياخد الأخير يخسر';$('nmC').textContent='|'.repeat(n).replace(/(.{5})/g,'$1 ');$('nmM').textContent=msg;[['nmA',1],['nmB',2],['nmD',3]].forEach(a=>$(a[0]).disabled=over||a[1]>n)};
+  $('nmA').onclick=()=>take(1);$('nmB').onclick=()=>take(2);$('nmD').onclick=()=>take(3);
+  $('nmX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
