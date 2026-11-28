@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -986,6 +986,7 @@ function buildFdi(){
  for(let a=0;a<4;a++)for(let b=0;b<4;b++)g.add(mesh(G.box(0.6,0.1,0.6),cc[(a*2+b)%6],-1.05+a*0.7,0.74,-5.85+b*0.7));
  fdih={it:{x:0,z:0.2,label:'🌊 العب غمّر اللوحة',fn:fdiStart}};interacts.push(fdih.it);
  g.add(portalMesh('ارجع لكسر الكود',5.8,5.8,0x7048e8,'mmdroom'));
+ g.add(portalMesh('خمسة في صف',-5.8,5.8,0xc2955a,'gmkroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🌊 غمّر اللوحة: ابدأ من الركن اللي فوق شمال واختار لون يغمّر الجيران. لوّن اللوحة كلها بلون واحد قبل ما الحركات تخلص',4200)
 }
@@ -1009,4 +1010,45 @@ function fdiStart(){
    $('fiM').textContent=msg};
   $('fiP').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.c!==undefined)pick(+x.dataset.c)};
   $('fiX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildGmk(){
+ const g=indoor(0xc2955a,0xfff8ee,0xe9d3b0);
+ sign(g,'⭕ خمسة في صف ضد 🤖',0,4.6,-7.6,'rgba(194,149,90,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0xd9a95b,0,0.55,-4.8));
+ for(let a=0;a<5;a++){g.add(mesh(G.box(0.03,0.04,2.8),0x5c3d2e,-1.2+a*0.6,0.72,-4.8),mesh(G.box(2.8,0.04,0.03),0x5c3d2e,0,0.72,-6.0+a*0.6))}
+ g.add(mesh(G.cyl(0.2,0.2,0.1,12),0xf1f3f5,-0.6,0.8,-5.4),mesh(G.cyl(0.2,0.2,0.1,12),0x212529,0.6,0.8,-4.2));
+ gmkh={it:{x:0,z:0.2,label:'⭕ العب خمسة في صف',fn:gmkStart}};interacts.push(gmkh.it);
+ g.add(portalMesh('ارجع لغمّر اللوحة',5.8,5.8,0x1098ad,'fdiroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('⭕ خمسة في صف: كوّن ٥ قطع ورا بعض (أفقي أو رأسي أو قطري) قبل البوت 🤖. أنت الفاتح وبتبدأ',4200)
+}
+function gmkStart(){
+ const N=9;let b,over=false,msg='',mv=0,last=-1;
+ const init=()=>{b=Array(81).fill(0);mv=0;last=-1};init();
+ const D=[[0,1],[1,0],[1,1],[1,-1]];
+ const at=(r,c)=>r<0||r>=N||c<0||c>=N?-1:b[r*N+c];
+ const line=(i,p,d)=>{const r=(i/N)|0,c=i%N;let n=1,open=0;for(const s of[1,-1]){let y=r+d[0]*s,x=c+d[1]*s;while(at(y,x)===p){n++;y+=d[0]*s;x+=d[1]*s}if(at(y,x)===0)open++}return[n,open]};
+ const wins=(i,p)=>D.some(d=>line(i,p,d)[0]>=5);
+ const val=(n,o)=>n>=5?100000:n===4?(o===2?10000:o===1?1000:0):n===3?(o===2?1000:o===1?100:0):n===2?(o===2?100:o===1?10:0):1;
+ const sc=(i,p)=>D.reduce((a,d)=>{const l=line(i,p,d);return a+val(l[0],l[1])},0);
+ window.gkq=()=>({b:b.slice(),over,msg,mv,set:a=>{b=a.slice()},play:i=>play(i)});
+ let paint=()=>{};
+ const fin=(w)=>{over=true;me.gmkGames=(me.gmkGames||0)+1;const win=w===1;if(win)me.gmkBest=(me.gmkBest||0)+1;const dd=today();if(me.gmkDD!==dd){me.gmkDD=dd;me.gmkDC=0}
+  let cn=win?(mv<=12?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.gmkDC||0)));if(cn){me.coins+=cn;me.gmkDC=(me.gmkDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg=(win?'🏆 كسبت! خمسة ورا بعض':w===2?'🤖 البوت كسب':'🤝 تعادل')+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const botMove=()=>{let best=-1,bs=-1;for(let i=0;i<81;i++){if(b[i])continue;const r=(i/N)|0,c=i%N;const near=Math.abs(r-4)+Math.abs(c-4);let s=sc(i,2)*1.1+sc(i,1)+Math.random()*3-near*0.1;if(wins(i,2)){b[i]=2;wins(i,2);b[i]=0}
+   if(s>bs){bs=s;best=i}}return best};
+ const full=()=>b.every(v=>v);
+ const play=i=>{if(over||b[i])return;b[i]=1;mv++;last=i;sfx('place');if(wins(i,1)){msg='';fin(1);return}if(full()){fin(0);return}
+  const j=botMove();b[j]=2;last=j;if(wins(j,2)){fin(2);return}if(full()){fin(0);return}msg='';paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">⭕ خمسة في صف ضد 🤖</h2><div id="gkS" style="text-align:center;font-size:14px;margin:2px"></div><div id="gkB" style="display:grid;justify-content:center;direction:ltr;margin:4px auto;gap:2px"></div><div id="gkM" style="text-align:center;font-size:13px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn d" id="gkX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('gkB'))return;const sm=innerHeight<420,cs=sm?11:34;$('gkS').textContent='حركاتك '+mv+(!over?' · دورك':'');
+   const B=$('gkB');B.style.gridTemplateColumns='repeat(9,'+cs+'px)';B.innerHTML='';
+   for(let i=0;i<81;i++){const e=document.createElement('button');e.className='btn';e.dataset.i=i;e.disabled=over||!!b[i];
+    e.style.cssText='width:'+cs+'px!important;height:'+cs+'px!important;min-width:0!important;min-height:0!important;line-height:1!important;padding:0;margin:0;border-radius:3px;background:#d9a95b;position:relative;'+(i===last?'outline:2px solid #e03131;':'');
+    if(b[i]){const d=document.createElement('div');d.style.cssText='position:absolute;inset:'+(sm?1:4)+'px;border-radius:50%;background:'+(b[i]===1?'#f8f9fa':'#212529')+';box-shadow:0 1px 2px #0008';e.appendChild(d)}B.appendChild(e)}
+   $('gkM').textContent=msg};
+  $('gkB').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.i!==undefined)play(+x.dataset.i)};
+  $('gkX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
