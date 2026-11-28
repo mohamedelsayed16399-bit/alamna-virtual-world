@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -743,6 +743,7 @@ function buildHgm(){
  g.add(mesh(G.box(0.2,0.55,0.2),0x5c3d2e,-1.9,0.28,-4.8),mesh(G.box(0.2,0.55,0.2),0x5c3d2e,1.9,0.28,-4.8));
  hgmh={it:{x:0,z:0.2,label:'🔤 العب كمّل الكلمة',fn:hgmStart}};interacts.push(hgmh.it);
  g.add(portalMesh('ارجع لمعركة السفن',5.8,5.8,0x1864ab,'shproom'));
+ g.add(portalMesh('لعبة الخنزير',-5.8,5.8,0xe64980,'pigroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🔤 كلمة مخبّية. اختار حرف بالدور مع البوت 🤖، اللي يكشف آخر حرف يكسب',3600)
 }
@@ -768,4 +769,36 @@ function hgmStart(){
    const K=$('hgK');K.innerHTML='';AL.forEach(l=>{const b=document.createElement('button');b.className='btn';b.dataset.l=l;b.textContent=l;const u=used.has(l);b.style.cssText='width:'+cs+'px!important;min-width:0!important;min-height:0!important;height:'+(cs-4)+'px!important;line-height:1!important;padding:0;margin:0;font-size:16px;'+(u?(w.includes(l)?'background:#2b8a3e;':'background:#495057;opacity:.5;'):'');b.disabled=u||over;K.appendChild(b)});$('hgM').textContent=msg};
   $('hgK').onclick=e=>{const b=e.target.closest('button');if(b)pick(b.dataset.l)};
   $('hgX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildPig(){
+ const g=indoor(0xe64980,0xfff0f6,0xfaa2c1);
+ sign(g,'🐷 لعبة الخنزير ضد 🤖',0,4.6,-7.6,'rgba(230,73,128,.92)');
+ g.add(mesh(G.sph(0.7,8),0xfaa2c1,0,0.9,-4.8),mesh(G.box(0.4,0.3,0.3),0xf783ac,0,0.85,-4.2),mesh(G.sph(0.15,5),0x212529,-0.25,1.1,-4.3),mesh(G.sph(0.15,5),0x212529,0.25,1.1,-4.3));
+ pigh={it:{x:0,z:0.2,label:'🐷 العب الخنزير',fn:pigStart}};interacts.push(pigh.it);
+ g.add(portalMesh('ارجع لكمّل الكلمة',5.8,5.8,0x5f3dc4,'hgmroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🐷 ارمي النرد واجمع. لو طلع 1 تخسر دورك. "احفظ" يثبّت نقطك. أول واحد لـ40 يكسب',3800)
+}
+function pigStart(){
+ const GOAL=40,rl=()=>1+Math.floor(Math.random()*6);
+ let my=0,bt=0,turn=0,over=false,msg='',last=0,forced=null;
+ window.pigq=()=>({my,bt,turn,over,msg,last,force:a=>{forced=a.slice()},roll:()=>roll(),hold:()=>hold()});
+ let paint=()=>{};
+ const nextRoll=()=>{if(forced&&forced.length)return forced.shift();return rl()};
+ const fin=win=>{over=true;me.pigGames=(me.pigGames||0)+1;if(win)me.pigBest=(me.pigBest||0)+1;const dd=today();if(me.pigDD!==dd){me.pigDD=dd;me.pigDC=0}
+  let cn=win?(bt<=15?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.pigDC||0)));if(cn){me.coins+=cn;me.pigDC=(me.pigDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg+='\n'+(win?'🏆 كسبت البوت! ':'🤖 البوت كسب. ')+my+':'+bt+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const botTurn=()=>{let t=0,log='';while(true){const d=nextRoll();if(d===1){log+=' 🎲1 💥';t=0;break}t+=d;log+=' '+d;if(t>=12||bt+t>=GOAL)break}
+  bt+=t;msg+=' · 🤖:'+log+(t?' ← حفظ '+t:' ← خسر دوره');if(bt>=GOAL){fin(false);return}turn=0;last=0;paint()};
+ let cur=0;
+ const roll=()=>{if(over||turn!==0)return;const d=nextRoll();last=d;sfx('tick');
+  if(d===1){cur=0;msg='🎲 1! خسرت دورك 💥';turn=1;paint();setTimeout(()=>{if(!$('pzS')&&!over)return;botTurn()},700);return}
+  cur+=d;msg='🎲 '+d+' · الدور: '+cur;paint()};
+ const hold=()=>{if(over||turn!==0||cur===0)return;my+=cur;msg='حفظت '+cur;cur=0;sfx('place');if(my>=GOAL){fin(true);return}turn=1;paint();setTimeout(()=>{if(!over)botTurn()},700)};
+ window.pigq=()=>({my,bt,turn,over,msg,cur,force:a=>{forced=a.slice()},roll,hold,bot:()=>{if(turn===1)botTurn()}});
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🐷 لعبة الخنزير ضد 🤖</h2><div id="pzS" style="text-align:center;font-size:15px;margin:4px"></div><div id="pzD" style="text-align:center;font-size:40px;font-weight:bold;margin:6px 0;min-height:1.2em"></div><div id="pzM" style="text-align:center;font-size:13px;margin:6px 0;min-height:3.2em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="pzR" style="width:auto!important;display:inline-block!important">🎲 ارمي</button><button class="btn" id="pzH" style="width:auto!important;display:inline-block!important">💾 احفظ</button><button class="btn d" id="pzX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('pzS'))return;$('pzS').textContent='أنت '+my+' : '+bt+' 🤖 · الهدف '+GOAL+' · دورك '+cur;$('pzD').textContent=last||'';$('pzM').textContent=msg;$('pzR').disabled=over||turn!==0;$('pzH').disabled=over||turn!==0||cur===0};
+  $('pzR').onclick=roll;$('pzH').onclick=hold;
+  $('pzX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
