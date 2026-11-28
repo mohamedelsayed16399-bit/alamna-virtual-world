@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;let lndh=null;let tnkh=null;let hshh=null;let knth=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;let lndh=null;let tnkh=null;let hshh=null;let knth=null;let akrh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1782,6 +1782,7 @@ function buildKnt(){
  g.add(mesh(G.cyl(0.22,0.3,0.6),0x212529,-0.4,0.9,-5.1),mesh(G.box(0.35,0.4,0.2),0x212529,-0.3,1.35,-5.1));
  knth={it:{x:0,z:0.2,label:'♞ العب جولة الحصان',fn:kntStart}};interacts.push(knth.it);
  g.add(portalMesh('ارجع للجسور',5.8,5.8,0x0b7285,'hshroom'));
+ g.add(portalMesh('نوّر الغرفة',-5.8,5.8,0xf59f00,'akrroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('♞ جولة الحصان: ابدأ من أي مربع وقفّز بالحصان (حرف L) على كل مربعات اللوحة مرة واحدة بس. لو اتحاصرت دوس تراجع',5600)
 }
@@ -1812,4 +1813,53 @@ function kntStart(){
   $('kqU').onclick=()=>{if(won)return;path.pop();stuck=false;msg=path.length?'رجعت خطوة':'دوس أي مربع تبدأ منه';paint()};
   $('kqN').onclick=()=>{load();paint()};
   $('kqX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildAkr(){
+ const g=indoor(0xf59f00,0xfff9db,0xffe066);
+ sign(g,'💡 نوّر الغرفة',0,4.6,-7.6,'rgba(245,159,0,.92)');
+ [[-2,-4.8],[0,-5.6],[2,-4.8]].forEach(p=>{g.add(mesh(G.cyl(0.05,0.05,1.6),0x868e96,p[0],0.9,p[1]),mesh(G.sph(0.4),0xffe066,p[0],1.9,p[1]))});
+ g.add(mesh(G.box(0.9,0.9,0.9),0x343a40,-1,0.5,-3.8),mesh(G.box(0.9,0.9,0.9),0x343a40,1,0.5,-3.8));
+ akrh={it:{x:0,z:0.2,label:'💡 العب نوّر الغرفة',fn:akrStart}};interacts.push(akrh.it);
+ g.add(portalMesh('ارجع لجولة الحصان',5.8,5.8,0x5f3dc4,'kntroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('💡 نوّر الغرفة: حط لمبات بحيث كل المربعات البيضا تنوّر. اللمبة بتنوّر في 4 اتجاهات لحد الحيطة، ومينفعش لمبتين يشوفوا بعض. الرقم على الحيطة = عدد اللمبات اللي حواليها',6000)
+}
+function akrStart(){
+ const N=7,S=300,CS=S/N,WL=[8,10,12];
+ let li=(me.akrLvl||0)%3,wall,clue,bulb,won,msg,moves;
+ const gen=()=>{wall=Array.from({length:N},()=>Array(N).fill(false));let n=0;while(n<WL[li]){const x=Math.floor(Math.random()*N),y=Math.floor(Math.random()*N);if(!wall[y][x]){wall[y][x]=true;n++}}
+  const B=Array.from({length:N},()=>Array(N).fill(false));
+  const seen=(x,y,Bm)=>{const out=[[x,y]];for(const d of [[1,0],[-1,0],[0,1],[0,-1]]){let a=x+d[0],b=y+d[1];while(a>=0&&b>=0&&a<N&&b<N&&!wall[b][a]){out.push([a,b]);a+=d[0];b+=d[1]}}return out};
+  const lit=Array.from({length:N},()=>Array(N).fill(false));
+  const cells=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(!wall[y][x])cells.push([x,y]);
+  cells.sort(()=>Math.random()-.5);
+  cells.forEach(c=>{if(!lit[c[1]][c[0]]){B[c[1]][c[0]]=true;seen(c[0],c[1]).forEach(p=>{lit[p[1]][p[0]]=true})}});
+  clue=Array.from({length:N},()=>Array(N).fill(-1));
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(wall[y][x]&&Math.random()<0.7){let k=0;for(const d of [[1,0],[-1,0],[0,1],[0,-1]]){const a=x+d[0],b=y+d[1];if(a>=0&&b>=0&&a<N&&b<N&&B[b][a])k++}clue[y][x]=k}
+  return B};
+ const load=()=>{const B=gen();window._akrSol=B;bulb=Array.from({length:N},()=>Array(N).fill(false));won=false;moves=0;msg='دوس على مربع أبيض عشان تحط لمبة'};load();
+ const rays=(x,y)=>{const out=[[x,y]];for(const d of [[1,0],[-1,0],[0,1],[0,-1]]){let a=x+d[0],b=y+d[1];while(a>=0&&b>=0&&a<N&&b<N&&!wall[b][a]){out.push([a,b]);a+=d[0];b+=d[1]}}return out};
+ const calc=()=>{const lit=Array.from({length:N},()=>Array(N).fill(0));for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(bulb[y][x])rays(x,y).forEach(p=>{lit[p[1]][p[0]]++});
+  let conflict=0;for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(bulb[y][x]&&lit[y][x]>1)conflict++;
+  let dark=0;for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(!wall[y][x]&&!lit[y][x])dark++;
+  const cnt=(x,y)=>{let k=0;for(const d of [[1,0],[-1,0],[0,1],[0,-1]]){const a=x+d[0],b=y+d[1];if(a>=0&&b>=0&&a<N&&b<N&&bulb[b][a])k++}return k};
+  let badClue=0;for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(wall[y][x]&&clue[y][x]>=0&&cnt(x,y)!==clue[y][x])badClue++;
+  return{lit,conflict,dark,badClue,cnt}};
+ const tap=(x,y)=>{if(won||x<0||y<0||x>=N||y>=N||wall[y][x])return;bulb[y][x]=!bulb[y][x];moves++;const c=calc();msg=c.conflict?'⚠️ فيه لمبتين شايفين بعض':c.dark?'لسه '+c.dark+' مربع ضلمة':c.badClue?'فيه رقم مش مظبوط':'';if(!c.conflict&&!c.dark&&!c.badClue)win()};
+ const win=()=>{won=true;me.akrGames=(me.akrGames||0)+1;const dd=today();if(me.akrDD!==dd){me.akrDD=dd;me.akrDC=0}let cn=Math.min(3,Math.max(0,6-(me.akrDC||0)));me.akrBest=(me.akrBest||0)+1;if(cn){me.coins+=cn;me.akrDC=(me.akrDC||0)+cn;updCoins();sfx('win')}else sfx('star');me.akrLvl=(li+1)%3;msg='🏆 نوّرت الغرفة كلها في '+moves+' حركة!'+(cn?' +'+cn+'🪙':'');saveMe()};
+ window.akrq=()=>{const c=calc();return{won,msg,moves,li,dark:c.dark,conflict:c.conflict,badClue:c.badClue,sol:window._akrSol.map(r=>[...r]),wall:wall.map(r=>[...r]),n:N,bulbs:bulb.flat().filter(Boolean).length}};
+ let paint=()=>{};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;line-height:1!important;padding:8px 14px';
+  c.innerHTML='<h2 style="margin:4px">💡 نوّر الغرفة</h2><div id="lqS" style="text-align:center;font-size:12px;margin:2px"></div><canvas id="lqC" width="'+S+'" height="'+S+'" style="display:block;margin:4px auto;border-radius:8px;max-width:100%;touch-action:manipulation"></canvas><div id="lqM" style="text-align:center;font-size:12px;margin:3px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="lqN" style="'+bs+'">لغز جديد</button><button class="btn d" id="lqX" style="'+bs+'">إغلاق</button></div>';
+  const cv=$('lqC'),cx=cv.getContext('2d');
+  if(innerHeight<420){cv.style.width='130px';cv.style.height='130px'}
+  paint=()=>{if(!$('lqC'))return;const c=calc();$('lqS').textContent='لغز '+(li+1)+' من 3 · ضلمة '+c.dark+' · لمبات '+bulb.flat().filter(Boolean).length;$('lqM').textContent=msg;
+   cx.textAlign='center';cx.textBaseline='middle';
+   for(let y=0;y<N;y++)for(let x=0;x<N;x++){const X=x*CS,Y=y*CS;if(wall[y][x]){cx.fillStyle='#343a40';cx.fillRect(X,Y,CS,CS);if(clue[y][x]>=0){const k=c.cnt(x,y);cx.fillStyle=k===clue[y][x]?'#69db7c':k>clue[y][x]?'#ff8787':'#fff';cx.font='bold 20px sans-serif';cx.fillText(clue[y][x],X+CS/2,Y+CS/2+1)}}
+    else{cx.fillStyle=c.lit[y][x]?'#ffec99':'#f1f3f5';cx.fillRect(X,Y,CS,CS);if(bulb[y][x]){cx.fillStyle=c.lit[y][x]>1?'#e03131':'#f08c00';cx.beginPath();cx.arc(X+CS/2,Y+CS/2,CS*0.28,0,7);cx.fill();cx.fillStyle='#fff';cx.fillRect(X+CS/2-3,Y+CS/2-2,6,4)}}
+    cx.strokeStyle='#ced4da';cx.lineWidth=1;cx.strokeRect(X,Y,CS,CS)}};
+  cv.onclick=e=>{const r=cv.getBoundingClientRect();tap(Math.floor((e.clientX-r.left)*S/r.width/CS),Math.floor((e.clientY-r.top)*S/r.height/CS));paint()};
+  $('lqN').onclick=()=>{load();paint()};
+  $('lqX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
