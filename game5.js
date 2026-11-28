@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1280,6 +1280,7 @@ function buildPgs(){
  for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)if(i||j)g.add(mesh(G.box(0.3,0.4,0.3),0xffd43b,i*0.9,0.9,-4.8+j*0.9));
  pgsh={it:{x:0,z:0.2,label:'📍 العب سوليتير الأوتاد',fn:pgsStart}};interacts.push(pgsh.it);
  g.add(portalMesh('ارجع لزحمة المرور',5.8,5.8,0x495057,'jamroom'));
+ g.add(portalMesh('رتّب الألوان',-5.8,5.8,0x1c7ed6,'wsgroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('📍 سوليتير الأوتاد: اقفز بوتد فوق وتد جنبه في خانة فاضية، والوتد اللي اتقفز عليه بيتشال. الهدف يفضل وتد واحد',4200)
 }
@@ -1313,4 +1314,43 @@ function pgsStart(){
   $('pqU').onclick=()=>{if(hist.length&&!over){b=hist.pop();cnt++;sel=null;msg='';paint()}};
   $('pqN').onclick=()=>{load();paint()};
   $('pqX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildWsg(){
+ const g=indoor(0x1c7ed6,0xe7f5ff,0xa5d8ff);
+ sign(g,'🧪 رتّب الألوان',0,4.6,-7.6,'rgba(28,126,214,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0x495057,0,0.55,-4.8));
+ const cc=[0xe03131,0x2f9e44,0x1971c2,0xf08c00,0x9c36b5];
+ for(let i=0;i<5;i++){g.add(mesh(G.box(0.4,0.9,0.4),cc[i],-1+i*0.5,1.1,-4.8))}
+ wsgh={it:{x:0,z:0.2,label:'🧪 العب رتّب الألوان',fn:wsgStart}};interacts.push(wsgh.it);
+ g.add(portalMesh('ارجع لسوليتير الأوتاد',5.8,5.8,0x495057,'pgsroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🧪 رتّب الألوان: اضغط أنبوبة وبعدين أنبوبة تانية تصب فيها. كل أنبوبة لازم تبقى لون واحد',4200)
+}
+function wsgStart(){
+ const LV=[[[[1,2,0,0],[1,2,1,0],[2,1,2,0],[],[]],10],[[[2,1,1,0],[1,3,2,0],[1,3,0,2],[0,2,3,3],[],[]],13],[[[0,4,1,3],[2,2,4,4],[0,3,0,1],[2,2,3,1],[1,0,4,3],[],[]],15],[[[0,0,3,4],[4,0,3,1],[2,4,2,2],[2,1,0,3],[1,3,1,4],[],[]],15],[[[1,0,3,2],[0,4,4,3],[2,0,5,5],[0,5,2,1],[4,4,3,3],[1,1,2,5],[],[]],16],[[[3,0,6,5],[5,2,2,1],[3,1,4,6],[5,6,3,0],[4,0,1,0],[5,4,3,1],[2,2,4,6],[],[]],23]];const CAP=4;
+ let li=(me.wsgLvl||0)%LV.length,T,mv=0,sel=-1,over=false,msg='',hist=[];
+ const load=()=>{T=LV[li][0].map(a=>a.slice());mv=0;sel=-1;over=false;hist=[];msg='مستوى '+(li+1)+' من '+LV.length};load();
+ const run=a=>{let k=0;while(k<a.length&&a[a.length-1-k]===a[a.length-1])k++;return k};
+ const can=(i,j)=>{if(i===j||!T[i].length||T[j].length>=CAP)return false;return !T[j].length||T[j][T[j].length-1]===T[i][T[i].length-1]};
+ const done=()=>T.every(a=>!a.length||(a.length===CAP&&a.every(x=>x===a[0])));
+ const pour=(i,j)=>{if(over||!can(i,j))return false;hist.push(T.map(a=>a.slice()));const n=Math.min(run(T[i]),CAP-T[j].length);for(let k=0;k<n;k++)T[j].push(T[i].pop());mv++;sel=-1;sfx('place');if(done())fin();return true};
+ window.wsgq=()=>({T:T.map(a=>a.slice()),mv,over,msg,li,par:LV[li][1],set:(t,l)=>{T=t.map(a=>a.slice());mv=0;hist=[];sel=-1;over=false;if(l!==undefined)li=l},pour});
+ let paint=()=>{};
+ const fin=()=>{over=true;me.wsgGames=(me.wsgGames||0)+1;me.wsgBest=(me.wsgBest||0)+1;const dd=today();if(me.wsgDD!==dd){me.wsgDD=dd;me.wsgDC=0}
+  let cn=mv<=LV[li][1]+6?3:2;cn=Math.min(cn,Math.max(0,6-(me.wsgDC||0)));if(cn){me.coins+=cn;me.wsgDC=(me.wsgDC||0)+cn;updCoins();sfx('win')}else sfx('star');
+  me.wsgLvl=(li+1)%LV.length;msg='🏆 خلصت في '+mv+' صبّة'+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;padding:6px 12px';
+  c.innerHTML='<h2 style="margin:4px">🧪 رتّب الألوان</h2><div id="wzS" style="text-align:center;font-size:14px;margin:2px"></div><div id="wzB" style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:6px auto;direction:ltr;max-width:300px"></div><div id="wzM" style="text-align:center;font-size:12px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><button class="btn" id="wzU" style="'+bs+'">تراجع</button><button class="btn" id="wzN" style="'+bs+'">من الأول</button><button class="btn d" id="wzX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const COL=['#e03131','#2f9e44','#1971c2','#f08c00','#9c36b5','#15aabf','#e64980'];
+  paint=()=>{if(!$('wzB'))return;const sm=innerHeight<420,cs=sm?13:28,B=$('wzB');B.innerHTML='';B.style.maxWidth=sm?'520px':'300px';$('wzS').textContent='صبّات '+mv+' · مستوى '+(li+1);
+   T.forEach((a,i)=>{const e=document.createElement('div');e.dataset.i=i;e.style.cssText='box-sizing:border-box;width:'+(cs+10)+'px;height:'+(cs*CAP+8)+'px;border:3px solid '+(i===sel?'#ffd43b':'#adb5bd')+';border-radius:0 0 14px 14px;background:#ffffff22;display:flex;flex-direction:column-reverse;padding:2px;cursor:pointer;overflow:hidden';
+    a.forEach(v=>{const d=document.createElement('div');d.style.cssText='width:100%;height:'+cs+'px;border-radius:5px;margin-top:0;pointer-events:none;background:'+COL[v];e.appendChild(d)});B.appendChild(e)});
+   $('wzU').disabled=!hist.length||over;$('wzM').textContent=msg};
+  $('wzB').onclick=e=>{const x=e.target.closest('[data-i]');if(!x||over)return;const i=+x.dataset.i;
+   if(sel<0){if(T[i].length)sel=i}else if(sel===i)sel=-1;else if(!pour(sel,i)){msg='مينفعش تصب هنا';sel=T[i].length?i:-1}else if(!over)msg='';
+   paint()};
+  $('wzU').onclick=()=>{if(hist.length&&!over){T=hist.pop();mv=Math.max(0,mv-1);sel=-1;msg='';paint()}};
+  $('wzN').onclick=()=>{load();paint()};
+  $('wzX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
