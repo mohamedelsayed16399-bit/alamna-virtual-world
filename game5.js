@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1153,6 +1153,7 @@ function buildHxg(){
  g.add(mesh(G.box(3.1,0.06,0.1),0xe8590c,0,0.74,-6.3),mesh(G.box(3.1,0.06,0.1),0xe8590c,0.5,0.74,-3.3));
  hxgh={it:{x:0,z:0.2,label:'⬡ العب هيكس',fn:hxgStart}};interacts.push(hxgh.it);
  g.add(portalMesh('ارجع لسلم وثعبان',5.8,5.8,0x37b24d,'snlroom'));
+ g.add(portalMesh('دومينو',-5.8,5.8,0x495057,'dmoroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('⬡ هيكس: وصّل الحافة اللي فوق بالحافة اللي تحت بقطعك (برتقالي). البوت 🤖 بيوصّل يمين بشمال. مفيش تعادل',4200)
 }
@@ -1183,4 +1184,51 @@ function hxgStart(){
    $('hxM').textContent=msg};
   $('hxB').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.i!==undefined)play(+x.dataset.i)};
   $('hxX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildDmo(){
+ const g=indoor(0x495057,0xf8f9fa,0xced4da);
+ sign(g,'🁢 دومينو ضد 🤖',0,4.6,-7.6,'rgba(73,80,87,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0x2b8a3e,0,0.55,-4.8));
+ for(let k=0;k<5;k++){g.add(mesh(G.box(0.5,0.06,0.9),0xf8f9fa,-1.2+k*0.6,0.74,-4.8+((k%2)?0.3:-0.3)),mesh(G.cyl(0.05,0.05,0.02,8),0x212529,-1.2+k*0.6,0.78,-4.8+((k%2)?0.3:-0.3)))}
+ dmoh={it:{x:0,z:0.2,label:'🁢 العب دومينو',fn:dmoStart}};interacts.push(dmoh.it);
+ g.add(portalMesh('ارجع لهيكس',5.8,5.8,0x4263eb,'hxgroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🁢 دومينو: كل واحد معاه ٧ قطع. حط قطعة رقمها زي طرف الصف. مفيش قطعة؟ اسحب. اللي يخلّص قطعه الأول يكسب',4200)
+}
+function dmoStart(){
+ let hand,bot,stock,chain,over=false,msg='',sel=-1,passes=0;
+ const init=()=>{const all=[];for(let a=0;a<=6;a++)for(let b=a;b<=6;b++)all.push([a,b]);for(let i=all.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[all[i],all[j]]=[all[j],all[i]]}hand=all.splice(0,7);bot=all.splice(0,7);stock=all;chain=[];sel=-1;passes=0};init();
+ const L=()=>chain.length?chain[0][0]:-1,R=()=>chain.length?chain[chain.length-1][1]:-1;
+ const fitsL=t=>!chain.length||t[0]===L()||t[1]===L(),fitsR=t=>!chain.length||t[0]===R()||t[1]===R();
+ const can=t=>fitsL(t)||fitsR(t);
+ const pips=a=>a.reduce((s,t)=>s+t[0]+t[1],0);
+ const put=(t,side)=>{if(!chain.length){chain.push([t[0],t[1]]);return}if(side==='L')chain.unshift(t[1]===L()?[t[0],t[1]]:[t[1],t[0]]);else chain.push(t[0]===R()?[t[0],t[1]]:[t[1],t[0]])};
+ window.dqq=()=>({hand:hand.map(t=>t.slice()),bot:bot.map(t=>t.slice()),stock:stock.length,chain:chain.map(t=>t.slice()),over,msg,sel,set:(h,b,s,c)=>{hand=h;bot=b;stock=s;chain=c;sel=-1;passes=0},play:(i,s)=>play(i,s),draw:()=>drawBtn(),botT:()=>botTurn()});
+ let paint=()=>{};
+ const fin=(w)=>{over=true;me.dmoGames=(me.dmoGames||0)+1;const win=w===1;if(win)me.dmoBest=(me.dmoBest||0)+1;const dd=today();if(me.dmoDD!==dd){me.dmoDD=dd;me.dmoDC=0}
+  let cn=win?(pips(bot)>=15?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.dmoDC||0)));if(cn){me.coins+=cn;me.dmoDC=(me.dmoDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg=(win?'🏆 كسبت! ':w===2?'🤖 البوت كسب ':'🤝 تعادل ')+'(نقطك '+pips(hand)+' · نقطه '+pips(bot)+')'+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const blocked=()=>!stock.length&&!hand.some(can)&&!bot.some(can);
+ const endCheck=()=>{if(!hand.length){fin(1);return true}if(!bot.length){fin(2);return true}if(blocked()){const a=pips(hand),b=pips(bot);fin(a<b?1:b<a?2:0);return true}return false};
+ const botTurn=()=>{let g=0;while(g++<20){const m=bot.filter(can);if(m.length){m.sort((x,y)=>(y[0]+y[1])-(x[0]+x[1]));const t=m[0];bot.splice(bot.indexOf(t),1);const side=fitsL(t)?'L':'R';put(t,chain.length?side:'R');passes=0;msg+=' · 🤖 لعب '+t[0]+'|'+t[1];return}
+   if(stock.length){bot.push(stock.pop());msg+=' · 🤖 سحب';continue}
+   msg+=' · 🤖 عدّى';passes++;return}};
+ const play=(i,side)=>{if(over||i<0||i>=hand.length)return;const t=hand[i];if(!can(t))return;
+  if(chain.length){if(!side)side=fitsL(t)&&fitsR(t)&&L()!==R()?null:(fitsL(t)?'L':'R');if(!side){sel=i;msg='اختار الجهة';paint();return}if(side==='L'&&!fitsL(t)||side==='R'&&!fitsR(t))return}
+  hand.splice(i,1);put(t,side||'R');sel=-1;passes=0;msg='لعبت '+t[0]+'|'+t[1];sfx('place');if(endCheck())return;botTurn();if(endCheck())return;paint()};
+ const drawBtn=()=>{if(over||hand.some(can))return;if(stock.length){hand.push(stock.pop());msg='سحبت';sel=-1;paint();return}
+  msg='عدّيت';passes++;botTurn();if(endCheck())return;paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🁢 دومينو ضد 🤖</h2><div id="dqS" style="text-align:center;font-size:14px;margin:2px"></div><div id="dqB" style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center;direction:ltr;margin:4px auto;overflow:auto"></div><div id="dqH" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;direction:ltr;margin:6px 0"></div><div id="dqM" style="text-align:center;font-size:13px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="dqD" style="width:auto!important;display:inline-block!important;min-height:0!important">اسحب</button><button class="btn" id="dqL" style="width:auto!important;display:none!important;min-height:0!important">شمال</button><button class="btn" id="dqR" style="width:auto!important;display:none!important;min-height:0!important">يمين</button><button class="btn d" id="dqX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const tile=(t,cs,hl)=>'<span style="display:inline-flex;gap:2px;background:#f8f9fa;color:#212529;border-radius:4px;padding:'+(cs>20?4:2)+'px '+(cs>20?6:3)+'px;font-size:'+cs+'px;font-weight:bold;border:2px solid '+(hl?'#ffd43b':'#adb5bd')+'">'+t[0]+'<span style="color:#adb5bd">|</span>'+t[1]+'</span>';
+  paint=()=>{if(!$('dqB'))return;const sm=innerHeight<420;$('dqS').textContent='🤖 '+bot.length+' قطعة · سحب '+stock.length+(chain.length?' · الأطراف '+L()+' و '+R():'');
+   $('dqB').style.maxHeight=sm?'40px':'150px';$('dqB').innerHTML=chain.map(t=>tile(t,sm?10:14,false)).join('');
+   const H=$('dqH');H.innerHTML='';hand.forEach((t,i)=>{const e=document.createElement('button');e.className='btn';e.dataset.i=i;e.disabled=over||!can(t);
+    e.style.cssText='width:auto!important;min-width:0!important;min-height:0!important;line-height:1!important;padding:'+(sm?'3px 5px':'6px 9px')+';margin:0;border-radius:6px;background:'+(i===sel?'#fab005':can(t)?'#2f9e44':'#868e96')+';font-size:'+(sm?12:18)+'px;font-weight:bold;color:#fff';e.textContent=t[0]+'|'+t[1];H.appendChild(e)});
+   const need=!over&&!hand.some(can);$('dqD').style.display=need?'inline-block':'none';$('dqD').textContent=stock.length?'اسحب':'عدّي';
+   const ch=sel>=0&&!over&&hand[sel]&&fitsL(hand[sel])&&fitsR(hand[sel])&&chain.length&&L()!==R();$('dqL').style.setProperty('display',ch?'inline-block':'none','important');$('dqR').style.setProperty('display',ch?'inline-block':'none','important');
+   $('dqM').textContent=msg};
+  $('dqH').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.i!==undefined)play(+x.dataset.i)};
+  $('dqD').onclick=drawBtn;$('dqL').onclick=()=>play(sel,'L');$('dqR').onclick=()=>play(sel,'R');
+  $('dqX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
