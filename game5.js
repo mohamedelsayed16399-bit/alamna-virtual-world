@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1192,6 +1192,7 @@ function buildDmo(){
  for(let k=0;k<5;k++){g.add(mesh(G.box(0.5,0.06,0.9),0xf8f9fa,-1.2+k*0.6,0.74,-4.8+((k%2)?0.3:-0.3)),mesh(G.cyl(0.05,0.05,0.02,8),0x212529,-1.2+k*0.6,0.78,-4.8+((k%2)?0.3:-0.3)))}
  dmoh={it:{x:0,z:0.2,label:'🁢 العب دومينو',fn:dmoStart}};interacts.push(dmoh.it);
  g.add(portalMesh('ارجع لهيكس',5.8,5.8,0x4263eb,'hxgroom'));
+ g.add(portalMesh('زحمة المرور',-5.8,5.8,0xe03131,'jamroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🁢 دومينو: كل واحد معاه ٧ قطع. حط قطعة رقمها زي طرف الصف. مفيش قطعة؟ اسحب. اللي يخلّص قطعه الأول يكسب',4200)
 }
@@ -1231,4 +1232,43 @@ function dmoStart(){
   $('dqH').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.i!==undefined)play(+x.dataset.i)};
   $('dqD').onclick=drawBtn;$('dqL').onclick=()=>play(sel,'L');$('dqR').onclick=()=>play(sel,'R');
   $('dqX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildJam(){
+ const g=indoor(0xe03131,0xfff5f5,0xffc9c9);
+ sign(g,'🚗 زحمة المرور',0,4.6,-7.6,'rgba(224,49,49,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0x868e96,0,0.55,-4.8));
+ g.add(mesh(G.box(0.9,0.25,0.45),0xe03131,-0.6,0.82,-4.8),mesh(G.box(0.45,0.25,0.9),0x1971c2,0.4,0.82,-5.1),mesh(G.box(0.45,0.25,1.3),0x2f9e44,0.9,0.82,-4.5),mesh(G.box(0.9,0.25,0.45),0xf08c00,-0.3,0.82,-5.6));
+ jamh={it:{x:0,z:0.2,label:'🚗 العب زحمة المرور',fn:jamStart}};interacts.push(jamh.it);
+ g.add(portalMesh('ارجع للدومينو',5.8,5.8,0x495057,'dmoroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🚗 زحمة المرور: حرّك العربيات عشان العربية الحمرا تطلع من اليمين. اضغط عربية واختار الاتجاه. كل خطوة بتتحسب',4200)
+}
+function jamStart(){
+ const LV=[[[[2,0,2,1],[3,4,2,1],[5,3,3,1],[0,4,2,1],[1,2,2,1],[3,2,3,0],[4,4,2,1],[1,4,2,0],[0,1,2,1],[5,0,2,1]],8],[[[2,2,2,1],[2,4,2,0],[0,4,2,1],[1,5,3,0],[5,0,3,1],[0,1,2,0],[3,2,2,1],[4,1,2,1],[1,3,2,1],[4,4,2,0]],9],[[[2,0,2,1],[4,2,2,1],[2,2,2,0],[0,5,3,0],[3,4,2,1],[1,4,2,0],[0,0,2,1],[5,3,3,1],[4,1,2,0],[1,0,2,1],[0,3,2,1]],13],[[[2,1,2,1],[4,3,2,1],[3,0,2,0],[3,4,2,1],[0,2,2,0],[0,4,2,1],[5,1,2,1],[4,5,2,0],[1,3,3,0],[0,0,2,1],[3,2,2,0]],15],[[[2,0,2,1],[0,4,3,0],[4,2,2,0],[5,4,2,1],[3,1,2,1],[1,1,2,1],[4,4,2,1],[1,5,2,0],[0,2,2,1],[3,0,2,0]],20],[[[2,0,2,1],[2,5,2,0],[3,0,3,1],[4,1,2,1],[0,2,2,0],[4,3,2,0],[5,0,2,1],[0,0,2,0],[3,4,2,0],[2,3,2,0],[5,4,2,1],[0,3,3,1]],22]];
+ const N=6;let li=(me.jamLvl||0)%LV.length,P,mv=0,sel=-1,over=false,msg='';
+ const load=()=>{P=LV[li][0].map(a=>a.slice());mv=0;sel=-1;over=false;msg='مستوى '+(li+1)+' من '+LV.length+' · أقل عدد خطوات '+LV[li][1]};load();
+ const cells=(p)=>{const o=[];for(let k=0;k<p[2];k++)o.push(p[3]?[p[0],p[1]+k]:[p[0]+k,p[1]]);return o};
+ const free=(i,r,c)=>{if(r<0||c<0||r>=N||c>=N)return false;for(let j=0;j<P.length;j++){if(j===i)continue;if(cells(P[j]).some(x=>x[0]===r&&x[1]===c))return false}return true};
+ const canMove=(i,d)=>{const p=P[i];if(p[3]){const c=d<0?p[1]-1:p[1]+p[2];return free(i,p[0],c)}const r=d<0?p[0]-1:p[0]+p[2];return free(i,r,p[1])};
+ const move=(i,d)=>{if(over||i<0||!canMove(i,d))return false;const p=P[i];if(p[3])p[1]+=d;else p[0]+=d;mv++;sfx('place');
+  if(i===0&&p[1]+p[2]===N){fin()}return true};
+ window.jmq=()=>({P:P.map(a=>a.slice()),mv,over,msg,li,lv:LV.length,min:LV[li][1],set:(a,l)=>{P=a.map(x=>x.slice());mv=0;if(l!==undefined)li=l},move:(i,d)=>move(i,d)});
+ let paint=()=>{};
+ const fin=()=>{over=true;me.jamGames=(me.jamGames||0)+1;me.jamBest=(me.jamBest||0)+1;const dd=today();if(me.jamDD!==dd){me.jamDD=dd;me.jamDC=0}
+  let cn=mv<=LV[li][1]+4?3:2;cn=Math.min(cn,Math.max(0,6-(me.jamDC||0)));if(cn){me.coins+=cn;me.jamDC=(me.jamDC||0)+cn;updCoins();sfx('win')}else sfx('star');
+  me.jamLvl=(li+1)%LV.length;msg='🏆 خرّجت العربية في '+mv+' خطوة (الأقل '+LV[li][1]+')'+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🚗 زحمة المرور</h2><div id="jmS" style="text-align:center;font-size:14px;margin:2px"></div><div id="jmB" style="position:relative;margin:4px auto;background:#495057;border-radius:6px;direction:ltr"></div><div id="jmM" style="text-align:center;font-size:12px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><button class="btn" id="jmA" style="width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;padding:6px 14px">◀</button><button class="btn" id="jmC" style="width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;padding:6px 14px">▶</button><button class="btn" id="jmN" style="width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;padding:6px 10px">من الأول</button><button class="btn d" id="jmX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const COL=['#e03131','#1971c2','#2f9e44','#f08c00','#9c36b5','#15aabf','#74b816','#e64980','#868e96','#5f3dc4','#c2255c','#0b7285'];
+  paint=()=>{if(!$('jmB'))return;const sm=innerHeight<420,cs=sm?24:50;$('jmS').textContent='خطوات '+mv+' · مستوى '+(li+1);
+   const B=$('jmB');B.style.width=cs*N+'px';B.style.height=cs*N+'px';B.innerHTML='';
+   const ex=document.createElement('div');ex.style.cssText='position:absolute;right:-12px;top:'+(2*cs)+'px;width:12px;height:'+cs+'px;background:#51cf66;border-radius:0 4px 4px 0';B.appendChild(ex);
+   P.forEach((p,i)=>{const e=document.createElement('div');e.dataset.i=i;e.style.cssText='position:absolute;box-sizing:border-box;border-radius:8px;border:'+(i===sel?'3px solid #ffd43b':'2px solid #0006')+';background:'+(i===0?'#e03131':COL[1+(i-1)%11])+';left:'+(p[1]*cs+2)+'px;top:'+(p[0]*cs+2)+'px;width:'+((p[3]?p[2]:1)*cs-4)+'px;height:'+((p[3]?1:p[2])*cs-4)+'px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:'+(sm?10:16)+'px';if(i===0)e.textContent='🚗';B.appendChild(e)});
+   const hz=sel>=0&&P[sel][3];$('jmA').textContent=hz?'◀':'▲';$('jmC').textContent=hz?'▶':'▼';$('jmA').disabled=$('jmC').disabled=sel<0||over;
+   $('jmM').textContent=msg};
+  $('jmB').onclick=e=>{const x=e.target.closest('[data-i]');if(!x||over)return;sel=+x.dataset.i;paint()};
+  $('jmA').onclick=()=>{if(sel>=0){if(!move(sel,-1))msg='مسدود';else if(!over)msg='';paint()}};
+  $('jmC').onclick=()=>{if(sel>=0){if(!move(sel,1))msg='مسدود';else if(!over)msg='';paint()}};
+  $('jmN').onclick=()=>{load();paint()};
+  $('jmX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
