@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -707,6 +707,7 @@ function buildShp(){
  g.add(mesh(G.box(3.2,0.12,3.2),0x1c7ed6,0,0.5,-4.8),mesh(G.box(1.1,0.35,0.5),0x495057,0,0.78,-4.8),mesh(G.box(0.12,0.7,0.12),0x868e96,0,1.2,-4.8));
  shph={it:{x:0,z:0.2,label:'🚢 العب معركة السفن',fn:shpStart}};interacts.push(shph.it);
  g.add(portalMesh('ارجع لواحد وعشرين',5.8,5.8,0x2b8a3e,'bjkroom'));
+ g.add(portalMesh('كمّل الكلمة',-5.8,5.8,0x5f3dc4,'hgmroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🚢 ٤ سفن مخبّية في شبكة 5×5. اضرب بالدور مع البوت 🤖، أول واحد يغرّق ٤ يكسب',3600)
 }
@@ -734,4 +735,37 @@ function shpStart(){
    $('sqM').textContent=msg};
   $('sqB').onclick=e=>{const b=e.target.closest('button');if(b)fire(+b.dataset.i)};
   $('sqX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildHgm(){
+ const g=indoor(0x5f3dc4,0xf3f0ff,0xd0bfff);
+ sign(g,'🔤 كمّل الكلمة ضد 🤖',0,4.6,-7.6,'rgba(95,61,196,.92)');
+ for(let k=0;k<5;k++)g.add(mesh(G.box(0.55,0.7,0.12),k%2?0x7048e8:0xb197fc,-1.6+k*0.8,0.9,-4.8));
+ g.add(mesh(G.box(0.2,0.55,0.2),0x5c3d2e,-1.9,0.28,-4.8),mesh(G.box(0.2,0.55,0.2),0x5c3d2e,1.9,0.28,-4.8));
+ hgmh={it:{x:0,z:0.2,label:'🔤 العب كمّل الكلمة',fn:hgmStart}};interacts.push(hgmh.it);
+ g.add(portalMesh('ارجع لمعركة السفن',5.8,5.8,0x1864ab,'shproom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🔤 كلمة مخبّية. اختار حرف بالدور مع البوت 🤖، اللي يكشف آخر حرف يكسب',3600)
+}
+function hgmStart(){
+ const WS=['كتاب','قمر','شمس','نهر','جبل','بحر','نجم','حصان','خروف','دجاج','ثعلب','بطيخ','تفاح','برتقال','عصير','قلم','مفتاح','طبيب','مطر','ورد'];
+ const AL='ابتثجحخدذرزسشصضطظعغفقكلمنهوي'.split('');
+ const COM='الميونرتبسكد'.split('');
+ let w=WS[Math.floor(Math.random()*WS.length)],used=new Set(),miss=0,over=false,msg='',forced=null;
+ const done=()=>w.split('').every(c=>used.has(c));
+ window.hgmq=()=>({w,used:[...used],miss,over,msg,set:x=>{w=x},force:l=>{forced=l},pick:l=>pick(l)});
+ let paint=()=>{};
+ const fin=win=>{over=true;me.hgmGames=(me.hgmGames||0)+1;if(win)me.hgmBest=(me.hgmBest||0)+1;const dd=today();if(me.hgmDD!==dd){me.hgmDD=dd;me.hgmDC=0}
+  let cn=win?(miss<=3?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.hgmDC||0)));if(cn){me.coins+=cn;me.hgmDC=(me.hgmDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg+='\n'+(win?'🏆 كشفت آخر حرف! ':'🤖 البوت كشف آخر حرف. ')+'الكلمة: '+w+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const botPick=()=>{if(forced){const f=forced;forced=null;return f}const left=AL.filter(c=>!used.has(c));const cm=left.filter(c=>COM.includes(c));const pool=cm.length&&Math.random()<0.6?cm:left;return pool[Math.floor(Math.random()*pool.length)]};
+ const pick=l=>{if(over||used.has(l))return;used.add(l);const hit=w.includes(l);if(!hit)miss++;msg='أنت: '+l+(hit?' ✅':' ❌');sfx(hit?'star':'tick');
+  if(done()){fin(true);return}
+  let b=botPick();if(!b||used.has(b)){const left=AL.filter(c=>!used.has(c));b=left[0]}used.add(b);const bh=w.includes(b);msg+=' · 🤖: '+b+(bh?' ✅':' ❌');
+  if(done()){fin(false);return}paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🔤 كمّل الكلمة ضد 🤖</h2><div id="hgS" style="text-align:center;font-size:14px;margin:4px"></div><div id="hgW" style="text-align:center;font-size:30px;letter-spacing:6px;font-weight:bold;margin:6px 0"></div><div id="hgK" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;direction:rtl;margin:6px 0"></div><div id="hgM" style="text-align:center;font-size:13px;margin:4px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn d" id="hgX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('hgS'))return;const sm=innerHeight<420,cs=sm?30:38;$('hgS').textContent='كلمة من '+w.length+' حروف · غلطاتك '+miss;$('hgW').textContent=w.split('').map(c=>used.has(c)||over?c:'_').join(' ');
+   const K=$('hgK');K.innerHTML='';AL.forEach(l=>{const b=document.createElement('button');b.className='btn';b.dataset.l=l;b.textContent=l;const u=used.has(l);b.style.cssText='width:'+cs+'px!important;min-width:0!important;min-height:0!important;height:'+(cs-4)+'px!important;line-height:1!important;padding:0;margin:0;font-size:16px;'+(u?(w.includes(l)?'background:#2b8a3e;':'background:#495057;opacity:.5;'):'');b.disabled=u||over;K.appendChild(b)});$('hgM').textContent=msg};
+  $('hgK').onclick=e=>{const b=e.target.closest('button');if(b)pick(b.dataset.l)};
+  $('hgX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
