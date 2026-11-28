@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -525,6 +525,7 @@ function buildHil(){
  g.add(mesh(G.box(1,0.8,1),0x5f3dc4,0,0.4,-4.8));
  hilh={it:{x:0,z:0.2,label:'🃏 العب أعلى أو أقل',fn:hilStart}};interacts.push(hilh.it);
  g.add(portalMesh('ارجع لبوكر النرد',5.8,5.8,0xd9480f,'pkdroom'));
+ g.add(portalMesh('حجر ورقة مقص',-5.8,5.8,0xe03131,'rpsroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🃏 10 كروت: خمّن الكارت الجاي أعلى ولا أقل. البوت 🤖 بيلعب معاك',3400)
 }
@@ -547,4 +548,34 @@ function hilStart(){
   paint=()=>{if(!$('hvS'))return;$('hvS').textContent='كارت '+Math.min(i+1,9)+'/9 · أنت '+my+' : '+bt+' 🤖';$('hvC').innerHTML='<div style="width:70px;height:96px;border-radius:10px;background:#fff;color:#5f3dc4;font-size:34px;font-weight:bold;display:flex;align-items:center;justify-content:center;border:3px solid #7048e8;direction:ltr">'+NMc(deck[over?9:i])+'</div>';$('hvM').textContent=msg;$('hvU').disabled=over;$('hvD').disabled=over};
   $('hvU').onclick=()=>step('u');$('hvD').onclick=()=>step('d');
   $('hvX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildRps(){
+ const g=indoor(0xe03131,0xfff5f5,0xffc9c9);
+ sign(g,'✊ حجر ورقة مقص ضد 🤖',0,4.6,-7.6,'rgba(224,49,49,.92)');
+ g.add(mesh(G.sph(0.6,8),0x868e96,-1.6,0.6,-4.8),mesh(G.box(1.1,0.08,1.4),0xf8f9fa,0,0.9,-4.8),mesh(G.box(0.12,0.9,0.12),0xe03131,1.6,0.6,-4.8),mesh(G.box(0.12,0.9,0.12),0xe03131,1.75,0.6,-4.8));
+ rpsh={it:{x:0,z:0.2,label:'✊ العب حجر ورقة مقص',fn:rpsStart}};interacts.push(rpsh.it);
+ g.add(portalMesh('ارجع لأعلى أو أقل',5.8,5.8,0x7048e8,'hilroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('✊ أول واحد يوصل 3 يكسب. البوت 🤖 بيحاول يتوقع حركتك',3400)
+}
+function rpsStart(){
+ const N=['حجر','ورقة','مقص'],E=['✊','✋','✌'];
+ let my=0,bt=0,over=false,msg='',last=-1,rd=1;
+ const beats=(a,b)=>(a+1)%3===b?0:a===b?-1:1; // 1 if a beats b: 0 beats 2, 1 beats 0, 2 beats 1
+ const win=(a,b)=>a===b?0:((a===0&&b===2)||(a===1&&b===0)||(a===2&&b===1))?1:-1;
+ let forced=null;
+ const botPick=()=>{if(forced!==null){const f=forced;forced=null;return f}if(last>=0&&Math.random()<0.4)return (last+1)%3;return Math.floor(Math.random()*3)};
+ window.rpsq=()=>({my,bt,over,rd,force:v=>{forced=v},pick:i=>pick(i)});
+ let paint=()=>{};
+ const pick=i=>{if(over)return;const b=botPick();const r=win(i,b);if(r>0)my++;else if(r<0)bt++;last=i;rd++;
+  msg='أنت '+E[i]+' '+N[i]+' · 🤖 '+E[b]+' '+N[b]+' · '+(r>0?'✅ كسبت الدور':r<0?'❌ خسرت الدور':'🤝 تعادل');sfx(r>0?'star':r<0?'err':'tick');
+  if(my>=3||bt>=3)fin();else paint()};
+ const fin=()=>{over=true;me.rpsGames=(me.rpsGames||0)+1;const w=my>bt;if(w)me.rpsBest=(me.rpsBest||0)+1;const dd=today();if(me.rpsDD!==dd){me.rpsDD=dd;me.rpsDC=0}
+  let cn=w?(bt===0?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.rpsDC||0)));if(cn){me.coins+=cn;me.rpsDC=(me.rpsDC||0)+cn;updCoins();sfx('win')}
+  msg+='\n'+(w?'🏆 كسبت البوت ':'🤖 البوت كسب ')+my+':'+bt+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">✊ حجر ورقة مقص ضد 🤖</h2><div id="rpS" style="text-align:center;font-size:15px;margin:4px"></div><div id="rpM" style="text-align:center;font-size:13px;margin:8px 0;min-height:4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="rpA" style="width:auto!important;display:inline-block!important">✊ حجر</button><button class="btn" id="rpB" style="width:auto!important;display:inline-block!important">✋ ورقة</button><button class="btn" id="rpC" style="width:auto!important;display:inline-block!important">✌ مقص</button><button class="btn d" id="rpX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('rpS'))return;$('rpS').textContent='أنت '+my+' : '+bt+' 🤖 · الأول لـ3';$('rpM').textContent=msg;['rpA','rpB','rpC'].forEach(k=>$(k).disabled=over)};
+  $('rpA').onclick=()=>pick(0);$('rpB').onclick=()=>pick(1);$('rpC').onclick=()=>pick(2);
+  $('rpX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
