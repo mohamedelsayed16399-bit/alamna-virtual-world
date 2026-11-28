@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -854,6 +854,7 @@ function buildRvs(){
  for(let a=0;a<4;a++)for(let b=0;b<4;b++)g.add(mesh(G.cyl(0.2,0.2,0.08,12),(a+b)%2?0x212529:0xf1f3f5,-1.05+a*0.7,0.74,-5.85+b*0.7));
  rvh={it:{x:0,z:0.2,label:'⚫ العب ريفيرسي',fn:rvsStart}};interacts.push(rvh.it);
  g.add(portalMesh('ارجع لمانكالا',5.8,5.8,0x8c5a2b,'mnkroom'));
+ g.add(portalMesh('نقط ومربعات',-5.8,5.8,0xf08c00,'dbxroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('⚫ ريفيرسي: حط قطعتك بحيث تحاصر قطع البوت 🤖 فتتقلب لونك. الأكتر قطع يكسب. أنت الفاتح',4200)
 }
@@ -890,4 +891,51 @@ function rvsStart(){
    $('rvM').textContent=msg};
   $('rvB').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.i!==undefined)play(+x.dataset.i)};
   $('rvX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildDbx(){
+ const g=indoor(0xf08c00,0xfff9e6,0xffe8a8);
+ sign(g,'🔲 نقط ومربعات ضد 🤖',0,4.6,-7.6,'rgba(240,140,0,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0xfff3bf,0,0.55,-4.8));
+ for(let a=0;a<4;a++)for(let b=0;b<4;b++)g.add(mesh(G.cyl(0.1,0.1,0.12,8),0x343a40,-1.05+a*0.7,0.74,-5.85+b*0.7));
+ dbxh={it:{x:0,z:0.2,label:'🔲 العب نقط ومربعات',fn:dbxStart}};interacts.push(dbxh.it);
+ g.add(portalMesh('ارجع لريفيرسي',5.8,5.8,0x2b8a3e,'rvsroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🔲 نقط ومربعات: وصّل نقطتين بخط. اللي يقفل مربع ياخده ويلعب تاني. الأكتر مربعات يكسب (أنت الأصفر)',4200)
+}
+function dbxStart(){
+ const R=4;let H,V,own,turn=0,over=false,msg='';
+ const init=()=>{H=Array(20).fill(0);V=Array(20).fill(0);own=Array(16).fill(0)};init();
+ const sides=k=>{const r=(k/R)|0,c=k%R;return[['h',r*4+c],['h',(r+1)*4+c],['v',r*5+c],['v',r*5+c+1]]};
+ const arr=t=>t==='h'?H:V;
+ const cntS=k=>sides(k).filter(s=>arr(s[0])[s[1]]).length;
+ const take=(t,i,w)=>{arr(t)[i]=1;let n=0;for(let k=0;k<16;k++)if(!own[k]&&cntS(k)===4){own[k]=w;n++}return n};
+ const sc=w=>own.filter(v=>v===w).length;
+ const free=()=>{const a=[];for(let i=0;i<20;i++){if(!H[i])a.push(['h',i]);if(!V[i])a.push(['v',i])}return a};
+ window.dbxq=()=>({H:H.slice(),V:V.slice(),own:own.slice(),turn,over,msg,set:(h,v,o)=>{H=h.slice();V=v.slice();own=o.slice()},play:(t,i)=>play(t,i),free:()=>free().length});
+ let paint=()=>{};
+ const fin=()=>{over=true;const m=sc(1),t=sc(2),win=m>t;me.dbxGames=(me.dbxGames||0)+1;if(win)me.dbxBest=(me.dbxBest||0)+1;const dd=today();if(me.dbxDD!==dd){me.dbxDD=dd;me.dbxDC=0}
+  let cn=win?(m-t>=5?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.dbxDC||0)));if(cn){me.coins+=cn;me.dbxDC=(me.dbxDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg+='\n'+(win?'🏆 كسبت! ':m===t?'🤝 تعادل ':'🤖 البوت كسب ')+m+':'+t+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const botPick=()=>{const f=free();let z=f.filter(e=>{arr(e[0])[e[1]]=1;let ok=false;for(let k=0;k<16;k++)if(!own[k]&&cntS(k)===4)ok=true;arr(e[0])[e[1]]=0;return ok});if(z.length)return z[0];
+  const safe=f.filter(e=>{arr(e[0])[e[1]]=1;let bad=false;for(let k=0;k<16;k++)if(!own[k]&&cntS(k)===3)bad=true;arr(e[0])[e[1]]=0;return!bad});
+  const L=safe.length?safe:f;return L[(Math.random()*L.length)|0]};
+ const botTurn=()=>{let n=0,g=0;while(!over&&free().length&&g++<30){const e=botPick();const k=take(e[0],e[1],2);n+=k;if(own.every(v=>v)){break}if(!k)break}
+  msg+=' · 🤖 '+(n?'أخد '+n:'لعب')};
+ const play=(t,i)=>{if(over||turn!==0||arr(t)[i])return;const k=take(t,i,1);msg='لعبت'+(k?' وأخدت '+k+' ← العب تاني':'');sfx(k?'star':'place');
+  if(own.every(v=>v)){fin();return}
+  if(k){paint();return}
+  botTurn();if(own.every(v=>v)){fin();return}paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🔲 نقط ومربعات ضد 🤖</h2><div id="dbS" style="text-align:center;font-size:14px;margin:2px"></div><div id="dbB" style="display:grid;justify-content:center;direction:ltr;margin:6px auto"></div><div id="dbM" style="text-align:center;font-size:13px;margin:4px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn d" id="dbX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('dbB'))return;const sm=innerHeight<420,d=sm?6:12,e=sm?18:44;$('dbS').textContent='🤖 '+sc(2)+' · أنت '+sc(1)+(!over?' · دورك':'');
+   const B=$('dbB');B.innerHTML='';B.style.gridTemplateColumns=('0px '+d+'px').repeat(0)+[d,e,d,e,d,e,d,e,d].map(x=>x+'px').join(' ');B.style.gridTemplateRows=[d,e,d,e,d,e,d,e,d].map(x=>x+'px').join(' ');
+   for(let r=0;r<9;r++)for(let c=0;c<9;c++){let x=document.createElement('div');
+    if(r%2===0&&c%2===0){x.style.cssText='width:'+d+'px;height:'+d+'px;border-radius:50%;background:#e9ecef'}
+    else if(r%2===1&&c%2===1){const k=((r-1)/2)*4+(c-1)/2;x.style.cssText='background:'+(own[k]===1?'#ffd43b':own[k]===2?'#868e96':'transparent')}
+    else{const t=r%2===0?'h':'v',i=t==='h'?(r/2)*4+(c-1)/2:((r-1)/2)*5+c/2,tk=arr(t)[i];const b=document.createElement('button');b.className='btn';b.dataset.t=t;b.dataset.i=i;b.disabled=tk||over;
+     b.style.cssText='width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;line-height:1!important;padding:0;margin:0;border-radius:4px;background:'+(tk?'#e9ecef':'#495057')+';opacity:'+(tk?1:.85);x=b}
+    B.appendChild(x)}
+   $('dbM').textContent=msg};
+  $('dbB').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.t)play(x.dataset.t,+x.dataset.i)};
+  $('dbX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
