@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;let lndh=null;let tnkh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;let lndh=null;let tnkh=null;let hshh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1678,6 +1678,7 @@ function buildTnk(){
  g.add(mesh(G.box(2.6,0.5,1.4),0x868e96,1.6,0.55,-4.8),mesh(G.box(1.2,0.4,0.9),0xadb5bd,1.6,1.0,-4.8));
  tnkh={it:{x:0,z:0.2,label:'💥 قاتل دبابة 🤖',fn:tnkStart}};interacts.push(tnkh.it);
  g.add(portalMesh('ارجع للهبوط على القمر',5.8,5.8,0x364fc7,'lndroom'));
+ g.add(portalMesh('لغز الجسور',-5.8,5.8,0x0b7285,'hshroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('💥 مبارزة الدبابات: ظبّط الزاوية والقوة واضرب دبابة الروبوت 🤖 قبل ما تضربك. خد بالك من الرياح!',5200)
 }
@@ -1723,4 +1724,53 @@ function tnkStart(){
   st('tqA1',()=>{ang=Math.max(5,ang-3)});st('tqA2',()=>{ang=Math.min(85,ang+3)});st('tqP1',()=>{pow=Math.max(20,pow-4)});st('tqP2',()=>{pow=Math.min(100,pow+4)});st('tqF',()=>fire(0));
   $('tqN').onclick=()=>{load();paint()};
   $('tqX').onclick=()=>{clearInterval(iv);$('modal').style.display='none'};
+  paint()})}
+function buildHsh(){
+ const g=indoor(0x0b7285,0xe3fafc,0x99e9f2);
+ sign(g,'🌉 لغز الجسور',0,4.6,-7.6,'rgba(11,114,133,.92)');
+ [[-2.2,-4.8],[0,-4.8],[2.2,-4.8],[-1.1,-3.2]].forEach(p=>g.add(mesh(G.cyl(0.55,0.55,0.35),0xffd43b,p[0],0.45,p[1])));
+ g.add(mesh(G.box(2.2,0.1,0.3),0x8d6e63,-1.1,0.65,-4.8),mesh(G.box(2.2,0.1,0.3),0x8d6e63,1.1,0.65,-4.8));
+ hshh={it:{x:0,z:0.2,label:'🌉 العب لغز الجسور',fn:hshStart}};interacts.push(hshh.it);
+ g.add(portalMesh('ارجع للدبابات',5.8,5.8,0x2b8a3e,'tnkroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🌉 لغز الجسور: وصّل الجزر بجسور (واحد أو اتنين) بحيث كل جزيرة يبقى عدد جسورها زي رقمها وكل الجزر تتوصل ببعض. الجسور مفيش بينها تقاطع',5600)
+}
+function hshStart(){
+ const N=7,S=300,CS=S/N,SZ=[6,8,10];
+ let li=(me.hshLvl||0)%3,isl,sol,br,sel,won,msg,moves,pairs;
+ const gen=()=>{for(let tries=0;tries<200;tries++){const I=[],B=[],occ={};const key=(x,y)=>x+','+y;
+   const f=[Math.floor(Math.random()*N),Math.floor(Math.random()*N)];I.push({x:f[0],y:f[1]});occ[key(f[0],f[1])]='i';
+   const segs=[];let guard=0;
+   while(I.length<SZ[li]&&guard++<400){const a=I[Math.floor(Math.random()*I.length)],d=[[1,0],[-1,0],[0,1],[0,-1]][Math.floor(Math.random()*4)],len=2+Math.floor(Math.random()*3);
+    const nx=a.x+d[0]*len,ny=a.y+d[1]*len;if(nx<0||ny<0||nx>=N||ny>=N)continue;let ok=true;for(let k=1;k<=len;k++)if(occ[key(a.x+d[0]*k,a.y+d[1]*k)]){ok=false;break}if(!ok)continue;
+    I.push({x:nx,y:ny});occ[key(nx,ny)]='i';for(let k=1;k<len;k++)occ[key(a.x+d[0]*k,a.y+d[1]*k)]='b';
+    B.push([I.indexOf(a),I.length-1,1+Math.floor(Math.random()*2)])}
+   if(I.length===SZ[li]){I.forEach(o=>o.n=0);B.forEach(b=>{I[b[0]].n+=b[2];I[b[1]].n+=b[2]});return{I,B}}}
+  return null};
+ const nb=()=>{pairs=[];for(let i=0;i<isl.length;i++)for(let j=i+1;j<isl.length;j++){const a=isl[i],b=isl[j];if(a.x!==b.x&&a.y!==b.y)continue;let ok=true;for(let k=0;k<isl.length;k++){if(k===i||k===j)continue;const c=isl[k];if(a.x===b.x&&c.x===a.x&&c.y>Math.min(a.y,b.y)&&c.y<Math.max(a.y,b.y))ok=false;if(a.y===b.y&&c.y===a.y&&c.x>Math.min(a.x,b.x)&&c.x<Math.max(a.x,b.x))ok=false}if(ok)pairs.push([i,j])}};
+ const cross=(p,q)=>{const a=isl[p[0]],b=isl[p[1]],c=isl[q[0]],d=isl[q[1]];const ah=a.y===b.y,ch=c.y===d.y;if(ah===ch)return false;const H=ah?[a,b]:[c,d],V=ah?[c,d]:[a,b];const hy=H[0].y,vx=V[0].x;return vx>Math.min(H[0].x,H[1].x)&&vx<Math.max(H[0].x,H[1].x)&&hy>Math.min(V[0].y,V[1].y)&&hy<Math.max(V[0].y,V[1].y)};
+ const load=()=>{const r=gen();isl=r.I;sol=r.B;br=[];sel=null;won=false;moves=0;msg='دوس جزيرة وبعدين جزيرة تانية جنبها عشان توصلهم';nb()};load();
+ const deg=i=>br.reduce((s,b)=>s+(b[0]===i||b[1]===i?b[2]:0),0);
+ const connected=()=>{const seen=new Set([0]),st=[0];while(st.length){const u=st.pop();br.forEach(b=>{if(b[2]>0){const v=b[0]===u?b[1]:b[1]===u?b[0]:-1;if(v>=0&&!seen.has(v)){seen.add(v);st.push(v)}}})}return seen.size===isl.length};
+ const check=()=>isl.every((o,i)=>deg(i)===o.n)&&connected();
+ const link=(i,j)=>{const p=i<j?[i,j]:[j,i];if(!pairs.some(q=>q[0]===p[0]&&q[1]===p[1]))return false;let e=br.find(b=>b[0]===p[0]&&b[1]===p[1]);const nn=e?(e[2]+1)%3:1;
+  if(nn>0&&br.some(b=>b[2]>0&&!(b[0]===p[0]&&b[1]===p[1])&&cross(b,p))){msg='❌ الجسر ده هيقطع جسر تاني';return true}
+  if(e)e[2]=nn;else br.push([p[0],p[1],nn]);moves++;msg='';return true};
+ const win=()=>{won=true;me.hshGames=(me.hshGames||0)+1;const dd=today();if(me.hshDD!==dd){me.hshDD=dd;me.hshDC=0}let cn=Math.min(3,Math.max(0,6-(me.hshDC||0)));me.hshBest=(me.hshBest||0)+1;if(cn){me.coins+=cn;me.hshDC=(me.hshDC||0)+cn;updCoins();sfx('win')}else sfx('star');me.hshLvl=(li+1)%3;msg='🏆 حليتها في '+moves+' حركة!'+(cn?' +'+cn+'🪙':'');saveMe()};
+ const tap=i=>{if(won)return;if(sel===null){sel=i;return}if(sel===i){sel=null;return}if(link(sel,i)){sel=null;if(check())win()}else sel=i};
+ window.hshq=()=>({isl:isl.map(o=>({...o})),sol:sol.map(b=>[...b]),br:br.map(b=>[...b]),won,msg,moves,li,sel,pairs:pairs.length,tap,ok:check()});
+ let paint=()=>{};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;line-height:1!important;padding:8px 14px';
+  c.innerHTML='<h2 style="margin:4px">🌉 لغز الجسور</h2><div id="hsS" style="text-align:center;font-size:12px;margin:2px"></div><canvas id="hsC" width="'+S+'" height="'+S+'" style="display:block;margin:4px auto;border-radius:8px;background:#e3fafc;max-width:100%;touch-action:manipulation"></canvas><div id="hsM" style="text-align:center;font-size:12px;margin:3px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="hsN" style="'+bs+'">لغز جديد</button><button class="btn d" id="hsX" style="'+bs+'">إغلاق</button></div>';
+  const cv=$('hsC'),cx=cv.getContext('2d');
+  if(innerHeight<420){cv.style.width='130px';cv.style.height='130px'}
+  const P=o=>[o.x*CS+CS/2,o.y*CS+CS/2];
+  paint=()=>{if(!$('hsC'))return;$('hsS').textContent='لغز '+(li+1)+' من 3 · حركات '+moves;$('hsM').textContent=msg;
+   cx.clearRect(0,0,S,S);cx.strokeStyle='#c5f6fa';cx.lineWidth=1;for(let i=0;i<=N;i++){cx.beginPath();cx.moveTo(i*CS,0);cx.lineTo(i*CS,S);cx.moveTo(0,i*CS);cx.lineTo(S,i*CS);cx.stroke()}
+   br.forEach(b=>{if(b[2]<1)return;const A=P(isl[b[0]]),B=P(isl[b[1]]),hz=A[1]===B[1];cx.strokeStyle='#495057';cx.lineWidth=3;for(let k=0;k<b[2];k++){const o=b[2]===2?(k?4:-4):0;cx.beginPath();cx.moveTo(A[0]+(hz?0:o),A[1]+(hz?o:0));cx.lineTo(B[0]+(hz?0:o),B[1]+(hz?o:0));cx.stroke()}});
+   isl.forEach((o,i)=>{const p=P(o),d=deg(i);cx.beginPath();cx.arc(p[0],p[1],17,0,7);cx.fillStyle=d===o.n?'#69db7c':d>o.n?'#ffa8a8':'#fff';cx.fill();cx.lineWidth=i===sel?4:2;cx.strokeStyle=i===sel?'#1c7ed6':'#0b7285';cx.stroke();cx.fillStyle='#212529';cx.font='bold 18px sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(o.n,p[0],p[1]+1)})};
+  cv.onclick=e=>{const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*S/r.width,y=(e.clientY-r.top)*S/r.height;let bi=-1,bd=26;isl.forEach((o,i)=>{const p=P(o),d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;bi=i}});if(bi>=0)tap(bi);paint()};
+  $('hsN').onclick=()=>{load();paint()};
+  $('hsX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
