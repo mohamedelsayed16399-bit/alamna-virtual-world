@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1528,6 +1528,7 @@ function buildFtu(){
  g.add(mesh(G.box(2.4,0.1,0.15),0xf59f00,0,1.1,-4.8),mesh(G.box(0.15,0.5,0.15),0xf59f00,0,0.85,-4.8),mesh(G.box(0.6,0.15,0.6),0xe03131,-1.0,1.25,-4.8),mesh(G.box(0.4,0.15,0.4),0x1971c2,1.0,1.2,-4.8));
  ftuh={it:{x:0,z:0.2,label:'⚖️ العب أكبر وأصغر',fn:ftuStart}};interacts.push(ftuh.it);
  g.add(portalMesh('ارجع لظلّل المكرر',5.8,5.8,0x495057,'htrroom'));
+ g.add(portalMesh('المقلاع',-5.8,5.8,0x7048e8,'slgroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('⚖️ أكبر وأصغر: املا الجدول بالأرقام من 1 لحد الحجم، من غير تكرار في صف أو عمود، وراعي علامات > و < اللي بين الخانات',5000)
 }
@@ -1563,4 +1564,61 @@ function ftuStart(){
   $('fuP').onclick=e=>{const x=e.target.closest('[data-v]');if(!x||over)return;if(!sel){msg='اختار خانة الأول';paint();return}put(sel[0],sel[1],+x.dataset.v);if(!over)msg='';paint()};
   $('fuN').onclick=()=>{load();paint()};
   $('fuX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildSlg(){
+ const g=indoor(0x7048e8,0xf3f0ff,0xd0bfff);
+ sign(g,'🏹 المقلاع',0,4.6,-7.6,'rgba(112,72,232,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0x495057,0,0.55,-4.8));
+ g.add(mesh(G.box(0.15,1.0,0.15),0x8d5524,-1.0,1.2,-4.8),mesh(G.box(0.5,0.12,0.12),0x8d5524,-1.0,1.7,-4.8),mesh(G.box(0.25,0.25,0.25),0xe03131,-0.4,1.0,-4.8),mesh(G.box(0.4,0.4,0.4),0xf08c00,1.0,0.9,-4.8),mesh(G.box(0.4,0.4,0.4),0xf08c00,1.0,1.3,-4.8));
+ slgh={it:{x:0,z:0.2,label:'🏹 العب المقلاع',fn:slgStart}};interacts.push(slgh.it);
+ g.add(portalMesh('ارجع لأكبر وأصغر',5.8,5.8,0x495057,'fturoom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🏹 المقلاع: اسحب من المقلاع لورا وسيب عشان تضرب كل الأهداف. عندك 6 رميات بس. الحيطان بتوقف الكورة',4800)
+}
+function slgStart(){
+ const LV=[{"targets":[[200,168,12],[250,168,12]],"walls":[]},{"targets":[[220,168,12],[270,168,12],[245,100,11]],"walls":[[140,110,10,78]]},{"targets":[[235,90,11],[285,130,11],[190,60,11]],"walls":[]},{"targets":[[255,170,11],[270,140,11],[290,80,11],[200,70,11]],"walls":[[120,100,12,88],[180,130,60,10]]},{"targets":[[200,175,10],[250,175,10],[280,110,10],[230,60,10],[160,50,10]],"walls":[[110,90,12,98],[215,120,10,68]]},{"targets":[[185,176,10],[240,176,10],[295,176,10],[270,90,10],[210,50,10],[150,40,10]],"walls":[[100,110,12,78],[160,130,10,58],[250,110,50,8]]}];
+ const W=320,H=200,GY=188,SX=44,SY=140,GR=420;
+function simShot(LV,alive,vx,vy,keep){const path=[];let x=SX,y=SY,t=0;const killed=[];const dt=1/120;
+ for(let i=0;i<1800;i++){vy+=GR*dt;x+=vx*dt;y+=vy*dt;t+=dt;if(keep&&i%6===0)path.push([x,y]);
+  if(y>=GY-3||x>W+20||x<-20||t>8)break;
+  if(y<-80&&vy>0&&false)break;
+  let hitW=false;for(const w of LV.walls){if(x>w[0]&&x<w[0]+w[2]&&y>w[1]&&y<w[1]+w[3]){hitW=true;break}}
+  if(hitW)break;
+  for(let k=0;k<LV.targets.length;k++){if(!alive[k]||killed.includes(k))continue;const tg=LV.targets[k];if(Math.hypot(x-tg[0],y-tg[1])<=tg[2]+3){killed.push(k)}}}
+ return {killed,path,x,y}}
+
+ const MAXS=6;
+ let li=(me.slgLvl||0)%LV.length,alive,shots=0,over=false,msg='',aim=null,flying=null,path=[];
+ const load=()=>{alive=LV[li].targets.map(()=>true);shots=0;over=false;aim=null;flying=null;path=[];msg='مستوى '+(li+1)+' من '+LV.length};load();
+ const left=()=>alive.filter(a=>a).length;
+ const launch=(vx,vy,inst)=>{if(over||flying)return false;shots++;const r=simShot(LV[li],alive,vx,vy,true);
+  const done=()=>{r.killed.forEach(k=>alive[k]=false);flying=null;path=[];sfx(r.killed.length?'place':'star');if(!left())fin(true);else if(shots>=MAXS)fin(false);else msg=r.killed.length?'ضربت '+r.killed.length+' · باقي '+left():'فاتت! باقي '+(MAXS-shots)+' رميات'};
+  if(inst){done();paint();return true}
+  flying={p:r.path,i:0,done};return true};
+ window.slgq=()=>({alive:alive.slice(),shots,over,msg,li,n:LV.length,LV,launch,sim:(vx,vy)=>simShot(LV[li],alive,vx,vy),left,l:left()});
+ let paint=()=>{};
+ const fin=ok=>{over=true;me.slgGames=(me.slgGames||0)+1;if(ok){const dd=today();if(me.slgDD!==dd){me.slgDD=dd;me.slgDC=0}
+  let cn=shots<=LV[li].targets.length?3:2;cn=Math.min(cn,Math.max(0,6-(me.slgDC||0)));me.slgBest=(me.slgBest||0)+1;
+  if(cn){me.coins+=cn;me.slgDC=(me.slgDC||0)+cn;updCoins();sfx('win')}else sfx('star');
+  me.slgLvl=(li+1)%LV.length;msg='🏆 ضربت كل الأهداف في '+shots+' رميات'+(cn?' · +'+cn+'🪙':'')}else{sfx('star');msg='خلصت الرميات. جرّب تاني'}saveMe()};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;padding:6px 12px';
+  c.innerHTML='<h2 style="margin:4px">🏹 المقلاع</h2><div id="jxS" style="text-align:center;font-size:14px;margin:2px"></div><canvas id="jxC" width="'+W+'" height="'+H+'" style="display:block;margin:4px auto;border-radius:8px;touch-action:none;max-width:100%"></canvas><div id="jxM" style="text-align:center;font-size:12px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><button class="btn" id="jxN" style="'+bs+'">من الأول</button><button class="btn d" id="jxX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const cv=$('jxC'),cx=cv.getContext('2d');
+  if(innerHeight<420){cv.style.height='118px';cv.style.width='189px'}
+  const pt=e=>{const b=cv.getBoundingClientRect();return[(e.clientX-b.left)*W/b.width,(e.clientY-b.top)*H/b.height]};
+  paint=()=>{if(!$('jxC'))return;$('jxS').textContent='رميات '+(MAXS-shots)+' · أهداف '+left()+' · مستوى '+(li+1);$('jxM').textContent=msg;
+   const L=LV[li];cx.clearRect(0,0,W,H);cx.fillStyle='#d0ebff';cx.fillRect(0,0,W,H);cx.fillStyle='#69db7c';cx.fillRect(0,GY,W,H-GY);
+   cx.fillStyle='#6d4c41';L.walls.forEach(w=>cx.fillRect(w[0],w[1],w[2],w[3]));
+   L.targets.forEach((t,k)=>{if(!alive[k])return;[1,0.66,0.33].forEach((f,i)=>{cx.beginPath();cx.arc(t[0],t[1],t[2]*f,0,7);cx.fillStyle=i%2?'#fff':'#e03131';cx.fill()})});
+   cx.fillStyle='#8d5524';cx.fillRect(SX-3,SY,6,GY-SY);cx.fillRect(SX-10,SY-6,20,5);
+   if(aim){const vx=(SX-aim[0])*6,vy=-(aim[1]-SY)*6,r=simShot({targets:[],walls:L.walls},[],vx,vy,true);cx.fillStyle='#fff9';r.path.slice(0,14).forEach(p=>{cx.beginPath();cx.arc(p[0],p[1],2,0,7);cx.fill()});cx.beginPath();cx.arc(aim[0],aim[1],6,0,7);cx.fillStyle='#e03131';cx.fill()}
+   else if(!flying){cx.beginPath();cx.arc(SX,SY-4,6,0,7);cx.fillStyle='#e03131';cx.fill()}
+   if(flying&&flying.p.length){const q=flying.p[Math.min(flying.i,flying.p.length-1)];cx.beginPath();cx.arc(q[0],q[1],6,0,7);cx.fillStyle='#e03131';cx.fill()}};
+  const iv=setInterval(()=>{if(!$('jxC')){clearInterval(iv);return}if(flying){flying.i+=2;if(flying.i>=flying.p.length){flying.done()}paint()}},30);
+  cv.onpointerdown=e=>{if(over||flying)return;try{cv.setPointerCapture(e.pointerId)}catch(_){}const p=pt(e);aim=[Math.min(SX,p[0]),Math.max(SY,p[1])];paint()};
+  cv.onpointermove=e=>{if(!aim)return;let p=pt(e);let dx=SX-p[0],dy=p[1]-SY;const d=Math.hypot(dx,dy);if(d>60){dx*=60/d;dy*=60/d}aim=[SX-dx,SY+dy];if(aim[0]>SX)aim[0]=SX;if(aim[1]<SY)aim[1]=SY;paint()};
+  cv.onpointerup=e=>{if(!aim)return;const a=aim;aim=null;const vx=(SX-a[0])*6,vy=-(a[1]-SY)*6;if(Math.hypot(vx,vy)<60){paint();return}launch(vx,vy);paint()};
+  $('jxN').onclick=()=>{load();paint()};
+  $('jxX').onclick=()=>{clearInterval(iv);$('modal').style.display='none'};
   paint()})}
