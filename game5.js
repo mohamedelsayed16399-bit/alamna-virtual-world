@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1019,6 +1019,7 @@ function buildGmk(){
  g.add(mesh(G.cyl(0.2,0.2,0.1,12),0xf1f3f5,-0.6,0.8,-5.4),mesh(G.cyl(0.2,0.2,0.1,12),0x212529,0.6,0.8,-4.2));
  gmkh={it:{x:0,z:0.2,label:'⭕ العب خمسة في صف',fn:gmkStart}};interacts.push(gmkh.it);
  g.add(portalMesh('ارجع لغمّر اللوحة',5.8,5.8,0x1098ad,'fdiroom'));
+ g.add(portalMesh('داما',-5.8,5.8,0x5c3d2e,'damroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('⭕ خمسة في صف: كوّن ٥ قطع ورا بعض (أفقي أو رأسي أو قطري) قبل البوت 🤖. أنت الفاتح وبتبدأ',4200)
 }
@@ -1051,4 +1052,56 @@ function gmkStart(){
    $('gkM').textContent=msg};
   $('gkB').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.i!==undefined)play(+x.dataset.i)};
   $('gkX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildDam(){
+ const g=indoor(0x5c3d2e,0xfff4e6,0xd9b38c);
+ sign(g,'♟️ داما ضد 🤖',0,4.6,-7.6,'rgba(92,61,46,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0xf1d9b5,0,0.55,-4.8));
+ for(let a=0;a<4;a++)for(let b=0;b<4;b++)if((a+b)%2)g.add(mesh(G.box(0.7,0.05,0.7),0x5c3d2e,-1.05+a*0.7,0.72,-5.85+b*0.7));
+ g.add(mesh(G.cyl(0.22,0.22,0.15,12),0xf8f9fa,-0.35,0.82,-4.45),mesh(G.cyl(0.22,0.22,0.15,12),0x212529,0.35,0.82,-5.15));
+ damh={it:{x:0,z:0.2,label:'♟️ العب داما',fn:damStart}};interacts.push(damh.it);
+ g.add(portalMesh('ارجع لخمسة في صف',5.8,5.8,0xc2955a,'gmkroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('♟️ داما: حرّك قطعك قدّام بالقطر. الأكل إجباري، ولو وصلت آخر صف تبقى ملك (بتتحرك وتاكل في الاتجاهين). أنت الفاتح تحت',4200)
+}
+function damStart(){
+ const N=6;let b,turn=0,over=false,msg='',sel=-1,chain=-1;
+ const init=()=>{b=Array(36).fill(0);for(let r=0;r<2;r++)for(let c=0;c<N;c++)if((r+c)%2)b[r*N+c]=2;for(let r=4;r<6;r++)for(let c=0;c<N;c++)if((r+c)%2)b[r*N+c]=1};init();
+ const side=v=>v===1||v===3?1:v===2||v===4?2:0;
+ const dirs=v=>v===1?[[-1,-1],[-1,1]]:v===2?[[1,-1],[1,1]]:[[-1,-1],[-1,1],[1,-1],[1,1]];
+ const pieceMoves=(st,i,jumpsOnly)=>{const v=st[i],s=side(v),r=(i/N)|0,c=i%N,out=[];
+  dirs(v).forEach(d=>{const y=r+d[0],x=c+d[1];if(y<0||y>=N||x<0||x>=N)return;const t=st[y*N+x];
+   if(t===0&&!jumpsOnly)out.push({f:i,t:y*N+x,cap:-1});
+   else if(t&&side(t)!==s){const y2=y+d[0],x2=x+d[1];if(y2>=0&&y2<N&&x2>=0&&x2<N&&st[y2*N+x2]===0)out.push({f:i,t:y2*N+x2,cap:y*N+x})}});return out};
+ const legal=(st,s,only)=>{let jumps=[],steps=[];for(let i=0;i<36;i++){if(only>=0&&i!==only)continue;if(side(st[i])!==s)continue;const m=pieceMoves(st,i,false);m.forEach(x=>(x.cap>=0?jumps:steps).push(x))}return jumps.length?jumps:(only>=0?[]:steps)};
+ const apply=(st,m)=>{const v=st[m.f];st[m.f]=0;if(m.cap>=0)st[m.cap]=0;const r=(m.t/N)|0;let nv=v;let promo=false;if(v===1&&r===0){nv=3;promo=true}if(v===2&&r===N-1){nv=4;promo=true}st[m.t]=nv;return promo};
+ const cnt=s=>b.filter(v=>side(v)===s).length;
+ window.dmq=()=>({b:b.slice(),turn,over,msg,sel,chain,set:a=>{b=a.slice();sel=-1;chain=-1},play:(f,t)=>play(f,t),legal:()=>legal(b,1,chain).map(m=>m.f+'>'+m.t)});
+ let paint=()=>{};
+ const fin=win=>{over=true;me.damGames=(me.damGames||0)+1;if(win)me.damBest=(me.damBest||0)+1;const dd=today();if(me.damDD!==dd){me.damDD=dd;me.damDC=0}
+  let cn=win?(cnt(1)>=4?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.damDC||0)));if(cn){me.coins+=cn;me.damDC=(me.damDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg=(win?'🏆 كسبت! ':'🤖 البوت كسب ')+cnt(1)+':'+cnt(2)+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const botTurn=()=>{let ch=-1,g=0,caps=0;while(g++<12){const L=legal(b,2,ch);if(!L.length)break;let best=L[0],bs=-1e9;L.forEach(m=>{const t=b.slice();apply(t,m);const mat=t.filter(v=>side(v)===2).length-t.filter(v=>side(v)===1).length;const rep=legal(t,1,-1);const danger=rep.some(x=>x.cap>=0)?1.5:0;const adv=(m.t/N|0)*0.15;const s=mat*3-danger+adv+(b[m.f]>2?0.2:0)+Math.random()*0.8;if(s>bs){bs=s;best=m}});
+   const promo=apply(b,best);if(best.cap>=0)caps++;if(best.cap>=0&&!promo&&legal(b,2,best.t).length){ch=best.t;continue}break}
+  msg+=' · 🤖 لعب'+(caps?' وأكل '+caps:'')};
+ const end=()=>{if(!cnt(2)||!legal(b,2,-1).length){fin(true);return true}if(!cnt(1)||!legal(b,1,-1).length){fin(false);return true}return false};
+ const play=(f,t)=>{if(over||turn!==0)return;const L=legal(b,1,chain);const m=L.find(x=>x.f===f&&x.t===t);if(!m)return;const promo=apply(b,m);sfx(m.cap>=0?'star':'place');sel=-1;msg='لعبت'+(m.cap>=0?' وأكلت':'');
+  if(m.cap>=0&&!promo&&legal(b,1,m.t).length){chain=m.t;sel=m.t;msg+=' ← كمّل الأكل';paint();return}
+  chain=-1;if(!cnt(2)||!legal(b,2,-1).length){fin(true);return}
+  botTurn();if(end())return;paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">♟️ داما ضد 🤖</h2><div id="dmS" style="text-align:center;font-size:14px;margin:2px"></div><div id="dmB" style="display:grid;justify-content:center;direction:ltr;margin:4px auto;gap:0"></div><div id="dmM" style="text-align:center;font-size:13px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn d" id="dmX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('dmB'))return;const sm=innerHeight<420,cs=sm?19:52,L=over?[]:legal(b,1,chain),froms=new Set(L.map(m=>m.f)),tos=new Set(L.filter(m=>sel>=0&&m.f===sel).map(m=>m.t));
+   $('dmS').textContent='🤖 '+cnt(2)+' · أنت '+cnt(1)+(!over?' · دورك':'');
+   const B=$('dmB');B.style.gridTemplateColumns='repeat(6,'+cs+'px)';B.innerHTML='';
+   for(let i=0;i<36;i++){const r=(i/N)|0,cc=i%N,dark=(r+cc)%2===1;const e=document.createElement('button');e.className='btn';e.dataset.i=i;
+    const act=dark&&!over&&(froms.has(i)||tos.has(i));e.disabled=!act;
+    e.style.cssText='width:'+cs+'px!important;height:'+cs+'px!important;min-width:0!important;min-height:0!important;line-height:1!important;padding:0;margin:0;border-radius:0;position:relative;background:'+(dark?'#8b5a3c':'#f1d9b5')+';'+(i===sel?'outline:3px solid #ffd43b;outline-offset:-3px;':tos.has(i)?'outline:3px solid #51cf66;outline-offset:-3px;':'');
+    if(b[i]){const v=b[i],d=document.createElement('div');d.style.cssText='position:absolute;inset:'+(sm?3:6)+'px;border-radius:50%;background:'+(side(v)===1?'#f8f9fa':'#212529')+';box-shadow:0 1px 3px #0008;display:flex;align-items:center;justify-content:center;color:'+(side(v)===1?'#e8590c':'#ffd43b')+';font-size:'+(sm?10:20)+'px';if(v>2)d.textContent='★';e.appendChild(d)}
+    B.appendChild(e)}
+   $('dmM').textContent=msg};
+  $('dmB').onclick=e=>{const x=e.target.closest('button');if(!x||over)return;const i=+x.dataset.i;const L=legal(b,1,chain);
+   if(sel>=0&&L.some(m=>m.f===sel&&m.t===i)){play(sel,i);return}
+   if(chain<0&&L.some(m=>m.f===i)){sel=i;paint()}};
+  $('dmX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
