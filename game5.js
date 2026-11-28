@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1323,6 +1323,7 @@ function buildWsg(){
  for(let i=0;i<5;i++){g.add(mesh(G.box(0.4,0.9,0.4),cc[i],-1+i*0.5,1.1,-4.8))}
  wsgh={it:{x:0,z:0.2,label:'🧪 العب رتّب الألوان',fn:wsgStart}};interacts.push(wsgh.it);
  g.add(portalMesh('ارجع لسوليتير الأوتاد',5.8,5.8,0x495057,'pgsroom'));
+ g.add(portalMesh('وصّل الأنابيب',-5.8,5.8,0x0c8599,'plmroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🧪 رتّب الألوان: اضغط أنبوبة وبعدين أنبوبة تانية تصب فيها. كل أنبوبة لازم تبقى لون واحد',4200)
 }
@@ -1353,4 +1354,49 @@ function wsgStart(){
   $('wzU').onclick=()=>{if(hist.length&&!over){T=hist.pop();mv=Math.max(0,mv-1);sel=-1;msg='';paint()}};
   $('wzN').onclick=()=>{load();paint()};
   $('wzX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildPlm(){
+ const g=indoor(0x0c8599,0xe3fafc,0x99e9f2);
+ sign(g,'🔧 وصّل الأنابيب',0,4.6,-7.6,'rgba(12,133,153,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0x495057,0,0.55,-4.8));
+ g.add(mesh(G.box(2.4,0.3,0.4),0x1c7ed6,0,0.9,-4.8),mesh(G.box(0.4,0.3,2.4),0x1c7ed6,0,0.9,-4.8),mesh(G.box(0.7,0.4,0.7),0x15aabf,0,1.05,-4.8));
+ plmh={it:{x:0,z:0.2,label:'🔧 العب وصّل الأنابيب',fn:plmStart}};interacts.push(plmh.it);
+ g.add(portalMesh('ارجع لرتّب الألوان',5.8,5.8,0x495057,'wsgroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🔧 وصّل الأنابيب: اضغط أي قطعة عشان تلفها. وصّل المية من المصدر (الفوق شمال) لكل القطع',4200)
+}
+function plmStart(){
+ const SZ=[3,4,4,5,5,6];
+ let li=(me.plmLvl||0)%SZ.length,N,M,SOL,mv=0,over=false,msg='',par=0;
+ const rot=m=>((m<<1)|(m>>3))&15;
+ const gen=()=>{N=SZ[li];let s=li*7919+13;const rnd=()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296};
+  const sol=[];for(let i=0;i<N*N;i++)sol.push(0);const seen=new Set([0]),st=[0];
+  const DR=[[-1,0,1,4],[0,1,2,8],[1,0,4,1],[0,-1,8,2]];
+  while(st.length){const cur=st[st.length-1],r=Math.floor(cur/N),c=cur%N;const opts=DR.filter(d=>{const rr=r+d[0],cc=c+d[1];return rr>=0&&cc>=0&&rr<N&&cc<N&&!seen.has(rr*N+cc)});
+   if(!opts.length){st.pop();continue}const d=opts[Math.floor(rnd()*opts.length)],nx=(r+d[0])*N+c+d[1];sol[cur]|=d[2];sol[nx]|=d[3];seen.add(nx);st.push(nx)}
+  SOL=sol;M=sol.map(m=>{let k=Math.floor(rnd()*4),x=m;for(let i=0;i<k;i++)x=rot(x);return x});
+  if(M.every((m,i)=>m===SOL[i])){M[1]=rot(M[1])}
+  par=0;M.forEach((m,i)=>{let x=m,k=0;while(x!==SOL[i]&&k<4){x=rot(x);k++}par+=k%4})};
+ const load=()=>{gen();mv=0;over=false;msg='مستوى '+(li+1)+' من '+SZ.length};load();
+ const wet=()=>{const w=new Set([0]),st=[0];while(st.length){const cur=st.pop(),r=Math.floor(cur/N),c=cur%N,m=M[cur];
+   [[-1,0,1,4],[0,1,2,8],[1,0,4,1],[0,-1,8,2]].forEach(d=>{if(!(m&d[2]))return;const rr=r+d[0],cc=c+d[1];if(rr<0||cc<0||rr>=N||cc>=N)return;const n=rr*N+cc;if(w.has(n)||!(M[n]&d[3]))return;w.add(n);st.push(n)})}return w};
+ const click=i=>{if(over||i<0||i>=N*N)return false;M[i]=rot(M[i]);mv++;sfx('place');if(wet().size===N*N)fin();return true};
+ window.plmq=()=>({M:M.slice(),SOL:SOL.slice(),N,mv,over,msg,li,par,wet:wet().size,set:a=>{M=a.slice();mv=0;over=false},click});
+ let paint=()=>{};
+ const fin=()=>{over=true;me.plmGames=(me.plmGames||0)+1;me.plmBest=(me.plmBest||0)+1;const dd=today();if(me.plmDD!==dd){me.plmDD=dd;me.plmDC=0}
+  let cn=mv<=par+4?3:2;cn=Math.min(cn,Math.max(0,6-(me.plmDC||0)));if(cn){me.coins+=cn;me.plmDC=(me.plmDC||0)+cn;updCoins();sfx('win')}else sfx('star');
+  me.plmLvl=(li+1)%SZ.length;msg='🏆 المية وصلت لكل القطع في '+mv+' لفة'+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;padding:6px 12px';
+  c.innerHTML='<h2 style="margin:4px">🔧 وصّل الأنابيب</h2><div id="qpS" style="text-align:center;font-size:14px;margin:2px"></div><div id="qpB" style="position:relative;margin:4px auto;direction:ltr;background:#1b2a3a;border-radius:8px"></div><div id="qpM" style="text-align:center;font-size:12px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><button class="btn" id="qpN" style="'+bs+'">من الأول</button><button class="btn d" id="qpX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('qpB'))return;const sm=innerHeight<420,cs=sm?Math.floor(130/N):Math.floor(300/N),B=$('qpB');B.style.width=cs*N+'px';B.style.height=cs*N+'px';B.innerHTML='';$('qpS').textContent='لفّات '+mv+' · مستوى '+(li+1);
+   const w=wet(),t=Math.max(4,Math.round(cs*0.28));
+   M.forEach((m,i)=>{const r=Math.floor(i/N),c=i%N,col=w.has(i)?'#4dabf7':'#868e96';const e=document.createElement('div');e.dataset.i=i;e.style.cssText='position:absolute;box-sizing:border-box;left:'+(c*cs)+'px;top:'+(r*cs)+'px;width:'+cs+'px;height:'+cs+'px;border:1px solid #0004;background:#243b53;cursor:pointer';
+    const add=(l,tp,wd,ht)=>{const d=document.createElement('div');d.style.cssText='position:absolute;pointer-events:none;background:'+col+';left:'+l+'px;top:'+tp+'px;width:'+wd+'px;height:'+ht+'px;border-radius:2px';e.appendChild(d)};
+    const h=(cs-t)/2;add(h,h,t,t);if(m&1)add(h,0,t,h);if(m&2)add(h+t,h,h,t);if(m&4)add(h,h+t,t,h);if(m&8)add(0,h,h,t);
+    if(i===0){e.style.outline='2px solid #ffd43b';e.style.outlineOffset='-3px'}B.appendChild(e)});
+   $('qpM').textContent=msg};
+  $('qpB').onclick=e=>{const x=e.target.closest('[data-i]');if(!x||over)return;click(+x.dataset.i);if(!over)msg='';paint()};
+  $('qpN').onclick=()=>{load();paint()};
+  $('qpX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
