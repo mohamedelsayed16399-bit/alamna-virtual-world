@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -673,6 +673,7 @@ function buildBjk(){
  [[-0.8,0],[0,0.2],[0.8,0.4]].forEach(a=>g.add(mesh(G.box(0.5,0.03,0.7),0xffffff,a[0],0.9,-4.8+a[1])));
  bjkh={it:{x:0,z:0.2,label:'🃏 العب واحد وعشرين',fn:bjkStart}};interacts.push(bjkh.it);
  g.add(portalMesh('ارجع للحساب السريع',5.8,5.8,0xf08c00,'calroom'));
+ g.add(portalMesh('معركة السفن',-5.8,5.8,0x1864ab,'shproom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🃏 قرّب من 21 من غير ما تعدّي. الموزّع 🤖 بيسحب لحد 17. 3 جولات',3400)
 }
@@ -699,4 +700,38 @@ function bjkStart(){
    $('bjH').style.display=$('bjT').style.display=done?'none':'inline-block';$('bjN').style.display=(done&&!over)?'inline-block':'none'};
   $('bjH').onclick=hit;$('bjT').onclick=stand;$('bjN').onclick=nextRound;
   $('bjX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildShp(){
+ const g=indoor(0x1864ab,0xe7f5ff,0xa5d8ff);
+ sign(g,'🚢 معركة السفن ضد 🤖',0,4.6,-7.6,'rgba(24,100,171,.92)');
+ g.add(mesh(G.box(3.2,0.12,3.2),0x1c7ed6,0,0.5,-4.8),mesh(G.box(1.1,0.35,0.5),0x495057,0,0.78,-4.8),mesh(G.box(0.12,0.7,0.12),0x868e96,0,1.2,-4.8));
+ shph={it:{x:0,z:0.2,label:'🚢 العب معركة السفن',fn:shpStart}};interacts.push(shph.it);
+ g.add(portalMesh('ارجع لواحد وعشرين',5.8,5.8,0x2b8a3e,'bjkroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🚢 ٤ سفن مخبّية في شبكة 5×5. اضرب بالدور مع البوت 🤖، أول واحد يغرّق ٤ يكسب',3600)
+}
+function shpStart(){
+ const N=25,K=4;
+ const place=()=>{const s=new Set();while(s.size<K)s.add(Math.floor(Math.random()*N));return s};
+ let mine=place(),bots=place(),shotMe=new Set(),shotBot=new Set(),hitMe=0,hitBot=0,over=false,msg='';
+ window.shpq=()=>({mine:[...mine],bots:[...bots],hitMe,hitBot,over,msg,fire:i=>fire(i)});
+ let paint=()=>{};
+ const fin=win=>{over=true;me.shpGames=(me.shpGames||0)+1;if(win)me.shpBest=(me.shpBest||0)+1;const dd=today();if(me.shpDD!==dd){me.shpDD=dd;me.shpDC=0}
+  let cn=win?(shotMe.size<=12?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.shpDC||0)));if(cn){me.coins+=cn;me.shpDC=(me.shpDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg+='\n'+(win?'🏆 غرّقت أسطول البوت! ':'🤖 البوت غرّق أسطولك. ')+(cn?'+'+cn+'🪙':'');saveMe();paint()};
+ const fire=i=>{if(over||shotMe.has(i))return;shotMe.add(i);const h=bots.has(i);if(h)hitMe++;msg='ضربتك: '+(h?'💥 صابت':'🌊 غلط');sfx(h?'star':'tick');
+  if(hitMe>=K){fin(true);return}
+  let j;const un=[];for(let k=0;k<N;k++)if(!shotBot.has(k))un.push(k);
+  const near=[];shotBot.forEach(s=>{if(mine.has(s)){[s-1,s+1,s-5,s+5].forEach(n=>{if(n>=0&&n<N&&!shotBot.has(n)&&Math.abs((n%5)-(s%5))<=1)near.push(n)})}});
+  j=near.length&&Math.random()<0.8?near[Math.floor(Math.random()*near.length)]:un[Math.floor(Math.random()*un.length)];
+  shotBot.add(j);const bh=mine.has(j);if(bh)hitBot++;msg+=' · 🤖: '+(bh?'💥 صابت':'🌊 غلط');
+  if(hitBot>=K){fin(false);return}paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🚢 معركة السفن ضد 🤖</h2><div id="sqS" style="text-align:center;font-size:14px;margin:4px"></div><div style="display:flex;gap:14px;justify-content:center;align-items:flex-start;flex-wrap:wrap"><div><div style="text-align:center;font-size:12px">🎯 شبكة البوت (اضرب)</div><div id="sqB" style="display:grid;grid-template-columns:repeat(5,auto);gap:3px;direction:ltr;margin-top:4px;justify-content:center"></div></div><div><div style="text-align:center;font-size:12px">🚢 سفنك</div><div id="sqY" style="display:grid;grid-template-columns:repeat(5,auto);gap:2px;direction:ltr;margin-top:4px;justify-content:center"></div></div></div><div id="sqM" style="text-align:center;font-size:13px;margin:6px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn d" id="sqX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('sqS'))return;const cs=innerHeight<420?19:34,cy=innerHeight<420?13:22;$('sqS').textContent='أنت '+hitMe+'/'+K+' · 🤖 '+hitBot+'/'+K;const B=$('sqB'),Y=$('sqY');B.innerHTML='';Y.innerHTML='';
+   for(let i=0;i<N;i++){const b=document.createElement('button');b.className='btn';b.dataset.i=i;const s=shotMe.has(i);b.textContent=s?(bots.has(i)?'💥':'•'):'';b.style.cssText='width:'+cs+'px!important;min-width:0!important;min-height:0!important;line-height:1!important;height:'+cs+'px!important;padding:0;margin:0;box-sizing:border-box;font-size:'+(cs>30?16:12)+'px;'+(s?(bots.has(i)?'background:#c92a2a;':'background:#364fc7;'):'');B.appendChild(b);
+    const d=document.createElement('div');const sh=shotBot.has(i);d.textContent=mine.has(i)?(sh?'💥':'🚢'):(sh?'•':'');d.style.cssText='width:'+cy+'px;height:'+cy+'px;font-size:'+(cy>20?12:9)+'px;text-align:center;line-height:'+cy+'px;border-radius:4px;background:'+(mine.has(i)?(sh?'#c92a2a':'#495057'):(sh?'#364fc7':'#1c2541'));Y.appendChild(d)}
+   $('sqM').textContent=msg};
+  $('sqB').onclick=e=>{const b=e.target.closest('button');if(b)fire(+b.dataset.i)};
+  $('sqX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
