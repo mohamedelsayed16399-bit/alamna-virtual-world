@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -642,6 +642,7 @@ function buildCal(){
  [[-1.4,0],[0,0.3],[1.4,0.6]].forEach((a,i)=>g.add(mesh(G.box(0.9,0.9,0.9),0xf08c00,a[0],0.45+a[1]*0.2,-4.8),mesh(G.box(0.5,0.1,0.05),0xffffff,a[0],0.6+a[1]*0.2,-4.33),mesh(G.box(0.1,0.5,0.05),0xffffff,a[0],0.6+a[1]*0.2,-4.33)));
  calh={it:{x:0,z:0.2,label:'🧮 العب حساب سريع',fn:calStart}};interacts.push(calh.it);
  g.add(portalMesh('ارجع لخمّن الرقم',5.8,5.8,0x1098ad,'gsnroom'));
+ g.add(portalMesh('واحد وعشرين',-5.8,5.8,0x2b8a3e,'bjkroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🧮 7 مسائل، اختار الإجابة الصح. البوت 🤖 بيحل معاك',3400)
 }
@@ -664,4 +665,38 @@ function calStart(){
   paint=()=>{if(!$('mqS'))return;$('mqS').textContent='مسألة '+Math.min(q+1,7)+'/7 · أنت '+my+' : '+bt+' 🤖';$('mqQ').textContent=over?'':cur.txt+' = ؟';$('mqM').textContent=msg;const A=$('mqA');A.innerHTML='';if(!over)cur.arr.forEach(v=>{const b=document.createElement('button');b.className='btn';b.dataset.v=v;b.textContent=v;b.style.cssText='width:auto!important;display:inline-block!important;min-width:64px;font-size:20px';A.appendChild(b)})};
   $('mqA').onclick=e=>{const b=e.target.closest('button');if(b)ans(+b.dataset.v)};
   $('mqX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildBjk(){
+ const g=indoor(0x2b8a3e,0xebfbee,0x8ce99a);
+ sign(g,'🃏 واحد وعشرين ضد 🤖',0,4.6,-7.6,'rgba(43,138,62,.92)');
+ g.add(mesh(G.cyl(1.8,1.8,0.12,16),0x2b8a3e,0,0.8,-4.8),mesh(G.cyl(0.15,0.15,0.8,6),0x5c3d2e,0,0.4,-4.8));
+ [[-0.8,0],[0,0.2],[0.8,0.4]].forEach(a=>g.add(mesh(G.box(0.5,0.03,0.7),0xffffff,a[0],0.9,-4.8+a[1])));
+ bjkh={it:{x:0,z:0.2,label:'🃏 العب واحد وعشرين',fn:bjkStart}};interacts.push(bjkh.it);
+ g.add(portalMesh('ارجع للحساب السريع',5.8,5.8,0xf08c00,'calroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🃏 قرّب من 21 من غير ما تعدّي. الموزّع 🤖 بيسحب لحد 17. 3 جولات',3400)
+}
+function bjkStart(){
+ const draw=()=>{const v=1+Math.floor(Math.random()*13);return v};
+ const val=h=>{let s=0,a=0;h.forEach(c=>{if(c===1){a++;s+=11}else s+=c>10?10:c});while(s>21&&a>0){s-=10;a--}return s};
+ const nm=c=>c===1?'A':c===11?'J':c===12?'Q':c===13?'K':''+c;
+ let P=[],D=[],rd=1,my=0,bt=0,over=false,msg='',done=false;
+ const deal=()=>{P=[draw(),draw()];D=[draw(),draw()];done=false};
+ deal();
+ window.bjkq=()=>({P:P.slice(),D:D.slice(),rd,my,bt,over,done,msg,val,set:(p,d)=>{P=p.slice();D=d.slice()},hit:()=>hit(),stand:()=>stand(),next:()=>nextRound()});
+ let paint=()=>{};
+ const fin=()=>{over=true;me.bjkGames=(me.bjkGames||0)+1;const win=my>bt;if(win)me.bjkBest=(me.bjkBest||0)+1;const dd=today();if(me.bjkDD!==dd){me.bjkDD=dd;me.bjkDC=0}
+  let cn=win?(bt===0?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.bjkDC||0)));if(cn){me.coins+=cn;me.bjkDC=(me.bjkDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg+='\n'+(win?'🏆 كسبت الموزّع ':my===bt?'🤝 تعادل ':'🤖 الموزّع كسب ')+my+':'+bt+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const endRound=r=>{done=true;const a=val(P),b=val(D);if(r>0)my++;else if(r<0)bt++;msg='جولة '+rd+': أنت '+a+' · 🤖 '+b+' · '+(r>0?'✅ كسبت':r<0?'❌ خسرت':'🤝 تعادل');sfx(r>0?'star':r<0?'err':'tick');if(rd>=3)fin();else paint()};
+ const hit=()=>{if(over||done)return;P.push(draw());sfx('place');if(val(P)>21){endRound(-1);return}paint()};
+ const stand=()=>{if(over||done)return;while(val(D)<17)D.push(draw());const a=val(P),b=val(D);endRound(b>21||a>b?1:a<b?-1:0)};
+ const nextRound=()=>{if(!done||over)return;rd++;deal();msg='';paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🃏 واحد وعشرين ضد 🤖</h2><div id="bjS" style="text-align:center;font-size:15px;margin:4px"></div><div id="bjD" style="text-align:center;font-size:18px;margin:6px 0;direction:ltr"></div><div id="bjP" style="text-align:center;font-size:20px;font-weight:bold;margin:6px 0;direction:ltr"></div><div id="bjM" style="text-align:center;font-size:13px;margin:6px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="bjH" style="width:auto!important;display:inline-block!important">اسحب</button><button class="btn" id="bjT" style="width:auto!important;display:inline-block!important">كفاية</button><button class="btn" id="bjN" style="width:auto!important;display:inline-block!important">الجولة الجاية ▶</button><button class="btn d" id="bjX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('bjS'))return;$('bjS').textContent='جولة '+Math.min(rd,3)+'/3 · أنت '+my+' : '+bt+' 🤖';
+   $('bjD').textContent='🤖 '+(done?D.map(nm).join(' ')+' = '+val(D):nm(D[0])+' ?');$('bjP').textContent='أنت '+P.map(nm).join(' ')+' = '+val(P);$('bjM').textContent=msg;
+   $('bjH').style.display=$('bjT').style.display=done?'none':'inline-block';$('bjN').style.display=(done&&!over)?'inline-block':'none'};
+  $('bjH').onclick=hit;$('bjT').onclick=stand;$('bjN').onclick=nextRound;
+  $('bjX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
