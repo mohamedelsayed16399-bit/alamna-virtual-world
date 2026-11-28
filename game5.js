@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1114,6 +1114,7 @@ function buildSnl(){
  g.add(mesh(G.box(0.12,0.6,0.12),0x8d5524,-0.7,0.95,-5.2),mesh(G.box(0.12,0.6,0.12),0x8d5524,-0.4,0.95,-5.2),mesh(G.cyl(0.14,0.14,0.5,8),0x2f9e44,0.8,0.95,-4.4));
  snlh={it:{x:0,z:0.2,label:'🐍 العب سلم وثعبان',fn:snlStart}};interacts.push(snlh.it);
  g.add(portalMesh('ارجع للداما',5.8,5.8,0x5c3d2e,'damroom'));
+ g.add(portalMesh('هيكس',-5.8,5.8,0x4263eb,'hxgroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🐍 سلم وثعبان: ارمي النرد وكمّل لحد ٣٦. السلم يطلّعك والثعبان ينزّلك. أنت الفاتح والبوت 🤖 الغامق',4200)
 }
@@ -1143,4 +1144,43 @@ function snlStart(){
    $('lzM').textContent=msg;$('lzR').disabled=over};
   $('lzR').onclick=()=>roll();
   $('lzX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildHxg(){
+ const g=indoor(0x4263eb,0xedf2ff,0xbac8ff);
+ sign(g,'⬡ هيكس ضد 🤖',0,4.6,-7.6,'rgba(66,99,235,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0xdbe4ff,0,0.55,-4.8));
+ for(let a=0;a<5;a++)for(let b=0;b<5;b++)g.add(mesh(G.cyl(0.17,0.17,0.06,6),(a+b)%2?0x748ffc:0x91a7ff,-1.2+a*0.6+b*0.12,0.72,-6.0+b*0.6));
+ g.add(mesh(G.box(3.1,0.06,0.1),0xe8590c,0,0.74,-6.3),mesh(G.box(3.1,0.06,0.1),0xe8590c,0.5,0.74,-3.3));
+ hxgh={it:{x:0,z:0.2,label:'⬡ العب هيكس',fn:hxgStart}};interacts.push(hxgh.it);
+ g.add(portalMesh('ارجع لسلم وثعبان',5.8,5.8,0x37b24d,'snlroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('⬡ هيكس: وصّل الحافة اللي فوق بالحافة اللي تحت بقطعك (برتقالي). البوت 🤖 بيوصّل يمين بشمال. مفيش تعادل',4200)
+}
+function hxgStart(){
+ const N=5;let b,over=false,msg='',mv=0;
+ const init=()=>{b=Array(25).fill(0);mv=0};init();
+ const nb=i=>{const r=(i/N)|0,c=i%N,o=[];[[0,-1],[0,1],[-1,0],[1,0],[-1,1],[1,-1]].forEach(d=>{const y=r+d[0],x=c+d[1];if(y>=0&&y<N&&x>=0&&x<N)o.push(y*N+x)});return o};
+ const dist=(st,p)=>{const o=3-p,INF=99,dd=Array(25).fill(INF),q=[];for(let i=0;i<25;i++){const r=(i/N)|0,c=i%N,src=p===1?r===0:c===0;if(src&&st[i]!==o){dd[i]=st[i]===p?0:1}}
+  let ch=true;while(ch){ch=false;for(let i=0;i<25;i++){if(dd[i]>=INF)continue;nb(i).forEach(j=>{if(st[j]===o)return;const w=dd[i]+(st[j]===p?0:1);if(w<dd[j]){dd[j]=w;ch=true}})}}
+  let best=INF;for(let i=0;i<25;i++){const r=(i/N)|0,c=i%N,tg=p===1?r===N-1:c===N-1;if(tg&&dd[i]<best)best=dd[i]}return best};
+ window.hxq=()=>({b:b.slice(),over,msg,mv,dm:dist(b,1),db:dist(b,2),set:a=>{b=a.slice()},play:i=>play(i)});
+ let paint=()=>{};
+ const fin=win=>{over=true;me.hxgGames=(me.hxgGames||0)+1;if(win)me.hxgBest=(me.hxgBest||0)+1;const dd=today();if(me.hxgDD!==dd){me.hxgDD=dd;me.hxgDC=0}
+  let cn=win?(mv<=8?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.hxgDC||0)));if(cn){me.coins+=cn;me.hxgDC=(me.hxgDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg=(win?'🏆 كسبت! وصّلت فوق بتحت':'🤖 البوت وصّل يمين بشمال')+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const botMove=()=>{let best=-1,bs=-1e9;for(let i=0;i<25;i++){if(b[i])continue;b[i]=2;const db=dist(b,2),dm=dist(b,1);b[i]=0;const s=(db===0?1000:0)+(dm-db)*2+Math.random()*0.8-Math.abs(((i/N)|0)-2)*0.1-Math.abs(i%N-2)*0.1;if(s>bs){bs=s;best=i}}return best};
+ const play=i=>{if(over||b[i])return;b[i]=1;mv++;sfx('place');if(dist(b,1)===0){fin(true);return}
+  const j=botMove();b[j]=2;msg='';if(dist(b,2)===0){fin(false);return}paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">⬡ هيكس ضد 🤖</h2><div id="hxS" style="text-align:center;font-size:14px;margin:2px"></div><div id="hxB" style="direction:ltr;margin:6px auto;width:max-content"></div><div id="hxM" style="text-align:center;font-size:13px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn d" id="hxX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('hxB'))return;const sm=innerHeight<420,cs=sm?20:46;$('hxS').textContent='حركاتك '+mv+(!over?' · دورك':'')+' · أنت: فوق↔تحت (برتقالي)';
+   const B=$('hxB');B.innerHTML='';
+   for(let r=0;r<N;r++){const row=document.createElement('div');row.style.cssText='display:flex;gap:2px;margin-bottom:2px;margin-left:'+(r*(cs+2)/2)+'px';
+    for(let c=0;c<N;c++){const i=r*N+c,e=document.createElement('button');e.className='btn';e.dataset.i=i;e.disabled=over||!!b[i];
+     let bd='border:2px solid #4c6ef5;';const bt=r===0?'#e8590c':'#bac8ff',bb=r===N-1?'#e8590c':'#bac8ff',bl=c===0?'#212529':'#bac8ff',br=c===N-1?'#212529':'#bac8ff';
+     e.style.cssText='width:'+cs+'px!important;height:'+cs+'px!important;min-width:0!important;min-height:0!important;line-height:1!important;padding:0;margin:0;border-radius:30%;box-sizing:border-box;border-style:solid;border-width:3px;border-color:'+bt+' '+br+' '+bb+' '+bl+';background:'+(b[i]===1?'#fff':b[i]===2?'#212529':'#dbe4ff');
+     row.appendChild(e)}B.appendChild(row)}
+   $('hxM').textContent=msg};
+  $('hxB').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.i!==undefined)play(+x.dataset.i)};
+  $('hxX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
