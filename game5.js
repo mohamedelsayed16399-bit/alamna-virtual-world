@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;let lndh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1572,6 +1572,7 @@ function buildSlg(){
  g.add(mesh(G.box(0.15,1.0,0.15),0x8d5524,-1.0,1.2,-4.8),mesh(G.box(0.5,0.12,0.12),0x8d5524,-1.0,1.7,-4.8),mesh(G.box(0.25,0.25,0.25),0xe03131,-0.4,1.0,-4.8),mesh(G.box(0.4,0.4,0.4),0xf08c00,1.0,0.9,-4.8),mesh(G.box(0.4,0.4,0.4),0xf08c00,1.0,1.3,-4.8));
  slgh={it:{x:0,z:0.2,label:'🏹 العب المقلاع',fn:slgStart}};interacts.push(slgh.it);
  g.add(portalMesh('ارجع لأكبر وأصغر',5.8,5.8,0x495057,'fturoom'));
+ g.add(portalMesh('هبوط على القمر',-5.8,5.8,0x364fc7,'lndroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🏹 المقلاع: اسحب من المقلاع لورا وسيب عشان تضرب كل الأهداف. عندك 6 رميات بس. الحيطان بتوقف الكورة',4800)
 }
@@ -1621,4 +1622,51 @@ function simShot(LV,alive,vx,vy,keep){const path=[];let x=SX,y=SY,t=0;const kill
   cv.onpointerup=e=>{if(!aim)return;const a=aim;aim=null;const vx=(SX-a[0])*6,vy=-(a[1]-SY)*6;if(Math.hypot(vx,vy)<60){paint();return}launch(vx,vy);paint()};
   $('jxN').onclick=()=>{load();paint()};
   $('jxX').onclick=()=>{clearInterval(iv);$('modal').style.display='none'};
+  paint()})}
+function buildLnd(){
+ const g=indoor(0x364fc7,0xedf2ff,0xbac8ff);
+ sign(g,'🌙 هبوط على القمر',0,4.6,-7.6,'rgba(54,79,199,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0x495057,0,0.55,-4.8));
+ g.add(mesh(G.box(0.6,0.5,0.6),0xced4da,0,1.2,-4.8),mesh(G.cyl(0.08,0.08,0.6),0x868e96,-0.4,0.9,-4.8),mesh(G.cyl(0.08,0.08,0.6),0x868e96,0.4,0.9,-4.8),mesh(G.box(0.9,0.06,0.9),0xffd43b,0,0.72,-4.8));
+ lndh={it:{x:0,z:0.2,label:'🌙 العب هبوط على القمر',fn:lndStart}};interacts.push(lndh.it);
+ g.add(portalMesh('ارجع للمقلاع',5.8,5.8,0x495057,'slgroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🌙 هبوط على القمر: دوّر ◀ ▶ وشغّل المحرك 🔥 عشان تنزل على المنصة الصفرا بالراحة. السرعة قليلة والزاوية مستقيمة تقريباً وإلا هتتحطم',5200)
+}
+function lndStart(){
+ const W=320,H=200;
+ const LV=[
+  {g:30,pts:[[0,170],[80,175],[130,160],[170,185],[230,185],[270,170],[320,175]],pad:[170,230],s:[40,40,15],f:100},
+  {g:35,pts:[[0,150],[60,165],[100,120],[140,150],[190,175],[250,185],[290,185],[320,150]],pad:[250,290],s:[30,35,20],f:100},
+  {g:35,pts:[[0,185],[60,185],[100,150],[150,110],[200,140],[250,160],[320,130]],pad:[0,60],s:[270,40,-20],f:100},
+  {g:38,pts:[[0,120],[70,130],[110,175],[160,185],[200,185],[240,170],[290,110],[320,100]],pad:[160,200],s:[40,40,25],f:90},
+  {g:45,pts:[[0,160],[80,150],[130,120],[150,185],[185,185],[210,140],[260,150],[320,170]],pad:[150,185],s:[260,40,-25],f:80}];
+ let li=(me.lndLvl||0)%LV.length,L,s,over=false,msg='',keys={l:false,r:false,t:false},fuel;
+ const gy=x=>{const p=L.pts;for(let i=0;i<p.length-1;i++)if(x>=p[i][0]&&x<=p[i+1][0]){const t=(x-p[i][0])/(p[i+1][0]-p[i][0]);return p[i][1]+(p[i+1][1]-p[i][1])*t}return p[p.length-1][1]};
+ const load=()=>{L=LV[li];s={x:L.s[0],y:L.s[1],vx:L.s[2],vy:0,a:0};fuel=L.f;over=false;msg='مستوى '+(li+1)+' من '+LV.length;keys={l:false,r:false,t:false}};load();
+ const tick=dt=>{if(over)return;if(keys.l)s.a-=2.1*dt;if(keys.r)s.a+=2.1*dt;if(keys.t&&fuel>0){const T=95;s.vx+=Math.sin(s.a)*T*dt;s.vy-=Math.cos(s.a)*T*dt;fuel=Math.max(0,fuel-14*dt)}
+  s.vy+=L.g*dt;s.x+=s.vx*dt;s.y+=s.vy*dt;
+  if(s.x<4){s.x=4;s.vx=0}if(s.x>W-4){s.x=W-4;s.vx=0}
+  const g1=gy(s.x-5),g2=gy(s.x+5),gg=Math.min(g1,g2,gy(s.x));
+  if(s.y>=gg-2||s.y<-60){if(s.y<-60){s.y=-60;s.vy=0;return}const onPad=s.x-5>=L.pad[0]-2&&s.x+5<=L.pad[1]+2,soft=Math.abs(s.vx)<26&&s.vy<48&&Math.abs(Math.sin(s.a))<0.28;over=true;fin(onPad&&soft,onPad,soft)}};
+ window.lndq=()=>({s:{...s},over,msg,li,fuel,keys,pad:L.pad,g:L.g,n:LV.length,tick,set:(o)=>{Object.assign(s,o)},key:(k,v)=>{keys[k]=v}});
+ let paint=()=>{};
+ const fin=(ok,onPad,soft)=>{me.lndGames=(me.lndGames||0)+1;if(ok){const dd=today();if(me.lndDD!==dd){me.lndDD=dd;me.lndDC=0}
+  let cn=fuel>40?3:2;cn=Math.min(cn,Math.max(0,6-(me.lndDC||0)));me.lndBest=(me.lndBest||0)+1;if(cn){me.coins+=cn;me.lndDC=(me.lndDC||0)+cn;updCoins();sfx('win')}else sfx('star');
+  me.lndLvl=(li+1)%LV.length;msg='🏆 هبطت بسلام! وقود '+Math.round(fuel)+(cn?' · +'+cn+'🪙':'')}else{sfx('star');msg='💥 اتحطمت: '+(!onPad?'مش على المنصة':!soft?'سرعة أو ميل زيادة':'')+' · جرّب تاني'}saveMe();paint()};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;line-height:1!important;padding:8px 18px;user-select:none;touch-action:none';
+  c.innerHTML='<h2 style="margin:4px">🌙 هبوط على القمر</h2><div id="luS" style="text-align:center;font-size:13px;margin:2px"></div><canvas id="luC" width="'+W+'" height="'+H+'" style="display:block;margin:4px auto;border-radius:8px;background:#0b1026;max-width:100%"></canvas><div id="luM" style="text-align:center;font-size:12px;margin:3px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><button class="btn" id="luL" style="'+bs+'">◀</button><button class="btn" id="luT" style="'+bs+'">🔥</button><button class="btn" id="luR" style="'+bs+'">▶</button><button class="btn" id="luN" style="'+bs+'">من الأول</button><button class="btn d" id="luX" style="width:auto!important;display:inline-block!important;min-height:0!important;line-height:1!important;padding:8px 14px">إغلاق</button></div>';
+  const cv=$('luC'),cx=cv.getContext('2d');
+  if(innerHeight<420){cv.style.height='108px';cv.style.width='173px'}
+  paint=()=>{if(!$('luC'))return;$('luS').textContent='وقود '+Math.round(fuel)+' · سرعة ↓ '+Math.round(s.vy)+' ↔ '+Math.round(s.vx)+' · مستوى '+(li+1);$('luM').textContent=msg;
+   cx.clearRect(0,0,W,H);cx.fillStyle='#0b1026';cx.fillRect(0,0,W,H);cx.fillStyle='#fff8';[[20,20],[90,50],[200,30],[260,60],[150,15],[300,25],[50,90]].forEach(p=>cx.fillRect(p[0],p[1],2,2));
+   cx.beginPath();cx.moveTo(0,H);L.pts.forEach(p=>cx.lineTo(p[0],p[1]));cx.lineTo(W,H);cx.closePath();cx.fillStyle='#868e96';cx.fill();
+   cx.fillStyle='#fcc419';cx.fillRect(L.pad[0],gy(L.pad[0])-3,L.pad[1]-L.pad[0],4);
+   cx.save();cx.translate(s.x,s.y-6);cx.rotate(s.a);cx.fillStyle=over&&msg[0]==='💥'?'#e03131':'#e9ecef';cx.fillRect(-5,-6,10,8);cx.fillStyle='#4dabf7';cx.fillRect(-2,-4,4,3);cx.strokeStyle='#e9ecef';cx.lineWidth=1.5;cx.beginPath();cx.moveTo(-5,2);cx.lineTo(-8,6);cx.moveTo(5,2);cx.lineTo(8,6);cx.stroke();
+   if(keys.t&&fuel>0&&!over){cx.fillStyle='#ff922b';cx.beginPath();cx.moveTo(-3,2);cx.lineTo(0,10+Math.random()*4);cx.lineTo(3,2);cx.fill()}cx.restore()};
+  const iv=setInterval(()=>{if(!$('luC')){clearInterval(iv);return}tick(0.033);paint()},33);
+  const hold=(id,k)=>{const b=$(id);const on=e=>{e.preventDefault();keys[k]=true};const off=()=>{keys[k]=false};b.onpointerdown=on;b.onpointerup=off;b.onpointerleave=off;b.onpointercancel=off};hold('luL','l');hold('luR','r');hold('luT','t');
+  $('luN').onclick=()=>{load();paint()};
+  $('luX').onclick=()=>{clearInterval(iv);$('modal').style.display='none'};
   paint()})}
