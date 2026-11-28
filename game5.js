@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;let lndh=null;let tnkh=null;let hshh=null;let knth=null;let akrh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;let lndh=null;let tnkh=null;let hshh=null;let knth=null;let akrh=null;let tnth=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1821,6 +1821,7 @@ function buildAkr(){
  g.add(mesh(G.box(0.9,0.9,0.9),0x343a40,-1,0.5,-3.8),mesh(G.box(0.9,0.9,0.9),0x343a40,1,0.5,-3.8));
  akrh={it:{x:0,z:0.2,label:'💡 العب نوّر الغرفة',fn:akrStart}};interacts.push(akrh.it);
  g.add(portalMesh('ارجع لجولة الحصان',5.8,5.8,0x5f3dc4,'kntroom'));
+ g.add(portalMesh('الخيام والأشجار',-5.8,5.8,0x2f9e44,'tntroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('💡 نوّر الغرفة: حط لمبات بحيث كل المربعات البيضا تنوّر. اللمبة بتنوّر في 4 اتجاهات لحد الحيطة، ومينفعش لمبتين يشوفوا بعض. الرقم على الحيطة = عدد اللمبات اللي حواليها',6000)
 }
@@ -1862,4 +1863,56 @@ function akrStart(){
   cv.onclick=e=>{const r=cv.getBoundingClientRect();tap(Math.floor((e.clientX-r.left)*S/r.width/CS),Math.floor((e.clientY-r.top)*S/r.height/CS));paint()};
   $('lqN').onclick=()=>{load();paint()};
   $('lqX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildTnt(){
+ const g=indoor(0x2f9e44,0xebfbee,0xb2f2bb);
+ sign(g,'⛺ الخيام والأشجار',0,4.6,-7.6,'rgba(47,158,68,.92)');
+ [-2.2,-0.8].forEach(x=>g.add(mesh(G.cyl(0.12,0.12,0.8),0x8d6e63,x,0.8,-5),mesh(G.sph(0.55),0x2f9e44,x,1.5,-5)));
+ [0.6,2].forEach(x=>g.add(mesh(G.cone(0.7,1.0,4),0xff922b,x,0.9,-5)));
+ tnth={it:{x:0,z:0.2,label:'⛺ العب الخيام والأشجار',fn:tntStart}};interacts.push(tnth.it);
+ g.add(portalMesh('ارجع لنوّر الغرفة',5.8,5.8,0xf59f00,'akrroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('⛺ الخيام: كل شجرة لازم يبقى جنبها (فوق/تحت/يمين/شمال) خيمة واحدة بس، والخيام مينفعش تلمس بعض ولا حتى بالزاوية. الأرقام على الصفوف والأعمدة = عدد الخيام',6000)
+}
+function tntStart(){
+ const N=7,S=300,CS=S/(N+1),TN=[7,8,9];
+ let li=(me.tntLvl||0)%3,tree,tent,mark,rowC,colC,won,msg,moves;
+ const D4=[[1,0],[-1,0],[0,1],[0,-1]];
+ const gen=()=>{for(let tr=0;tr<300;tr++){const T=Array.from({length:N},()=>Array(N).fill(0)),E=Array.from({length:N},()=>Array(N).fill(0));let n=0,g=0;
+   while(n<TN[li]&&g++<500){const x=Math.floor(Math.random()*N),y=Math.floor(Math.random()*N);if(T[y][x]||E[y][x])continue;
+    let touch=false;for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const X=x+a,Y=y+b;if(X>=0&&Y>=0&&X<N&&Y<N&&E[Y][X])touch=true}if(touch)continue;
+    const ds=D4.slice().sort(()=>Math.random()-.5);let ok=false;for(const d of ds){const X=x+d[0],Y=y+d[1];if(X>=0&&Y>=0&&X<N&&Y<N&&!T[Y][X]&&!E[Y][X]){T[Y][X]=1;E[y][x]=1;ok=true;break}}if(ok)n++}
+   if(n===TN[li])return{T,E}}return null};
+ const load=()=>{const r=gen();tree=r.T;window._tntSol=r.E;tent=Array.from({length:N},()=>Array(N).fill(false));mark=Array.from({length:N},()=>Array(N).fill(false));rowC=r.E.map(row=>row.reduce((a,b)=>a+b,0));colC=[];for(let x=0;x<N;x++){let c=0;for(let y=0;y<N;y++)c+=r.E[y][x];colC.push(c)}won=false;moves=0;msg='دوس على مربع: خيمة ⛺ ← علامة · ← فاضي'};load();
+ const status=()=>{let touch=0,rowBad=0,colBad=0,tents=0,trees=0;for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(tree[y][x])trees++;if(tent[y][x]){tents++;for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){if(!a&&!b)continue;const X=x+a,Y=y+b;if(X>=0&&Y>=0&&X<N&&Y<N&&tent[Y][X])touch++}}}
+  for(let y=0;y<N;y++){let c=0;for(let x=0;x<N;x++)if(tent[y][x])c++;if(c!==rowC[y])rowBad++}
+  for(let x=0;x<N;x++){let c=0;for(let y=0;y<N;y++)if(tent[y][x])c++;if(c!==colC[x])colBad++}
+  // matching trees<->adjacent tents
+  const tl=[],el=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(tree[y][x])tl.push([x,y]);if(tent[y][x])el.push([x,y])}
+  let match=false;if(tl.length===el.length){const mt=Array(el.length).fill(-1);const adj=tl.map(t=>el.map((e,i)=>Math.abs(t[0]-e[0])+Math.abs(t[1]-e[1])===1?i:-1).filter(i=>i>=0));
+   const tryK=(u,seen)=>{for(const v of adj[u]){if(seen[v])continue;seen[v]=1;if(mt[v]<0||tryK(mt[v],seen)){mt[v]=u;return true}}return false};
+   let ok=true;for(let u=0;u<tl.length;u++)if(!tryK(u,Array(el.length).fill(0))){ok=false;break}match=ok}
+  return{touch,rowBad,colBad,tents,trees,match}};
+ const tap2=(x,y)=>{ // cycle: empty->tent->mark->empty
+  if(won||x<0||y<0||x>=N||y>=N||tree[y][x])return;if(!tent[y][x]&&!mark[y][x]){tent[y][x]=true}else if(tent[y][x]){tent[y][x]=false;mark[y][x]=true}else{mark[y][x]=false}
+  moves++;const s=status();msg=s.touch?'⚠️ فيه خيمتين لازقين':'خيام '+s.tents+' من '+s.trees;if(!s.touch&&!s.rowBad&&!s.colBad&&s.match)win()};
+ const win=()=>{won=true;me.tntGames=(me.tntGames||0)+1;const dd=today();if(me.tntDD!==dd){me.tntDD=dd;me.tntDC=0}let cn=Math.min(3,Math.max(0,6-(me.tntDC||0)));me.tntBest=(me.tntBest||0)+1;if(cn){me.coins+=cn;me.tntDC=(me.tntDC||0)+cn;updCoins();sfx('win')}else sfx('star');me.tntLvl=(li+1)%3;msg='🏆 نصبت الخيام صح في '+moves+' حركة!'+(cn?' +'+cn+'🪙':'');saveMe()};
+ window.tntq=()=>{const s=status();return{won,msg,moves,li,n:N,trees:s.trees,tents:s.tents,touch:s.touch,rowBad:s.rowBad,colBad:s.colBad,sol:window._tntSol.map(r=>[...r]),tree:tree.map(r=>[...r]),tap:tap2}};
+ let paint=()=>{};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;line-height:1!important;padding:8px 14px';
+  c.innerHTML='<h2 style="margin:4px">⛺ الخيام والأشجار</h2><div id="tzS" style="text-align:center;font-size:12px;margin:2px"></div><canvas id="tzC" width="'+S+'" height="'+S+'" style="display:block;margin:4px auto;border-radius:8px;background:#ebfbee;max-width:100%;touch-action:manipulation"></canvas><div id="tzM" style="text-align:center;font-size:12px;margin:3px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="tzN" style="'+bs+'">لغز جديد</button><button class="btn d" id="tzX" style="'+bs+'">إغلاق</button></div>';
+  const cv=$('tzC'),cx=cv.getContext('2d');
+  if(innerHeight<420){cv.style.width='130px';cv.style.height='130px'}
+  paint=()=>{if(!$('tzC'))return;const s=status();$('tzS').textContent='لغز '+(li+1)+' من 3 · خيام '+s.tents+' / '+s.trees;$('tzM').textContent=msg;
+   cx.clearRect(0,0,S,S);cx.textAlign='center';cx.textBaseline='middle';cx.font='bold 15px sans-serif';
+   for(let i=0;i<N;i++){let c=0;for(let x=0;x<N;x++)if(tent[i][x])c++;cx.fillStyle=c===rowC[i]?'#2f9e44':c>rowC[i]?'#e03131':'#495057';cx.fillText(rowC[i],(N+0.5)*CS,(i+0.5)*CS);
+    c=0;for(let y=0;y<N;y++)if(tent[y][i])c++;cx.fillStyle=c===colC[i]?'#2f9e44':c>colC[i]?'#e03131':'#495057';cx.fillText(colC[i],(i+0.5)*CS,(N+0.5)*CS)}
+   for(let y=0;y<N;y++)for(let x=0;x<N;x++){const X=x*CS,Y=y*CS;cx.fillStyle=(x+y)%2?'#d3f9d8':'#b2f2bb';cx.fillRect(X,Y,CS,CS);
+    if(tree[y][x]){cx.fillStyle='#8d6e63';cx.fillRect(X+CS/2-3,Y+CS*0.55,6,CS*0.3);cx.fillStyle='#2b8a3e';cx.beginPath();cx.arc(X+CS/2,Y+CS*0.42,CS*0.3,0,7);cx.fill()}
+    else if(tent[y][x]){cx.fillStyle='#ff922b';cx.beginPath();cx.moveTo(X+CS/2,Y+6);cx.lineTo(X+CS-6,Y+CS-6);cx.lineTo(X+6,Y+CS-6);cx.closePath();cx.fill();cx.fillStyle='#e8590c';cx.fillRect(X+CS/2-3,Y+CS-16,6,10)}
+    else if(mark[y][x]){cx.fillStyle='#868e96';cx.beginPath();cx.arc(X+CS/2,Y+CS/2,3,0,7);cx.fill()}}};
+  cv.onclick=e=>{const r=cv.getBoundingClientRect();tap2(Math.floor((e.clientX-r.left)*S/r.width/CS),Math.floor((e.clientY-r.top)*S/r.height/CS));paint()};
+  $('tzN').onclick=()=>{load();paint()};
+  $('tzX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
