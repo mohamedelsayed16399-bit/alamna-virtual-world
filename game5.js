@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;let lndh=null;let tnkh=null;let hshh=null;let knth=null;let akrh=null;let tnth=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;let lndh=null;let tnkh=null;let hshh=null;let knth=null;let akrh=null;let tnth=null;let clnh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1871,6 +1871,7 @@ function buildTnt(){
  [0.6,2].forEach(x=>g.add(mesh(G.cone(0.7,1.0,4),0xff922b,x,0.9,-5)));
  tnth={it:{x:0,z:0.2,label:'⛺ العب الخيام والأشجار',fn:tntStart}};interacts.push(tnth.it);
  g.add(portalMesh('ارجع لنوّر الغرفة',5.8,5.8,0xf59f00,'akrroom'));
+ g.add(portalMesh('خطوط الألوان',-5.8,5.8,0xd6336c,'clnroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('⛺ الخيام: كل شجرة لازم يبقى جنبها (فوق/تحت/يمين/شمال) خيمة واحدة بس، والخيام مينفعش تلمس بعض ولا حتى بالزاوية. الأرقام على الصفوف والأعمدة = عدد الخيام',6000)
 }
@@ -1915,4 +1916,43 @@ function tntStart(){
   cv.onclick=e=>{const r=cv.getBoundingClientRect();tap2(Math.floor((e.clientX-r.left)*S/r.width/CS),Math.floor((e.clientY-r.top)*S/r.height/CS));paint()};
   $('tzN').onclick=()=>{load();paint()};
   $('tzX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildCln(){
+ const g=indoor(0xd6336c,0xfff0f6,0xfcc2d7);
+ sign(g,'🔮 خطوط الألوان',0,4.6,-7.6,'rgba(214,51,108,.92)');
+ [0xe03131,0x1c7ed6,0x2f9e44,0xfab005,0x7048e8].forEach((c,i)=>g.add(mesh(G.sph(0.4),c,-2+i*1,0.9,-5)));
+ g.add(mesh(G.box(5.4,0.3,1.2),0x868e96,0,0.35,-5));
+ clnh={it:{x:0,z:0.2,label:'🔮 العب خطوط الألوان',fn:clnStart}};interacts.push(clnh.it);
+ g.add(portalMesh('ارجع للخيام',5.8,5.8,0x2f9e44,'tntroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🔮 خطوط الألوان: دوس على كورة وبعدين على مربع فاضي توصله، ورتّب 4 كور أو أكتر من نفس اللون في خط عشان يختفوا. كل دور بيظهر 3 كور جداد',6000)
+}
+function clnStart(){
+ const N=7,S=300,CS=S/N,COL=['#e03131','#1c7ed6','#2f9e44','#fab005','#7048e8'];
+ let b,nxt,score,over,msg,sel,moves;
+ const rnd=()=>1+Math.floor(Math.random()*5);
+ const empties=()=>{const e=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(!b[y][x])e.push([x,y]);return e};
+ const lines=()=>{const rm=new Set();const D=[[1,0],[0,1],[1,1],[1,-1]];for(let y=0;y<N;y++)for(let x=0;x<N;x++){const c=b[y][x];if(!c)continue;for(const d of D){const px=x-d[0],py=y-d[1];if(px>=0&&py>=0&&px<N&&py<N&&b[py][px]===c)continue;let k=0,X=x,Y=y;while(X>=0&&Y>=0&&X<N&&Y<N&&b[Y][X]===c){k++;X+=d[0];Y+=d[1]}if(k>=4){X=x;Y=y;for(let i=0;i<k;i++){rm.add(Y*N+X);X+=d[0];Y+=d[1]}}}}
+  rm.forEach(i=>{b[Math.floor(i/N)][i%N]=0});return rm.size};
+ const spawn=()=>{for(let i=0;i<3;i++){const e=empties();if(!e.length)break;const p=e[Math.floor(Math.random()*e.length)];b[p[1]][p[0]]=nxt[i]}nxt=[rnd(),rnd(),rnd()];const r=lines();if(r)score+=r;if(!empties().length){over=true;fin()}};
+ const load=()=>{b=Array.from({length:N},()=>Array(N).fill(0));score=0;over=false;sel=null;moves=0;nxt=[rnd(),rnd(),rnd()];msg="دوس كورة وبعدين مربع فاضي";spawn();spawn();score=0};load();
+ const reach=(a,c)=>{const seen=Array.from({length:N},()=>Array(N).fill(false));const q=[a];seen[a[1]][a[0]]=true;while(q.length){const u=q.shift();if(u[0]===c[0]&&u[1]===c[1])return true;for(const d of [[1,0],[-1,0],[0,1],[0,-1]]){const X=u[0]+d[0],Y=u[1]+d[1];if(X>=0&&Y>=0&&X<N&&Y<N&&!seen[Y][X]&&!b[Y][X]){seen[Y][X]=true;q.push([X,Y])}}}return false};
+ const fin=()=>{me.clnGames=(me.clnGames||0)+1;if(score>(me.clnBest||0))me.clnBest=score;let cn=score>=60?3:score>=40?2:score>=20?1:0;const dd=today();if(me.clnDD!==dd){me.clnDD=dd;me.clnDC=0}cn=Math.min(cn,Math.max(0,6-(me.clnDC||0)));if(cn){me.coins+=cn;me.clnDC=(me.clnDC||0)+cn;updCoins();sfx('win')}else sfx('star');msg='انتهت اللعبة! نتيجتك '+score+(cn?' · +'+cn+'🪙':'');saveMe()};
+ const tap=(x,y)=>{if(over||x<0||y<0||x>=N||y>=N)return;if(b[y][x]){sel=[x,y];msg='اختار مربع فاضي توصله';return}
+  if(!sel){msg='اختار كورة الأول';return}if(!reach(sel,[x,y])){msg='❌ مفيش طريق للمربع ده';return}
+  b[y][x]=b[sel[1]][sel[0]];b[sel[1]][sel[0]]=0;sel=null;moves++;const r=lines();if(r){score+=r;msg='✨ مسحت '+r+' كورة'}else{msg='';spawn()}};
+ window.clnq=()=>({b:b.map(r=>[...r]),nxt:[...nxt],score,over,msg,moves,tap,balls:b.flat().filter(Boolean).length,end:()=>{if(!over){over=true;fin()}},put:(nb)=>{b=nb.map(r=>[...r])}});
+ let paint=()=>{};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;line-height:1!important;padding:8px 14px';
+  c.innerHTML='<h2 style="margin:4px">🔮 خطوط الألوان</h2><div id="cyS" style="text-align:center;font-size:12px;margin:2px"></div><canvas id="cyC" width="'+S+'" height="'+S+'" style="display:block;margin:4px auto;border-radius:8px;background:#fff0f6;max-width:100%;touch-action:manipulation"></canvas><div id="cyM" style="text-align:center;font-size:12px;margin:3px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="cyN" style="'+bs+'">من الأول</button><button class="btn" id="cyE" style="'+bs+'">خلّص واحسب</button><button class="btn d" id="cyX" style="'+bs+'">إغلاق</button></div>';
+  const cv=$('cyC'),cx=cv.getContext('2d');
+  if(innerHeight<420){cv.style.width='130px';cv.style.height='130px'}
+  paint=()=>{if(!$('cyC'))return;$('cyS').innerHTML='نتيجة '+score+' · أحسن '+(me.clnBest||0)+' · الجاي: '+nxt.map(k=>'<span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:'+COL[k-1]+';margin:0 2px;vertical-align:middle"></span>').join('');$('cyM').textContent=msg;
+   cx.clearRect(0,0,S,S);for(let y=0;y<N;y++)for(let x=0;x<N;x++){const X=x*CS,Y=y*CS;cx.fillStyle=(x+y)%2?'#ffdeeb':'#fff0f6';cx.fillRect(X,Y,CS,CS);cx.strokeStyle='#fcc2d7';cx.strokeRect(X,Y,CS,CS);
+    if(b[y][x]){cx.fillStyle=COL[b[y][x]-1];cx.beginPath();cx.arc(X+CS/2,Y+CS/2,CS*0.36,0,7);cx.fill();cx.fillStyle='#fff6';cx.beginPath();cx.arc(X+CS/2-5,Y+CS/2-6,5,0,7);cx.fill();if(sel&&sel[0]===x&&sel[1]===y){cx.strokeStyle='#212529';cx.lineWidth=3;cx.beginPath();cx.arc(X+CS/2,Y+CS/2,CS*0.42,0,7);cx.stroke();cx.lineWidth=1}}}};
+  cv.onclick=e=>{const r=cv.getBoundingClientRect();tap(Math.floor((e.clientX-r.left)*S/r.width/CS),Math.floor((e.clientY-r.top)*S/r.height/CS));paint()};
+  $('cyN').onclick=()=>{load();paint()};
+  $('cyE').onclick=()=>{if(!over){over=true;fin()}paint()};
+  $('cyX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
