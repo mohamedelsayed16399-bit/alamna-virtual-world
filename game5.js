@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -612,6 +612,7 @@ function buildGsn(){
  [[-1.4,0x1098ad],[0,0x0b7285],[1.4,0x1098ad]].forEach((a,i)=>g.add(mesh(G.box(0.9,0.9,0.9),a[1],a[0],0.45,-4.8),mesh(G.box(0.5,0.1,0.05),0xffffff,a[0],0.6,-4.33)));
  gsnh={it:{x:0,z:0.2,label:'🔢 العب خمّن الرقم',fn:gsnStart}};interacts.push(gsnh.it);
  g.add(portalMesh('ارجع للعيدان',5.8,5.8,0x2f9e44,'nimroom'));
+ g.add(portalMesh('حساب سريع',-5.8,5.8,0xf08c00,'calroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🔢 رقم سري من 1 لـ100. تخمّنوا بالدور مع البوت 🤖 واللي يصيبه الأول يكسب',3400)
 }
@@ -634,4 +635,33 @@ function gsnStart(){
   paint=()=>{if(!$('gnS'))return;$('gnS').textContent='الرقم بين '+lo+' و '+hi+' · محاولاتك '+tries;$('gnM').textContent=msg;$('gnG').disabled=over;$('gnI').disabled=over;if(!over)$('gnI').value=''};
   $('gnG').onclick=()=>guess($('gnI').value);$('gnI').onkeydown=e=>{if(e.key==='Enter')guess($('gnI').value)};
   $('gnX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildCal(){
+ const g=indoor(0xf08c00,0xfff9db,0xffec99);
+ sign(g,'🧮 حساب سريع ضد 🤖',0,4.6,-7.6,'rgba(240,140,0,.92)');
+ [[-1.4,0],[0,0.3],[1.4,0.6]].forEach((a,i)=>g.add(mesh(G.box(0.9,0.9,0.9),0xf08c00,a[0],0.45+a[1]*0.2,-4.8),mesh(G.box(0.5,0.1,0.05),0xffffff,a[0],0.6+a[1]*0.2,-4.33),mesh(G.box(0.1,0.5,0.05),0xffffff,a[0],0.6+a[1]*0.2,-4.33)));
+ calh={it:{x:0,z:0.2,label:'🧮 العب حساب سريع',fn:calStart}};interacts.push(calh.it);
+ g.add(portalMesh('ارجع لخمّن الرقم',5.8,5.8,0x1098ad,'gsnroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🧮 7 مسائل، اختار الإجابة الصح. البوت 🤖 بيحل معاك',3400)
+}
+function calStart(){
+ const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+ let q=0,my=0,bt=0,over=false,msg='',cur=null;
+ const mk=()=>{const t=ri(0,2);let a,b,s,r;if(t===0){a=ri(12,89);b=ri(11,59);s='+';r=a+b}else if(t===1){a=ri(40,99);b=ri(11,39);s='−';r=a-b}else{a=ri(3,12);b=ri(3,12);s='×';r=a*b}
+  const o=new Set([r]);const ds=[-10,-3,-2,-1,1,2,3,10].filter(d=>r+d>0).sort(()=>Math.random()-.5);for(let k=0;o.size<4&&k<ds.length;k++)o.add(r+ds[k]);for(let k=1;o.size<4;k++)o.add(r+10+k);
+  const arr=[...o].sort(()=>Math.random()-.5);cur={txt:a+' '+s+' '+b,r,arr}};
+ window.calq=()=>({q,my,bt,over,cur,ans:v=>ans(v),msg});
+ let paint=()=>{};
+ const fin=()=>{over=true;me.calGames=(me.calGames||0)+1;const win=my>bt;if(win)me.calBest=Math.max(me.calBest||0,my);const dd=today();if(me.calDD!==dd){me.calDD=dd;me.calDC=0}
+  let cn=win?(my>=7?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.calDC||0)));if(cn){me.coins+=cn;me.calDC=(me.calDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg+='\n'+(win?'🏆 كسبت البوت ':my===bt?'🤝 تعادل ':'🤖 البوت كسب ')+my+':'+bt+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const ans=v=>{if(over)return;const ok=v===cur.r;const bok=Math.random()<0.7;if(ok)my++;if(bok)bt++;
+  msg=cur.txt+' = '+cur.r+' · أنت '+(ok?'✅':'❌')+' · 🤖 '+(bok?'✅':'❌');sfx(ok?'star':'err');q++;if(q>=7){fin();return}mk();paint()};
+ mk();
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🧮 حساب سريع ضد 🤖</h2><div id="mqS" style="text-align:center;font-size:15px;margin:4px"></div><div id="mqQ" style="text-align:center;font-size:30px;font-weight:bold;margin:8px 0;direction:ltr"></div><div id="mqA" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap"></div><div id="mqM" style="text-align:center;font-size:13px;margin:8px 0;min-height:3.2em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn d" id="mqX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('mqS'))return;$('mqS').textContent='مسألة '+Math.min(q+1,7)+'/7 · أنت '+my+' : '+bt+' 🤖';$('mqQ').textContent=over?'':cur.txt+' = ؟';$('mqM').textContent=msg;const A=$('mqA');A.innerHTML='';if(!over)cur.arr.forEach(v=>{const b=document.createElement('button');b.className='btn';b.dataset.v=v;b.textContent=v;b.style.cssText='width:auto!important;display:inline-block!important;min-width:64px;font-size:20px';A.appendChild(b)})};
+  $('mqA').onclick=e=>{const b=e.target.closest('button');if(b)ans(+b.dataset.v)};
+  $('mqX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
