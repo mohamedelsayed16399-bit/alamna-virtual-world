@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1061,6 +1061,7 @@ function buildDam(){
  g.add(mesh(G.cyl(0.22,0.22,0.15,12),0xf8f9fa,-0.35,0.82,-4.45),mesh(G.cyl(0.22,0.22,0.15,12),0x212529,0.35,0.82,-5.15));
  damh={it:{x:0,z:0.2,label:'♟️ العب داما',fn:damStart}};interacts.push(damh.it);
  g.add(portalMesh('ارجع لخمسة في صف',5.8,5.8,0xc2955a,'gmkroom'));
+ g.add(portalMesh('سلم وثعبان',-5.8,5.8,0x37b24d,'snlroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('♟️ داما: حرّك قطعك قدّام بالقطر. الأكل إجباري، ولو وصلت آخر صف تبقى ملك (بتتحرك وتاكل في الاتجاهين). أنت الفاتح تحت',4200)
 }
@@ -1104,4 +1105,42 @@ function damStart(){
    if(sel>=0&&L.some(m=>m.f===sel&&m.t===i)){play(sel,i);return}
    if(chain<0&&L.some(m=>m.f===i)){sel=i;paint()}};
   $('dmX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildSnl(){
+ const g=indoor(0x37b24d,0xf0fff4,0xb2f2bb);
+ sign(g,'🐍 سلم وثعبان ضد 🤖',0,4.6,-7.6,'rgba(55,178,77,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0xd8f5a2,0,0.55,-4.8));
+ for(let a=0;a<4;a++)for(let b=0;b<4;b++)g.add(mesh(G.box(0.7,0.05,0.7),(a+b)%2?0x74c0fc:0xffe066,-1.05+a*0.7,0.72,-5.85+b*0.7));
+ g.add(mesh(G.box(0.12,0.6,0.12),0x8d5524,-0.7,0.95,-5.2),mesh(G.box(0.12,0.6,0.12),0x8d5524,-0.4,0.95,-5.2),mesh(G.cyl(0.14,0.14,0.5,8),0x2f9e44,0.8,0.95,-4.4));
+ snlh={it:{x:0,z:0.2,label:'🐍 العب سلم وثعبان',fn:snlStart}};interacts.push(snlh.it);
+ g.add(portalMesh('ارجع للداما',5.8,5.8,0x5c3d2e,'damroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🐍 سلم وثعبان: ارمي النرد وكمّل لحد ٣٦. السلم يطلّعك والثعبان ينزّلك. أنت الفاتح والبوت 🤖 الغامق',4200)
+}
+function snlStart(){
+ const JUMP={3:14,8:20,15:26,21:32,17:6,27:11,33:19,30:24};
+ let pm=0,pb=0,over=false,msg='',rolls=0,die=0;
+ const step=(p,d)=>{let q=p+d;if(q>36)return{p,txt:'محتاج رقم أقل'};let t='';if(JUMP[q]){t=JUMP[q]>q?' سلم ↑':' ثعبان ↓';q=JUMP[q]}return{p:q,txt:t}};
+ window.snq=()=>({pm,pb,over,msg,rolls,set:(a,b)=>{pm=a;pb=b},roll:d=>roll(d)});
+ let paint=()=>{};
+ const fin=win=>{over=true;me.snlGames=(me.snlGames||0)+1;if(win)me.snlBest=(me.snlBest||0)+1;const dd=today();if(me.snlDD!==dd){me.snlDD=dd;me.snlDC=0}
+  let cn=win?(rolls<=9?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.snlDC||0)));if(cn){me.coins+=cn;me.snlDC=(me.snlDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg+='\n'+(win?'🏆 كسبت! ':'🤖 البوت كسب ')+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const roll=d=>{if(over)return;d=d||1+((Math.random()*6)|0);die=d;rolls++;const s=step(pm,d);pm=s.p;msg='رميت '+d+(s.txt?' ← '+s.txt:'');sfx('place');if(pm===36){fin(true);return}
+  const e=1+((Math.random()*6)|0),t=step(pb,e);pb=t.p;msg+=' · 🤖 رمى '+e+(t.txt?t.txt:'');if(pb===36){fin(false);return}paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🐍 سلم وثعبان ضد 🤖</h2><div id="lzS" style="text-align:center;font-size:14px;margin:2px"></div><div id="lzB" style="display:grid;justify-content:center;direction:ltr;margin:4px auto;gap:1px"></div><div id="lzM" style="text-align:center;font-size:13px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="lzR" style="width:auto!important;display:inline-block!important;min-height:0!important;background:#2f9e44">🎲 ارمي النرد</button><button class="btn d" id="lzX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('lzB'))return;const sm=innerHeight<420,cs=sm?19:52;$('lzS').textContent='🤖 '+pb+' · أنت '+pm+(die?' · النرد '+die:'');
+   const B=$('lzB');B.style.gridTemplateColumns='repeat(6,'+cs+'px)';B.innerHTML='';
+   for(let r=5;r>=0;r--)for(let cc=0;cc<6;cc++){const n=r*6+(r%2?5-cc:cc)+1;const j=JUMP[n];const e=document.createElement('div');
+    e.style.cssText='width:'+cs+'px;height:'+cs+'px;position:relative;box-sizing:border-box;font-size:'+(sm?7:11)+'px;color:#212529;background:'+(j?(j>n?'#8ce99a':'#ffa8a8'):(n+r)%2?'#fff3bf':'#e7f5ff')+';padding:1px 2px;overflow:hidden;line-height:1.1';
+    e.textContent=n+(j?(j>n?' ↑'+j:' ↓'+j):'');
+    if(pm===n||pb===n){const w=document.createElement('div');w.style.cssText='position:absolute;bottom:'+(sm?1:3)+'px;'+(pm===n&&pb===n?'':'left:50%;transform:translateX(-50%);')+'display:flex;gap:2px';
+     if(pm===n){const d=document.createElement('div');d.style.cssText='width:'+(sm?9:18)+'px;height:'+(sm?9:18)+'px;border-radius:50%;background:#fff;border:2px solid #e8590c';w.appendChild(d)}
+     if(pb===n){const d=document.createElement('div');d.style.cssText='width:'+(sm?9:18)+'px;height:'+(sm?9:18)+'px;border-radius:50%;background:#212529;border:2px solid #fff';w.appendChild(d)}
+     e.appendChild(w)}
+    B.appendChild(e)}
+   $('lzM').textContent=msg;$('lzR').disabled=over};
+  $('lzR').onclick=()=>roll();
+  $('lzX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
