@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1362,6 +1362,7 @@ function buildPlm(){
  g.add(mesh(G.box(2.4,0.3,0.4),0x1c7ed6,0,0.9,-4.8),mesh(G.box(0.4,0.3,2.4),0x1c7ed6,0,0.9,-4.8),mesh(G.box(0.7,0.4,0.7),0x15aabf,0,1.05,-4.8));
  plmh={it:{x:0,z:0.2,label:'🔧 العب وصّل الأنابيب',fn:plmStart}};interacts.push(plmh.it);
  g.add(portalMesh('ارجع لرتّب الألوان',5.8,5.8,0x495057,'wsgroom'));
+ g.add(portalMesh('لغز الدوائر',-5.8,5.8,0x5f3dc4,'bnrroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🔧 وصّل الأنابيب: اضغط أي قطعة عشان تلفها. وصّل المية من المصدر (الفوق شمال) لكل القطع',4200)
 }
@@ -1399,4 +1400,41 @@ function plmStart(){
   $('qpB').onclick=e=>{const x=e.target.closest('[data-i]');if(!x||over)return;click(+x.dataset.i);if(!over)msg='';paint()};
   $('qpN').onclick=()=>{load();paint()};
   $('qpX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildBnr(){
+ const g=indoor(0x5f3dc4,0xf3f0ff,0xd0bfff);
+ sign(g,'🔵 لغز الدوائر',0,4.6,-7.6,'rgba(95,61,196,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0x495057,0,0.55,-4.8));
+ for(let i=0;i<3;i++)for(let j=0;j<3;j++)g.add(mesh(G.cyl?G.cyl(0.32,0.32,0.2):G.box(0.5,0.2,0.5),(i+j)%2?0x4dabf7:0xff922b,(i-1)*0.9,0.82,-4.8+(j-1)*0.9));
+ bnrh={it:{x:0,z:0.2,label:'🔵 العب لغز الدوائر',fn:bnrStart}};interacts.push(bnrh.it);
+ g.add(portalMesh('ارجع لوصّل الأنابيب',5.8,5.8,0x495057,'plmroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🔵 لغز الدوائر: لوّن كل خانة أزرق أو برتقالي. مفيش 3 ورا بعض، وعدد كل لون في الصف والعمود متساوي، ومفيش صفين زي بعض',4800)
+}
+function bnrStart(){
+ const LV=[[[[-1,-1,-1,0],[1,0,-1,-1],[0,1,-1,1],[0,0,-1,-1]],[[1,1,0,0],[1,0,1,0],[0,1,0,1],[0,0,1,1]]],[[[-1,0,1,0,0,-1],[0,-1,0,-1,1,-1],[-1,1,0,1,-1,0],[1,0,-1,-1,0,-1],[0,0,-1,-1,-1,-1],[-1,-1,-1,-1,0,-1]],[[1,0,1,0,0,1],[0,1,0,0,1,1],[0,1,0,1,1,0],[1,0,1,1,0,0],[0,0,1,0,1,1],[1,1,0,1,0,0]]],[[[0,0,1,-1,-1,-1],[0,1,1,0,-1,-1],[-1,-1,-1,1,-1,0],[-1,-1,-1,-1,1,-1],[0,1,-1,1,-1,1],[-1,-1,-1,-1,1,0]],[[0,0,1,0,1,1],[0,1,1,0,0,1],[1,1,0,1,0,0],[1,0,1,0,1,0],[0,1,0,1,0,1],[1,0,0,1,1,0]]],[[[0,0,1,-1,1,1],[0,1,-1,-1,-1,1],[-1,-1,1,1,-1,-1],[-1,0,-1,-1,-1,-1],[1,-1,0,-1,-1,-1],[-1,-1,-1,1,-1,0]],[[0,0,1,0,1,1],[0,1,0,0,1,1],[1,0,1,1,0,0],[0,0,1,1,0,1],[1,1,0,0,1,0],[1,1,0,1,0,0]]],[[[-1,0,-1,-1,-1,-1],[1,0,-1,1,1,-1],[0,-1,-1,0,1,1],[0,-1,1,-1,-1,-1],[-1,-1,-1,0,-1,0],[-1,-1,-1,0,-1,-1]],[[1,0,1,1,0,0],[1,0,0,1,1,0],[0,1,0,0,1,1],[0,0,1,1,0,1],[1,1,0,0,1,0],[0,1,1,0,0,1]]],[[[-1,-1,1,-1,-1,-1],[1,1,0,0,-1,-1],[-1,-1,-1,0,-1,-1],[-1,1,-1,-1,0,0],[-1,-1,-1,-1,-1,1],[1,-1,1,1,-1,-1]],[[0,0,1,1,0,1],[1,1,0,0,1,0],[0,0,1,0,1,1],[1,1,0,1,0,0],[0,1,0,0,1,1],[1,0,1,1,0,0]]]];
+ let li=(me.bnrLvl||0)%LV.length,N,G0,F,SOL,mv=0,over=false,msg='',par=0;
+ const load=()=>{const L=LV[li];G0=L[0].map(r=>r.slice());SOL=L[1];N=G0.length;F=L[0].map(r=>r.map(v=>v>=0));mv=0;over=false;par=0;L[0].forEach((r,i)=>r.forEach((v,j)=>{if(v<0)par+=SOL[i][j]+1}));msg='مستوى '+(li+1)+' من '+LV.length};load();
+ const bad=()=>{const s=new Set(),h=N/2;
+  const line=(cells)=>{const v=cells.map(x=>G0[x[0]][x[1]]);for(let i=0;i+2<N;i++)if(v[i]>=0&&v[i]===v[i+1]&&v[i]===v[i+2]){s.add(cells[i][0]+','+cells[i][1]);s.add(cells[i+1][0]+','+cells[i+1][1]);s.add(cells[i+2][0]+','+cells[i+2][1])}
+   [0,1].forEach(c=>{if(v.filter(x=>x===c).length>h)cells.forEach((x,k)=>{if(v[k]===c)s.add(x[0]+','+x[1])})})};
+  for(let r=0;r<N;r++)line(Array.from({length:N},(_,c)=>[r,c]));for(let c=0;c<N;c++)line(Array.from({length:N},(_,r)=>[r,c]));return s};
+ const valid=()=>{if(G0.some(r=>r.some(v=>v<0)))return false;if(bad().size)return false;const R=G0.map(r=>r.join('')),C=G0[0].map((_,c)=>G0.map(r=>r[c]).join(''));return new Set(R).size===N&&new Set(C).size===N};
+ const tap=(r,c)=>{if(over||r<0||c<0||r>=N||c>=N||F[r][c])return false;G0[r][c]=G0[r][c]>=1?-1:G0[r][c]+1;mv++;sfx('place');if(valid())fin();return true};
+ window.bnrq=()=>({G:G0.map(r=>r.slice()),SOL:SOL.map(r=>r.slice()),F:F.map(r=>r.slice()),N,mv,over,msg,li,par,bad:bad().size,tap});
+ let paint=()=>{};
+ const fin=()=>{over=true;me.bnrGames=(me.bnrGames||0)+1;me.bnrBest=(me.bnrBest||0)+1;const dd=today();if(me.bnrDD!==dd){me.bnrDD=dd;me.bnrDC=0}
+  let cn=mv<=par+4?3:2;cn=Math.min(cn,Math.max(0,6-(me.bnrDC||0)));if(cn){me.coins+=cn;me.bnrDC=(me.bnrDC||0)+cn;updCoins();sfx('win')}else sfx('star');
+  me.bnrLvl=(li+1)%LV.length;msg='🏆 حليته في '+mv+' ضغطة'+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;padding:6px 12px';
+  c.innerHTML='<h2 style="margin:4px">🔵 لغز الدوائر</h2><div id="bzS" style="text-align:center;font-size:14px;margin:2px"></div><div id="bzB" style="position:relative;margin:4px auto;direction:ltr;background:#343a40;border-radius:8px"></div><div id="bzM" style="text-align:center;font-size:12px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><button class="btn" id="bzN" style="'+bs+'">من الأول</button><button class="btn d" id="bzX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('bzB'))return;const sm=innerHeight<420,cs=sm?Math.floor(132/N):Math.floor(306/N),B=$('bzB');B.style.width=cs*N+'px';B.style.height=cs*N+'px';B.innerHTML='';const bd=bad();$('bzS').textContent='ضغطات '+mv+' · مستوى '+(li+1);
+   for(let r=0;r<N;r++)for(let c=0;c<N;c++){const v=G0[r][c],e=document.createElement('div');e.dataset.r=r;e.dataset.c=c;
+    e.style.cssText='position:absolute;box-sizing:border-box;left:'+(c*cs)+'px;top:'+(r*cs)+'px;width:'+cs+'px;height:'+cs+'px;border:2px solid '+(bd.has(r+','+c)?'#fa5252':'#212529')+';background:'+(F[r][c]?'#495057':'#868e96')+';cursor:pointer;display:flex;align-items:center;justify-content:center';
+    if(v>=0){const d=document.createElement('div');d.style.cssText='pointer-events:none;width:72%;height:72%;border-radius:50%;background:'+(v?'#ff922b':'#4dabf7');e.appendChild(d)}B.appendChild(e)}
+   $('bzM').textContent=msg};
+  $('bzB').onclick=e=>{const x=e.target.closest('[data-r]');if(!x||over)return;if(!tap(+x.dataset.r,+x.dataset.c))msg='الخانة دي ثابتة';else if(!over)msg='';paint()};
+  $('bzN').onclick=()=>{load();paint()};
+  $('bzX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
