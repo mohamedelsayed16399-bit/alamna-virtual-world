@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -811,6 +811,7 @@ function buildMnk(){
  g.add(mesh(G.cyl(0.25,0.25,0.1,8),0x3b2314,-1.9,0.8,-4.8),mesh(G.cyl(0.25,0.25,0.1,8),0x3b2314,1.9,0.8,-4.8));
  mnkh={it:{x:0,z:0.2,label:'🕳️ العب مانكالا',fn:mnkStart}};interacts.push(mnkh.it);
  g.add(portalMesh('ارجع للعبة الخنزير',5.8,5.8,0xe64980,'pigroom'));
+ g.add(portalMesh('ريفيرسي',-5.8,5.8,0x2b8a3e,'rvsroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🕳️ مانكالا: وزّع الحصى عكس عقارب الساعة. لو آخر حصاة في مخزنك العب تاني. أنت تحت والبوت 🤖 فوق',4200)
 }
@@ -845,4 +846,48 @@ function mnkStart(){
    $('mkB').innerHTML=st(b[13],'🤖');$('mkU').innerHTML=st(b[6],'أنت');$('mkM').textContent=msg};
   $('mkY').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.i!==undefined)play(+x.dataset.i)};
   $('mkX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildRvs(){
+ const g=indoor(0x2b8a3e,0xf1fff4,0xb8e0c0);
+ sign(g,'⚫ ريفيرسي ضد 🤖',0,4.6,-7.6,'rgba(43,138,62,.92)');
+ g.add(mesh(G.box(3.2,0.3,3.2),0x2b8a3e,0,0.55,-4.8));
+ for(let a=0;a<4;a++)for(let b=0;b<4;b++)g.add(mesh(G.cyl(0.2,0.2,0.08,12),(a+b)%2?0x212529:0xf1f3f5,-1.05+a*0.7,0.74,-5.85+b*0.7));
+ rvh={it:{x:0,z:0.2,label:'⚫ العب ريفيرسي',fn:rvsStart}};interacts.push(rvh.it);
+ g.add(portalMesh('ارجع لمانكالا',5.8,5.8,0x8c5a2b,'mnkroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('⚫ ريفيرسي: حط قطعتك بحيث تحاصر قطع البوت 🤖 فتتقلب لونك. الأكتر قطع يكسب. أنت الفاتح',4200)
+}
+function rvsStart(){
+ const N=6;let b,turn=0,over=false,msg='';
+ const init=()=>{b=Array(36).fill(0);b[14]=2;b[21]=2;b[15]=1;b[20]=1};init();
+ const D=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+ const flips=(st,i,w)=>{if(st[i])return[];const r=(i/N)|0,c=i%N,o=3-w,out=[];
+  D.forEach(d=>{let y=r+d[0],x=c+d[1];const tmp=[];while(y>=0&&y<N&&x>=0&&x<N&&st[y*N+x]===o){tmp.push(y*N+x);y+=d[0];x+=d[1]}
+   if(tmp.length&&y>=0&&y<N&&x>=0&&x<N&&st[y*N+x]===w)out.push(...tmp)});return out};
+ const moves=(st,w)=>{const m=[];for(let i=0;i<36;i++)if(flips(st,i,w).length)m.push(i);return m};
+ const cnt=w=>b.filter(v=>v===w).length;
+ const put=(i,w)=>{const f=flips(b,i,w);b[i]=w;f.forEach(k=>b[k]=w);return f.length};
+ window.rvq=()=>({b:b.slice(),turn,over,msg,set:(a,t)=>{b=a.slice();turn=t||0},play:i=>play(i),moves:()=>moves(b,1)});
+ let paint=()=>{};
+ const fin=()=>{over=true;const m=cnt(1),t=cnt(2),win=m>t;me.rvsGames=(me.rvsGames||0)+1;if(win)me.rvsBest=(me.rvsBest||0)+1;const dd=today();if(me.rvsDD!==dd){me.rvsDD=dd;me.rvsDC=0}
+  let cn=win?(m-t>=10?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.rvsDC||0)));if(cn){me.coins+=cn;me.rvsDC=(me.rvsDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg+='\n'+(win?'🏆 كسبت! ':m===t?'🤝 تعادل ':'🤖 البوت كسب ')+m+':'+t+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const W=i=>{const r=(i/N)|0,c=i%N,e=(r===0||r===N-1),f=(c===0||c===N-1);return e&&f?10:(e||f?2:0)};
+ const botTurn=()=>{let log=0,guard=0;while(!over&&guard++<40){const m=moves(b,2);if(!m.length)break;let best=m[0],bs=-1e9;m.forEach(i=>{const s=flips(b,i,2).length+W(i)*2+Math.random()*1.5;if(s>bs){bs=s;best=i}});put(best,2);log++;msg+=' · 🤖 لعب '+(((best/N)|0)+1)+'،'+((best%N)+1);if(moves(b,1).length)break}
+  if(!log)msg+=' · 🤖 مفيش حركة'};
+ const endCheck=()=>{if(!moves(b,1).length&&!moves(b,2).length){fin();return true}return false};
+ const play=i=>{if(over||turn!==0||!flips(b,i,1).length)return;const n=put(i,1);msg='قلبت '+n;sfx('place');
+  if(endCheck())return;
+  if(moves(b,2).length){botTurn();if(endCheck())return}else msg+=' · 🤖 مفيش حركة';
+  if(!moves(b,1).length){msg+=' · مفيش حركة ليك';let g=0;while(!moves(b,1).length&&g++<40){if(!moves(b,2).length)break;botTurn()}if(endCheck())return}
+  paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">⚫ ريفيرسي ضد 🤖</h2><div id="rvS" style="text-align:center;font-size:14px;margin:2px"></div><div id="rvB" style="display:grid;grid-template-columns:repeat(6,auto);gap:3px;justify-content:center;direction:ltr;margin:6px auto"></div><div id="rvM" style="text-align:center;font-size:13px;margin:4px 0;min-height:2.6em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn d" id="rvX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  paint=()=>{if(!$('rvB'))return;const sm=innerHeight<420,cs=sm?26:44,lg=moves(b,1);$('rvS').textContent='🤖 '+cnt(2)+' · أنت '+cnt(1)+(!over?' · دورك':'');
+   const B=$('rvB');B.innerHTML='';for(let i=0;i<36;i++){const e=document.createElement('button');e.className='btn';e.dataset.i=i;const ok=!over&&lg.includes(i);
+    e.style.cssText='width:'+cs+'px!important;min-width:0!important;min-height:0!important;height:'+cs+'px!important;line-height:1!important;padding:0;margin:0;border-radius:6px;background:#2b8a3e;position:relative;'+(ok?'outline:2px solid #ffd43b;':'');e.disabled=!ok;
+    if(b[i]){const d=document.createElement('div');d.style.cssText='position:absolute;inset:'+(sm?3:5)+'px;border-radius:50%;background:'+(b[i]===1?'#f1f3f5':'#212529')+';box-shadow:0 1px 3px #0008';e.appendChild(d)}B.appendChild(e)}
+   $('rvM').textContent=msg};
+  $('rvB').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.i!==undefined)play(+x.dataset.i)};
+  $('rvX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
