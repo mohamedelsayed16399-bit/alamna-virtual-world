@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -899,6 +899,7 @@ function buildDbx(){
  for(let a=0;a<4;a++)for(let b=0;b<4;b++)g.add(mesh(G.cyl(0.1,0.1,0.12,8),0x343a40,-1.05+a*0.7,0.74,-5.85+b*0.7));
  dbxh={it:{x:0,z:0.2,label:'🔲 العب نقط ومربعات',fn:dbxStart}};interacts.push(dbxh.it);
  g.add(portalMesh('ارجع لريفيرسي',5.8,5.8,0x2b8a3e,'rvsroom'));
+ g.add(portalMesh('كسر الكود',-5.8,5.8,0x7048e8,'mmdroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🔲 نقط ومربعات: وصّل نقطتين بخط. اللي يقفل مربع ياخده ويلعب تاني. الأكتر مربعات يكسب (أنت الأصفر)',4200)
 }
@@ -938,4 +939,41 @@ function dbxStart(){
    $('dbM').textContent=msg};
   $('dbB').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.t)play(x.dataset.t,+x.dataset.i)};
   $('dbX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildMmd(){
+ const g=indoor(0x7048e8,0xf3f0ff,0xd0bfff);
+ sign(g,'🎯 كسر الكود',0,4.6,-7.6,'rgba(112,72,232,.92)');
+ g.add(mesh(G.box(3.2,0.3,2.2),0x7048e8,0,0.55,-4.8));
+ [0xe03131,0x2f9e44,0x1971c2,0xf08c00,0x9c36b5,0x15aabf].forEach((c,k)=>g.add(mesh(G.cyl(0.22,0.22,0.1,12),c,-1.25+k*0.5,0.78,-4.8)));
+ mmdh={it:{x:0,z:0.2,label:'🎯 العب كسر الكود',fn:mmdStart}};interacts.push(mmdh.it);
+ g.add(portalMesh('ارجع لنقط ومربعات',5.8,5.8,0xf08c00,'dbxroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('🎯 كسر الكود: خمّن ٤ ألوان مخفية في ٨ محاولات. "تمام" = لون ومكان صح، "لون" = لون صح ومكان غلط',4200)
+}
+function mmdStart(){
+ const COL=['#e03131','#2f9e44','#1971c2','#f08c00','#9c36b5','#15aabf'],MAX=8;
+ let sec,hist,cur,over=false,msg='';
+ const init=()=>{sec=[0,0,0,0].map(()=>(Math.random()*6)|0);hist=[];cur=[]};init();
+ const score=(s,g)=>{let ex=0,sa=s.slice(),ga=g.slice();for(let i=0;i<4;i++)if(sa[i]===ga[i]){ex++;sa[i]=ga[i]=-1}let co=0;for(let i=0;i<4;i++)if(ga[i]>=0){const j=sa.indexOf(ga[i]);if(j>=0){co++;sa[j]=-2}}return[ex,co]};
+ window.mmq=()=>({sec:sec.slice(),hist:hist.map(h=>h.slice()),cur:cur.slice(),over,msg,set:a=>{sec=a.slice()},pick:c=>pick(c),submit:()=>submit()});
+ let paint=()=>{};
+ const fin=win=>{over=true;me.mmdGames=(me.mmdGames||0)+1;if(win)me.mmdBest=(me.mmdBest||0)+1;const dd=today();if(me.mmdDD!==dd){me.mmdDD=dd;me.mmdDC=0}
+  let cn=win?(hist.length<=4?3:2):0;cn=Math.min(cn,Math.max(0,6-(me.mmdDC||0)));if(cn){me.coins+=cn;me.mmdDC=(me.mmdDC||0)+cn;updCoins();sfx('win')}else sfx('err');
+  msg=(win?'🏆 كسبت في '+hist.length+' محاولة':'خسرت. الكود كان: '+sec.map(v=>['أحمر','أخضر','أزرق','برتقالي','بنفسجي','تركواز'][v]).join(' '))+(cn?' · +'+cn+'🪙':'');saveMe();paint()};
+ const pick=c=>{if(over||cur.length>=4)return;cur.push(c);sfx('place');paint()};
+ const submit=()=>{if(over||cur.length<4){msg='كمّل ٤ ألوان';paint();return}const sc=score(sec,cur);hist.push(cur.concat(sc));cur=[];msg='';if(sc[0]===4){fin(true);return}if(hist.length>=MAX){fin(false);return}paint()};
+ modal(c=>{
+  c.innerHTML='<h2 style="margin:4px">🎯 كسر الكود</h2><div id="mxS" style="text-align:center;font-size:14px;margin:2px"></div><div id="mxH" style="overflow:auto;direction:ltr;margin:4px auto;text-align:center"></div><div id="mxG" style="display:flex;gap:6px;justify-content:center;align-items:center;direction:ltr;margin:4px 0"></div><div id="mxP" style="display:flex;gap:5px;justify-content:center;direction:ltr"></div><div id="mxM" style="text-align:center;font-size:13px;margin:4px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn d" id="mxX" style="width:auto!important;display:inline-block!important">إغلاق</button></div>';
+  const dot=(col,s)=>'<span style="display:inline-block;width:'+s+'px;height:'+s+'px;border-radius:50%;margin:0 2px;vertical-align:middle;background:'+(col===undefined?'#343a40':COL[col])+'"></span>';
+  const bs=b=>{b.style.cssText+=';min-width:0!important;min-height:0!important;line-height:1!important;padding:0 8px;margin:0;width:auto!important;display:inline-block!important'};
+  paint=()=>{if(!$('mxH'))return;const sm=innerHeight<420,ds=sm?12:20;$('mxS').textContent='محاولة '+Math.min(hist.length+1,MAX)+' من '+MAX;
+   $('mxH').style.maxHeight=sm?'52px':'230px';
+   $('mxH').innerHTML=hist.map(h=>'<div style="white-space:nowrap;font-size:'+(sm?11:13)+'px;line-height:'+(ds+4)+'px">'+h.slice(0,4).map(v=>dot(v,ds)).join('')+' <span style="direction:rtl;unicode-bidi:isolate"> تمام '+h[4]+' · لون '+h[5]+'</span></div>').join('');$('mxH').scrollTop=9999;
+   $('mxG').innerHTML=[0,1,2,3].map(i=>dot(cur[i],sm?20:28)).join('')+'<button class="btn" id="mxD" style="height:'+(sm?24:34)+'px!important">⌫</button><button class="btn" id="mxK" style="height:'+(sm?24:34)+'px!important;background:#2f9e44">تأكيد</button>';
+   ['mxD','mxK'].forEach(id=>bs($(id)));
+   $('mxD').onclick=()=>{if(!over){cur.pop();paint()}};$('mxK').onclick=submit;
+   $('mxP').innerHTML=COL.map((c,i)=>'<button class="btn" data-c="'+i+'" style="width:'+(sm?26:38)+'px!important;height:'+(sm?26:38)+'px!important;min-width:0!important;min-height:0!important;padding:0;margin:0;border-radius:50%;background:'+c+'"></button>').join('');
+   $('mxM').textContent=msg};
+  $('mxP').onclick=e=>{const x=e.target.closest('button');if(x&&x.dataset.c!==undefined)pick(+x.dataset.c)};
+  $('mxX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
