@@ -1,4 +1,4 @@
-let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;let lndh=null;let tnkh=null;let hshh=null;
+let bpph=null;let mg2h=null;let skbh=null;let mprh=null;let dtbh=null;let tfeh=null;let bxrh=null;let slph=null;let stph=null;let ldgh=null;let wsch=null;let pnkh=null;let pkdh=null;let hilh=null;let rpsh=null;let nimh=null;let gsnh=null;let calh=null;let bjkh=null;let shph=null;let hgmh=null;let pigh=null;let mnkh=null;let rvh=null;let dbxh=null;let mmdh=null;let fdih=null;let gmkh=null;let damh=null;let snlh=null;let hxgh=null;let dmoh=null;let jamh=null;let pgsh=null;let wsgh=null;let plmh=null;let bnrh=null;let nrdh=null;let htrh=null;let ftuh=null;let slgh=null;let lndh=null;let tnkh=null;let hshh=null;let knth=null;
 function buildBpp(){
  const g=indoor(0xd6336c,0xfff0f6,0xffc2d9);
  sign(g,'🎈 تحدّي البالونات',0,4.6,-7.6,'rgba(214,51,108,.92)');
@@ -1732,6 +1732,7 @@ function buildHsh(){
  g.add(mesh(G.box(2.2,0.1,0.3),0x8d6e63,-1.1,0.65,-4.8),mesh(G.box(2.2,0.1,0.3),0x8d6e63,1.1,0.65,-4.8));
  hshh={it:{x:0,z:0.2,label:'🌉 العب لغز الجسور',fn:hshStart}};interacts.push(hshh.it);
  g.add(portalMesh('ارجع للدبابات',5.8,5.8,0x2b8a3e,'tnkroom'));
+ g.add(portalMesh('جولة الحصان',-5.8,5.8,0x5f3dc4,'kntroom'));
  scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
  toast('🌉 لغز الجسور: وصّل الجزر بجسور (واحد أو اتنين) بحيث كل جزيرة يبقى عدد جسورها زي رقمها وكل الجزر تتوصل ببعض. الجسور مفيش بينها تقاطع',5600)
 }
@@ -1773,4 +1774,42 @@ function hshStart(){
   cv.onclick=e=>{const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*S/r.width,y=(e.clientY-r.top)*S/r.height;let bi=-1,bd=26;isl.forEach((o,i)=>{const p=P(o),d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;bi=i}});if(bi>=0)tap(bi);paint()};
   $('hsN').onclick=()=>{load();paint()};
   $('hsX').onclick=()=>{$('modal').style.display='none'};
+  paint()})}
+function buildKnt(){
+ const g=indoor(0x5f3dc4,0xf3f0ff,0xd0bfff);
+ sign(g,'♞ جولة الحصان',0,4.6,-7.6,'rgba(95,61,196,.92)');
+ for(let i=0;i<4;i++)for(let j=0;j<4;j++)g.add(mesh(G.box(0.8,0.12,0.8),(i+j)%2?0x343a40:0xf1f3f5,-1.2+i*0.8,0.5,-5.9+j*0.8));
+ g.add(mesh(G.cyl(0.22,0.3,0.6),0x212529,-0.4,0.9,-5.1),mesh(G.box(0.35,0.4,0.2),0x212529,-0.3,1.35,-5.1));
+ knth={it:{x:0,z:0.2,label:'♞ العب جولة الحصان',fn:kntStart}};interacts.push(knth.it);
+ g.add(portalMesh('ارجع للجسور',5.8,5.8,0x0b7285,'hshroom'));
+ scene.add(g);room.group=g;room.bounds=7;room.pickables=[];mergeStatic(g);
+ toast('♞ جولة الحصان: ابدأ من أي مربع وقفّز بالحصان (حرف L) على كل مربعات اللوحة مرة واحدة بس. لو اتحاصرت دوس تراجع',5600)
+}
+function kntStart(){
+ const N=6,S=300,CS=S/N,MV=[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]];
+ let path,won,msg,stuck;
+ const load=()=>{path=[];won=false;stuck=false;msg='دوس أي مربع تبدأ منه'};load();
+ const vis=(x,y)=>path.some(p=>p[0]===x&&p[1]===y);
+ const opts=()=>{if(!path.length)return[];const c=path[path.length-1];return MV.map(m=>[c[0]+m[0],c[1]+m[1]]).filter(p=>p[0]>=0&&p[1]>=0&&p[0]<N&&p[1]<N&&!vis(p[0],p[1]))};
+ const tap=(x,y)=>{if(won||x<0||y<0||x>=N||y>=N)return;if(!path.length){path.push([x,y]);msg='كمّل: اللي مضوّي هو الحركات الممكنة';return}
+  if(!opts().some(p=>p[0]===x&&p[1]===y)){msg='❌ الحصان مبيروحش هناك';return}path.push([x,y]);
+  if(path.length===N*N){won=true;win()}else if(!opts().length){stuck=true;msg='🚫 اتحاصرت ('+path.length+' من '+N*N+') · دوس تراجع'}else msg='مربعات '+path.length+' من '+N*N};
+ const win=()=>{me.kntGames=(me.kntGames||0)+1;const dd=today();if(me.kntDD!==dd){me.kntDD=dd;me.kntDC=0}let cn=Math.min(3,Math.max(0,6-(me.kntDC||0)));me.kntBest=(me.kntBest||0)+1;if(cn){me.coins+=cn;me.kntDC=(me.kntDC||0)+cn;updCoins();sfx('win')}else sfx('star');msg='🏆 غطّيت اللوحة كلها!'+(cn?' +'+cn+'🪙':'');saveMe()};
+ window.kntq=()=>({path:path.map(p=>[...p]),won,stuck,msg,n:N,opts:opts().length,tap});
+ let paint=()=>{};
+ modal(c=>{
+  const bs='width:auto!important;display:inline-block!important;min-height:0!important;min-width:0!important;line-height:1!important;padding:8px 14px';
+  c.innerHTML='<h2 style="margin:4px">♞ جولة الحصان</h2><div id="kqS" style="text-align:center;font-size:12px;margin:2px"></div><canvas id="kqC" width="'+S+'" height="'+S+'" style="display:block;margin:4px auto;border-radius:8px;max-width:100%;touch-action:manipulation"></canvas><div id="kqM" style="text-align:center;font-size:12px;margin:3px 0;min-height:1.4em;overflow:hidden"></div><div class="row" style="display:flex;gap:6px;justify-content:center"><button class="btn" id="kqU" style="'+bs+'">تراجع</button><button class="btn" id="kqN" style="'+bs+'">من الأول</button><button class="btn d" id="kqX" style="'+bs+'">إغلاق</button></div>';
+  const cv=$('kqC'),cx=cv.getContext('2d');
+  if(innerHeight<420){cv.style.width='130px';cv.style.height='130px'}
+  paint=()=>{if(!$('kqC'))return;$('kqS').textContent='مربعات '+path.length+' / '+N*N;$('kqM').textContent=msg;
+   const o=opts();for(let y=0;y<N;y++)for(let x=0;x<N;x++){cx.fillStyle=(x+y)%2?'#9775fa':'#e5dbff';cx.fillRect(x*CS,y*CS,CS,CS)}
+   o.forEach(p=>{cx.fillStyle='#ffd43b';cx.fillRect(p[0]*CS+3,p[1]*CS+3,CS-6,CS-6)});
+   cx.textAlign='center';cx.textBaseline='middle';cx.font='bold 16px sans-serif';
+   path.forEach((p,i)=>{const last=i===path.length-1;cx.fillStyle=last?'#2f9e44':'#495057';cx.fillRect(p[0]*CS+5,p[1]*CS+5,CS-10,CS-10);cx.fillStyle='#fff';cx.fillText(last?'♞':String(i+1),p[0]*CS+CS/2,p[1]*CS+CS/2+1)});
+   if(path.length>1){cx.strokeStyle='#fff8';cx.lineWidth=2;cx.beginPath();path.forEach((p,i)=>{const X=p[0]*CS+CS/2,Y=p[1]*CS+CS/2;i?cx.lineTo(X,Y):cx.moveTo(X,Y)});cx.stroke()}};
+  cv.onclick=e=>{const r=cv.getBoundingClientRect();tap(Math.floor((e.clientX-r.left)*S/r.width/CS),Math.floor((e.clientY-r.top)*S/r.height/CS));paint()};
+  $('kqU').onclick=()=>{if(won)return;path.pop();stuck=false;msg=path.length?'رجعت خطوة':'دوس أي مربع تبدأ منه';paint()};
+  $('kqN').onclick=()=>{load();paint()};
+  $('kqX').onclick=()=>{$('modal').style.display='none'};
   paint()})}
